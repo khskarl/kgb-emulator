@@ -7,8 +7,12 @@
 
 class Rom {
 private:
+	/* Rom data */
 	std::shared_ptr<uint8_t> data = nullptr;
 	size_t size = 0;
+
+	/* Rom header info */
+	std::string name;
 
 	bool LoadRomFromFilepath (std::string path);
 public:
@@ -17,8 +21,9 @@ public:
 	Rom (std::string path);
 	virtual ~Rom ();
 
-	size_t GetSize();
-	uint8_t* GetData();
+	uint8_t*    GetData();
+	size_t      GetSize();
+	std::string GetName();
 };
 
 #endif

@@ -16,6 +16,7 @@ $ ./build/gameboy.out roms/tetris.gb
 ```
 
 ## TODO
+-   [ ] Port to SFML
 -   [ ] Write the emulator
 
 

@@ -54,7 +54,7 @@ std::string DisassembleRom(Rom rom) {
 	char buffer[64];
 	pc = 0x0;
 	std::string disassembledRom = "";
-	while (pc < rom.GetSize() && pc <= 0x72) {
+	while (pc < rom.GetSize()) {
 		sprintf(buffer, "%04x ", pc);
 		std::string address(buffer);
 
@@ -653,3 +653,7 @@ std::string DisassembleCB(uint8_t* code) {
 		default: return Format("Unknown CB..", "", code[0]);
 	}
 }
+
+/* References
+http://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
+*/
