@@ -77,7 +77,6 @@ void CPU::InitializeOpcodeTable() {
 	opcodes[0x7C] = &CPU::opNull; opcodes[0x7D] = &CPU::opNull;
 	opcodes[0x7E] = &CPU::opNull; opcodes[0x7F] = &CPU::opNull;
 
-
 	opcodes[0x80] = &CPU::opNull; opcodes[0x81] = &CPU::opNull;
 	opcodes[0x82] = &CPU::opNull; opcodes[0x83] = &CPU::opNull;
 	opcodes[0x84] = &CPU::opNull; opcodes[0x85] = &CPU::opNull;
@@ -151,13 +150,22 @@ void CPU::InitializeOpcodeTable() {
 	opcodes[0xFE] = &CPU::opNull; opcodes[0xFF] = &CPU::opNull;
 }
 
-void CPU::opNull () {
-	// printf("Not implemented\n");
+
+// NOP
+void CPU::op0x00 () {
+	PC += 1;
+	clockCycles = 4;
 }
 
-/* LD A,d8 */
-void CPU::op0x3E() {
+// LD A,d8
+void CPU::op0x3E () {
 	// AF.hi = MMU->ReadByte(PC + 1);
-	clockCycles = 8;
 	PC += 2;
+	clockCycles = 8;
+}
+
+/* Not implemented instructions call this function */
+void CPU::opNull () {
+	// printf("Not implemented\n");
+	// assert("Not implemented");
 }

@@ -19,7 +19,7 @@ public:
 	bool isLoaded = false;
 
 	Rom (std::string path);
-	virtual ~Rom ();
+	~Rom ();
 
 	uint8_t*    GetData();
 	size_t      GetSize();
