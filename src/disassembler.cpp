@@ -151,7 +151,6 @@ std::string DisassembleOpcode(uint8_t* code) {
 		case 0x3F: return Format("CCF",  "", code[0]); break;
 
 
-
 		/* Horizontal order */
 		case 0x40: return Format("LD", "B,B",    code[0]); break;
 		case 0x41: return Format("LD", "B,C",    code[0]); break;
@@ -290,9 +289,7 @@ std::string DisassembleOpcode(uint8_t* code) {
 		case 0xBF: return Format("CP", "A",    code[0]); break;
 
 
-
-
-
+		/* Vertical order */
 		case 0xC0: return Format("RET", "NZ", code[0]); break;
 		case 0xD0: return Format("RET", "NC", code[0]); break;
 		case 0xE0: return Format("LDH", "($%02x),A", code[0], code[1]); break;
@@ -349,13 +346,19 @@ std::string DisassembleOpcode(uint8_t* code) {
 		case 0xFA: return Format("LD", "A,($%02x%02x)", code[0], code[1], code[2]); break;
 
 		case 0xCB: return DisassembleCB(code); break;
-
+		/*   0xDB: I don't exist */
+		/*   0xEB: I don't exist */
 		case 0xFB: return Format("EI", "", code[0]); break;
 
 		case 0xCC: return Format("CALL", "Z,$%02x%02x", code[0], code[1], code[2]); break;
 		case 0xDC: return Format("CALL", "C,$%02x%02x", code[0], code[1], code[2]); break;
+		/*   0xEC: I don't exist */
+		/*   0xFC: I don't exist */
 
 		case 0xCD: return Format("CALL", "$%02x%02x", code[0], code[1], code[2]); break;
+		/*   0xDD: I don't exist */
+		/*   0xED: I don't exist */
+		/*   0xFD: I don't exist */
 
 		case 0xCE: return Format("ADC", "A,$%02x", code[0], code[1]); break;
 		case 0xDE: return Format("SBC", "A,$%02x", code[0], code[1]); break;
@@ -646,7 +649,7 @@ std::string DisassembleCB(uint8_t* code) {
 		case 0xFD: return Format("SET", "7,L", code[0]); break;
 		case 0xFE: return Format("SET", "7,(HL)", code[0]); break;
 		case 0xFF: return Format("SET", "7,A", code[0]); break;
-				
+
 		default: return Format("Unknown CB..", "", code[0]);
 	}
 }
