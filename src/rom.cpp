@@ -38,3 +38,7 @@ bool Rom::LoadRomFromFilepath (std::string path) {
 uint8_t* Rom::GetData () {
 	return this->data.get();
 }
+
+size_t Rom::GetSize () {
+	return this->size;
+}
