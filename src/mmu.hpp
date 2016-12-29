@@ -25,15 +25,15 @@ public:
 
 	void Initialize(CPU* const  _cpu);
 
-	uint8_t  ReadByte (uint16_t address);
-	uint16_t ReadWord (uint16_t address);
-	void WriteByte (uint16_t address, uint8_t value);
-	void WriteWord (uint16_t address, uint8_t value);
+	uint8_t  ReadByte  (uint16_t address);
+	uint16_t ReadWord  (uint16_t address);
+	void     WriteByte (uint16_t address, uint8_t  value);
+	void     WriteWord (uint16_t address, uint16_t value);
 
 	void WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize);
 
 	uint8_t* GetRomRef (uint16_t address);
-
+	uint8_t* GetMemoryRef (uint16_t address);
 };
 
 #endif

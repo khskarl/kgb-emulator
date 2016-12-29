@@ -195,7 +195,7 @@ void CPU::op0x10 () {
 	PC += 2;
 	clockCycles = 4;
 }
-// JR NC,r8
+// JR NZ,r8
 // JR NC,r8
 
 // LD BC,D16
@@ -600,6 +600,13 @@ void CPU::op0x0F () {
 // RST 18H
 // RST 28H
 // RST 38H
+void CPU::op0xFF () {
+	SP -= 2;
+	mmu.WriteWord(SP, PC);
+
+	PC = 0x38;
+	clockCycles = 8;
+}
 
 
 
