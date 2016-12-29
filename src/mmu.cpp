@@ -97,7 +97,7 @@ uint16_t MMU::ReadWord (uint16_t address) {
 
 void MMU::WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize) {
 	assert(buffer != nullptr);
-	assert(bufferSize > 0 && bufferSize < 32768);
+	assert(bufferSize > 0 && bufferSize <= 32768);
 	std::memcpy(rom, buffer, bufferSize);
 }
 

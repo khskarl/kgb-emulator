@@ -339,6 +339,11 @@ void CPU::op0x0E () {
 // LD E,d8
 // LD L,d8
 // LD A,d8
+void CPU::op0x3E () {
+	AF.hi = mmu.ReadByte(PC + 1);
+	PC += 2;
+	clockCycles = 8;
+}
 
 // RRCA
 void CPU::op0x0F () {
@@ -350,14 +355,234 @@ void CPU::op0x0F () {
 // CPL
 // CCF
 
+/* 4. instructions */
+// LD B,B
+// LD B,C
+// LD B,D
+// LD B,E
+// LD B,H
+// LD B,L
+// LD B,(HL)
+// LD B,A
+// LD C,B
+// LD C,C
+// LD C,D
+// LD C,E
+// LD C,H
+// LD C,L
+// LD C,(HL)
+// LD C,A
+
+/* 5. instructions */
+// LD D,B
+// LD D,C
+// LD D,D
+// LD D,E
+// LD D,H
+// LD D,L
+// LD D,(HL)
+// LD D,A
+// LD E,B
+// LD E,C
+// LD E,D
+// LD E,E
+// LD E,H
+// LD E,L
+// LD E,(HL)
+// LD E,A
+
+/* 6. instructions */
+// LD H,B
+// LD H,C
+// LD H,D
+// LD H,E
+// LD H,H
+// LD H,L
+// LD H,(HL)
+// LD H,A
+// LD L,B
+// LD L,C
+// LD L,D
+// LD L,E
+// LD L,H
+// LD L,L
+// LD L,(HL)
+// LD L,A
+
+/* 7. instructions
+// LD (HL),B
+// LD (HL),C
+// LD (HL),D
+// LD (HL),E
+// LD (HL),H
+// LD (HL),L
+// HALT
+// LD (HL),A
+// LD A,B
+// LD A,C
+// LD A,D
+// LD A,E
+// LD A,H
+// LD A,L
+// LD A,(HL)
+// LD A,A
+
+/* 8. instructions */
+// ADD A,B
+// ADD A,C
+// ADD A,D
+// ADD A,E
+// ADD A,H
+// ADD A,L
+// ADD A,(HL)
+// ADD A,A
+// ADC A,B
+// ADC A,C
+// ADC A,D
+// ADC A,E
+// ADC A,H
+// ADC A,L
+// ADC A,(HL)
+// ADC A,A
+
+/* 9. instructions */
+// SUB B
+// SUB C
+// SUB D
+// SUB E
+// SUB H
+// SUB L
+// SUB (HL)
+// SUB A
+// SBC A,B
+// SBC A,C
+// SBC A,D
+// SBC A,E
+// SBC A,H
+// SBC A,L
+// SBC A,(HL)
+// SBC A,A
+
+/* A. instructions */
+// AND B
+// AND C
+// AND D
+// AND E
+// AND H
+// AND L
+// AND (HL)
+// AND A
+// XOR B
+// XOR C
+// XOR D
+// XOR E
+// XOR H
+// XOR L
+// XOR (HL)
+// XOR A
+
+/* B. instructions */
+// OR B
+// OR C
+// OR D
+// OR E
+// OR H
+// OR L
+// OR (HL)
+// OR A
+// CP B
+// CP C
+// CP D
+// CP E
+// CP H
+// CP L
+// CP (HL)
+// CP A
 
 
-// LD A,d8
-void CPU::op0x3E () {
-	AF.hi = mmu.ReadByte(PC + 1);
-	PC += 2;
-	clockCycles = 8;
-}
+/*  */
+// RET NZ
+// RET NC
+// LDH (a8),A
+// LDH A,(a8)
+
+// POP BC
+// POP DE
+// POP HL
+// POP AF
+
+// JP NZ,a16
+// JP NC,a16
+// LD (C),A
+// LD A,(C)
+
+// JP a16
+// D3..: I don't exist
+// E3..: I don't exist
+// DI
+
+// CALL NZ,a16
+// CALL NC,a16
+// E4..: I don't exist
+// F4..: I don't exist
+
+// PUSH BC
+// PUSH DE
+// PUSH HL
+// PUSH AF
+
+// ADD A,d8
+// SUB d8
+// AND d8
+// OR d8
+
+// RST 00H
+// RST 10H
+// RST 20H
+// RST 30H
+
+// RET Z
+// RET C
+// ADD SP,r8
+// LD HL,SP+r8
+
+// RET
+// RETI
+// JP (HL)
+// LD SP,HL
+
+// JP Z,a16
+// JP C,a16
+// LD (a16),A
+// LD A,(a16)
+
+// PREFIX CB
+// DB..: I don't exist
+// EB..: I don't exist
+// EI
+
+// CALL Z,a16
+// CALL C,a16
+// EC..: I don't exist
+// FC..: I don't exist
+
+
+// CALL a16
+// DD..: I don't exist
+// ED..: I don't exist
+// FD..: I don't exist
+
+// ADC A,d8
+// SBC A,d8
+// XOR A,d8
+// CP  A,d8
+
+// RST 08H
+// RST 18H
+// RST 28H
+// RST 38H
+
+
 
 /* Not implemented instructions call this function */
 void CPU::opNull () {
