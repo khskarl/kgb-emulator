@@ -66,7 +66,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x2C] = &CPU::opNull; opcodes[0x2D] = &CPU::opNull;
 	opcodes[0x2E] = &CPU::opNull; opcodes[0x2F] = &CPU::opNull;
 
-	opcodes[0x30] = &CPU::opNull; opcodes[0x31] = &CPU::opNull;
+	opcodes[0x30] = &CPU::opNull; opcodes[0x31] = &CPU::op0x31;
 	opcodes[0x32] = &CPU::opNull; opcodes[0x33] = &CPU::opNull;
 	opcodes[0x34] = &CPU::opNull; opcodes[0x35] = &CPU::opNull;
 	opcodes[0x36] = &CPU::opNull; opcodes[0x37] = &CPU::opNull;
@@ -207,6 +207,12 @@ void CPU::op0x01 () {
 // LD DE,D16
 // LD HL,D16
 // LD SP,D16
+void CPU::op0x31 () {
+	SP = mmu.ReadWord(PC + 1);
+
+	PC += 3;
+	clockCycles = 12;
+}
 
 
 
@@ -409,7 +415,7 @@ void CPU::op0x0F () {
 // LD L,(HL)
 // LD L,A
 
-/* 7. instructions
+/* 7. instructions */
 // LD (HL),B
 // LD (HL),C
 // LD (HL),D
