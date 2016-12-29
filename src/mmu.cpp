@@ -1,17 +1,20 @@
 #include "mmu.hpp"
+#include "cpu.hpp"
+
+#include "debug.hpp"
 
 MMU::MMU (CPU* _cpu) {
-	// if (master == nullptr) {
-	// 	assert("Invalid CPU passed as constructor argument");
-	// }
+	if (cpu == nullptr) {
+		assert("Invalid CPU passed as constructor argument");
+	}
 	this->cpu = _cpu;
 }
 
-MMU::~MMU () {
-
-}
+MMU::~MMU () {}
 
 uint8_t MMU::ReadByte (uint16_t address) {
+	assert(address >= 0x0000 && address <= 0xFFFF);
+
 	switch (address & 0xF000) {
 		/* BIOS / ROM0 */
 		case 0x0000:
@@ -76,10 +79,10 @@ uint8_t MMU::ReadByte (uint16_t address) {
 					return zram[address & 0x7F];
 			}
 			else
-				return 0;
+				return 0; // FIXME
 		}
 		default:
-		// assert blablabla
+			assert("ReadByte is trying to access an invalid address");
 		return 0;
 		break;
 

@@ -2,7 +2,8 @@
 #define MMU_HPP
 
 #include <stdint.h>
-#include "cpu.hpp"
+
+class CPU;
 
 class MMU {
 private:

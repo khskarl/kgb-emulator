@@ -44,7 +44,7 @@ std::string Format (const char* mnemonic, const char* args, uint8_t op, uint8_t 
 	char format[64];
 	sprintf(format, "%%02x %%02x %%02x  %%-5s %s", args);
 	char buffer[128];
-	sprintf(buffer, format, op, x, y, mnemonic, x, y);
+	sprintf(buffer, format, op, y, x, mnemonic, y, x);
 	return std::string(buffer);
 }
 
@@ -68,7 +68,6 @@ std::string DisassembleRom(Rom rom) {
 std::string DisassembleCB(uint8_t* code);
 
 std::string DisassembleOpcode(uint8_t* code) {
-
 	switch (code[0]) {
 		case 0x00: return Format("NOP",  "",  code[0]); break;
 		case 0x10: return Format("STOP",	 "0", code[0]); break;
@@ -374,9 +373,11 @@ std::string DisassembleOpcode(uint8_t* code) {
 	}
 }
 
-
-// TODO: Disassemble CB.. instructions
 std::string DisassembleCB(uint8_t* code) {
+
+	/* Every 0xCB.. instruction is 2 bytes, so we add one byte more to PC */
+	pc += 1;
+
 	switch (code[1]) {
 		case 0x00: return Format("RLC", "B", code[0]); break;
 		case 0x01: return Format("RLC", "C", code[0]); break;

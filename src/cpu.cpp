@@ -1,18 +1,33 @@
 #include "cpu.hpp"
 
+#include "debug.hpp"
+
 void CPU::Initialize() {
+	AF.word = 0;
+	BC.word = 0;
+	DE.word = 0;
+	HL.word = 0;
+
+	SP = 0x0;
+	PC = 0x0;
+
+	Z = 0, N = 0, H = 0, C = 0;
+	clockCycles = 0;
+
+	mmu = MMU(this);
+
 	this->InitializeOpcodeTable();
 }
 
 void CPU::InitializeOpcodeTable() {
-	opcodes[0x00] = &CPU::opNull; opcodes[0x01] = &CPU::opNull;
-	opcodes[0x02] = &CPU::opNull; opcodes[0x03] = &CPU::opNull;
-	opcodes[0x04] = &CPU::opNull; opcodes[0x05] = &CPU::opNull;
-	opcodes[0x06] = &CPU::opNull; opcodes[0x07] = &CPU::opNull;
-	opcodes[0x08] = &CPU::opNull; opcodes[0x09] = &CPU::opNull;
-	opcodes[0x0A] = &CPU::opNull; opcodes[0x0B] = &CPU::opNull;
-	opcodes[0x0C] = &CPU::opNull; opcodes[0x0D] = &CPU::opNull;
-	opcodes[0x0E] = &CPU::opNull; opcodes[0x0F] = &CPU::opNull;
+	opcodes[0x00] = &CPU::op0x00; opcodes[0x01] = &CPU::op0x01;
+	opcodes[0x02] = &CPU::op0x02; opcodes[0x03] = &CPU::op0x03;
+	opcodes[0x04] = &CPU::op0x04; opcodes[0x05] = &CPU::op0x05;
+	opcodes[0x06] = &CPU::op0x06; opcodes[0x07] = &CPU::op0x07;
+	opcodes[0x08] = &CPU::op0x08; opcodes[0x09] = &CPU::op0x09;
+	opcodes[0x0A] = &CPU::op0x0A; opcodes[0x0B] = &CPU::op0x0B;
+	opcodes[0x0C] = &CPU::op0x0C; opcodes[0x0D] = &CPU::op0x0D;
+	opcodes[0x0E] = &CPU::op0x0E; opcodes[0x0F] = &CPU::op0x0F;
 
 	opcodes[0x10] = &CPU::opNull; opcodes[0x11] = &CPU::opNull;
 	opcodes[0x12] = &CPU::opNull; opcodes[0x13] = &CPU::opNull;
@@ -156,16 +171,176 @@ void CPU::op0x00 () {
 	PC += 1;
 	clockCycles = 4;
 }
+// STOP 0
+void CPU::op0x10 () {
+	PC += 2;
+	clockCycles = 4;
+}
+// JR NC,r8
+// JR NC,r8
+
+// LD BC,D16
+void CPU::op0x01 () {
+	opNull();
+	PC += 3;
+	clockCycles = 12;
+}
+// LD DE,D16
+// LD HL,D16
+// LD SP,D16
+
+
+
+// LD (BC),A
+void CPU::op0x02 () {
+	opNull();
+	PC += 1;
+	clockCycles = 8;
+}
+// LD (DE),A
+// LD (HL+),A
+// LD (HL-),A
+
+// INC BC
+void CPU::op0x03 () {
+	opNull();
+	PC += 1;
+	clockCycles = 8;
+}
+// INC DE
+// INC HL
+// INC SP
+
+// INC B
+void CPU::op0x04 () {
+	opNull();
+	PC += 1;
+	clockCycles = 4;
+}
+// INC D
+// INC H
+// INC (HL)
+
+// DEC B
+void CPU::op0x05 () {
+	opNull();
+	PC += 1;
+	clockCycles = 4;
+}
+// DEC D
+// DEC H
+// DEC (HL)
+
+// LD B,d8
+void CPU::op0x06 () {
+	opNull();
+	PC += 2;
+	clockCycles = 8;
+}
+// LD D,d8
+// LD H,d8
+// LD (HL),d8
+
+// RLCA
+void CPU::op0x07 () {
+	opNull();
+	PC += 1;
+	clockCycles = 4;
+}
+// RLA
+// DAA
+// SCF
+
+// LD (a16),SP
+void CPU::op0x08 () {
+	opNull();
+	PC += 3;
+	clockCycles = 20;
+}
+// JR r8
+// JR Z,r8
+// JR C,r8
+
+// ADD HL,BC
+void CPU::op0x09 () {
+	opNull();
+	PC += 1;
+	clockCycles = 8;
+}
+// ADD HL,DE
+// ADD HL,HL
+// ADD HL,SP
+
+// LD A,(BC)
+void CPU::op0x0A () {
+	opNull();
+	PC += 1;
+	clockCycles = 8;
+}
+// LD A,(DE)
+// LD A,(HL+)
+// LD A,(HL-)
+
+// DEC BC
+void CPU::op0x0B () {
+	opNull();
+	PC += 1;
+	clockCycles = 8;
+}
+// DEC DE
+// DEC HL
+// DEC SP
+
+// INC C
+void CPU::op0x0C () {
+	opNull();
+	PC += 1;
+	clockCycles = 4;
+}
+// INC E
+// INC L
+// INC A
+
+// DEC C
+void CPU::op0x0D () {
+	opNull();
+	PC += 1;
+	clockCycles = 4;
+}
+// DEC E
+// DEC L
+// DEC A
+
+// LD C,d8
+void CPU::op0x0E () {
+	opNull();
+	PC += 2;
+	clockCycles = 8;
+}
+// LD E,d8
+// LD L,d8
+// LD A,d8
+
+// RRCA
+void CPU::op0x0F () {
+	opNull();
+	PC += 1;
+	clockCycles = 4;
+}
+// RRA
+// CPL
+// CCF
+
+
 
 // LD A,d8
 void CPU::op0x3E () {
-	// AF.hi = MMU->ReadByte(PC + 1);
+	AF.hi = mmu.ReadByte(PC + 1);
 	PC += 2;
 	clockCycles = 8;
 }
 
 /* Not implemented instructions call this function */
 void CPU::opNull () {
-	// printf("Not implemented\n");
-	// assert("Not implemented");
+	assert("Not implemented");
 }
