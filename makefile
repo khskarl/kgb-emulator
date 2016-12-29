@@ -21,10 +21,11 @@ OBJ_FILES := $(addprefix $(OBJDIR)/, $(notdir $(CPP_FILES:.cpp=.o)))
 # Creates obj folder
 dummy_make_folder := $(shell mkdir -p $(OBJDIR) $(BUILDDIR))
 
-debug: CXXFLAGS += -DDEBUG -g
-debug: $(BUILDDIR)/$(EXE)
 
 all: $(BUILDDIR)/$(EXE)
+
+debug: CXXFLAGS += -DDEBUG -g
+debug: $(BUILDDIR)/$(EXE)
 
 $(BUILDDIR)/$(EXE): $(OBJ_FILES)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
