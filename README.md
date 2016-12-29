@@ -16,10 +16,16 @@ $ ./build/gameboy.out roms/tetris.gb
 ```
 
 ## TODO
--   [ ] Port to SFML
+-   [x] Port to SFML
 -   [ ] Write the emulator
 
 
 ## Known bugs
-
 -   It doesn't work
+
+
+## References & Game Boy documentation
+-   [DuoDreamer's GameBoy Memory map](http://gameboy.mongenel.com/dmg/asmmemmap.html)
+-   [RealBoy in-depth blog](https://realboyemulator.wordpress.com/)
+-   [Pan Docs GameBoy Documentation](http://bgb.bircd.org/pandocs.htm)
+-   [Pastraiser's GameBoy CPU instruction table](http://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html)
