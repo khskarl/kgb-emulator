@@ -1,9 +1,9 @@
 #ifndef CPU_HPP
 #define CPU_HPP
 
-#include <stdint.h>
-
+#include <cstdint>
 #include "mmu.hpp"
+#include "rom.hpp"
 
 /* This structure allows a simple way to access lo/hi bytes from a 16bit */
 /* Example
@@ -45,14 +45,15 @@ public:
 	~CPU ();
 
 	void Initialize ();
+	void LoadRom (const Rom& rom);
 	void EmulateCycle ();
 	void FetchOpcode ();
 	void EmulateOpcode ();
 
 private:
 	/* Instruction tables */
-	void (CPU::*opcodes  [0xFF]) ();
-	void (CPU::*opcodesCB[0xFF]) ();
+	void (CPU::*opcodes  [256]) ();
+	void (CPU::*opcodesCB[256]) ();
 
 	/* Instructions */
 	void op0x00 (); void op0x01 (); void op0x02 (); void op0x03 ();

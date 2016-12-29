@@ -2,16 +2,19 @@
 #define CONTEXT_HPP
 
 #include <stdint.h>
+#include <string>
 
 namespace Context {
-void SetKeymap (uint8_t* argKeypad);
-bool SetupContext ();
+
+bool SetupContext (int scale);
 void DestroyContext ();
-void UpdateKeypad ();
 void HandleEvents ();
-void Draw (uint8_t displayBuffer[64 * 32]);
-void Sleep (float ms);
-bool ShouldQuit ();
-}
+void RenderDisplay ();
+void SetTitle (std::string title);
+bool IsOpen ();
+void SetDisplayBuffer (uint8_t* buffer);
+void CopyDisplayBuffer (uint8_t* buffer);
+
+};
 
 #endif

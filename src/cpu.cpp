@@ -1,8 +1,13 @@
 #include "cpu.hpp"
-
+#include "mmu.hpp"
 #include "debug.hpp"
 
-void CPU::Initialize() {
+CPU::CPU () {
+}
+
+CPU::~CPU () {}
+
+void CPU::Initialize () {
 	AF.word = 0;
 	BC.word = 0;
 	DE.word = 0;
@@ -14,12 +19,14 @@ void CPU::Initialize() {
 	Z = 0, N = 0, H = 0, C = 0;
 	clockCycles = 0;
 
-	mmu = MMU(this);
-
 	this->InitializeOpcodeTable();
 }
 
-void CPU::InitializeOpcodeTable() {
+void CPU::LoadRom (const Rom& rom) {
+	mmu.WriteBufferToRom(rom.GetData(), rom.GetSize());
+}
+
+void CPU::InitializeOpcodeTable () {
 	opcodes[0x00] = &CPU::op0x00; opcodes[0x01] = &CPU::op0x01;
 	opcodes[0x02] = &CPU::op0x02; opcodes[0x03] = &CPU::op0x03;
 	opcodes[0x04] = &CPU::op0x04; opcodes[0x05] = &CPU::op0x05;

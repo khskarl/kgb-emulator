@@ -32,14 +32,14 @@ bool Rom::LoadRomFromFilepath (std::string path) {
 	return true;
 }
 
-uint8_t* Rom::GetData () {
+uint8_t* const Rom::GetData () const {
 	return this->data.get();
 }
 
-size_t Rom::GetSize () {
+const size_t Rom::GetSize () const {
 	return this->size;
 }
 
-std::string Rom::GetName () {
+const std::string Rom::GetName () const {
 	return this->name;
 }

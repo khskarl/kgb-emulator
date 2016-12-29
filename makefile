@@ -2,18 +2,18 @@
 # http://stackoverflow.com/questions/10189931/including-multiple-sub-directories-in-a-make-file
 
 # Executable name
-EXE = gameboy.out
+EXE := gameboy.out
 
 # C++ compiler
-CXX = g++
-RM = -rm -rf
+CXX := clang++
+RM := -rm -rf
 # Compiler and dynamic link flags:
-CXXFLAGS  = -std=c++14 -Wall
-LDFLAGS   = -I/usr/include/SDL2 -lSDL2
+CXXFLAGS  := -std=c++14 -Wall
+LDFLAGS   := -lsfml-graphics -lsfml-window -lsfml-system
 # Directories
-SRCDIR = src
-OBJDIR = obj
-BUILDDIR = build
+SRCDIR := src
+OBJDIR := obj
+BUILDDIR := build
 # Files
 CPP_FILES := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/context/*.cpp)
 OBJ_FILES := $(addprefix $(OBJDIR)/, $(notdir $(CPP_FILES:.cpp=.o)))
@@ -29,11 +29,11 @@ $(BUILDDIR)/$(EXE): $(OBJ_FILES)
 
 # Object recipe for .cpp in source directory
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 # Object recipe for .cpp in source directory
 $(OBJDIR)/%.o: $(SRCDIR)/context/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
 	$(RM) *.out

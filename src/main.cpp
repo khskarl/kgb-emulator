@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "context/context.hpp"
+#include "cpu.hpp"
 #include "disassembler.hpp"
 #include "rom.hpp"
 
@@ -24,8 +25,24 @@ int main(int argc, char const *argv[]) {
 		             "Name: " << rom.GetName() << '\n' <<
 		             "Size: " << rom.GetSize() << " B\n";
 
-		std::cout << DisassembleRom(rom) << '\n';
+		// std::cout << DisassembleRom(rom) << '\n';
 	}
+
+	CPU cpu;
+	cpu.Initialize();
+	cpu.LoadRom(rom);
+
+
+
+	Context::SetupContext(3);
+	Context::SetTitle("MyGameBoy | " + rom.GetName());
+
+	while (Context::IsOpen()) {
+		Context::HandleEvents();
+		Context::RenderDisplay();
+	}
+
+	Context::DestroyContext();
 
 	return 0;
 }

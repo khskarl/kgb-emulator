@@ -1,16 +1,18 @@
 #include "mmu.hpp"
 #include "cpu.hpp"
 
+#include <cstring> // std::memcpy
 #include "debug.hpp"
 
-MMU::MMU (CPU* _cpu) {
+MMU::MMU () {}
+MMU::~MMU () {}
+
+void MMU::Initialize (CPU* const  _cpu) {
 	if (cpu == nullptr) {
 		assert("Invalid CPU passed as constructor argument");
 	}
 	this->cpu = _cpu;
 }
-
-MMU::~MMU () {}
 
 uint8_t MMU::ReadByte (uint16_t address) {
 	assert(address >= 0x0000 && address <= 0xFFFF);
@@ -22,7 +24,7 @@ uint8_t MMU::ReadByte (uint16_t address) {
 			if (address < 0x0100)
 				return bios[address];
 			else if (cpu->PC == 0x100)
-				this->inBios = false;
+				this->inBios = false; // TODO: Move this check to another place
 		}
 		return rom[address];
 		break;
@@ -64,7 +66,7 @@ uint8_t MMU::ReadByte (uint16_t address) {
 		/* Working RAM shadow, I/O, Zero-page RAM */
 		case 0xF000:
 		{
-			uint8_t lo = address & 0x0F00;
+			uint16_t lo = address & 0x0F00;
 			if (0x000 <= lo && lo <= 0xD00) {
 				return wram[address & 0x1FFF];
 			}
@@ -79,7 +81,7 @@ uint8_t MMU::ReadByte (uint16_t address) {
 					return zram[address & 0x7F];
 			}
 			else
-				return 0; // FIXME
+				return 0;
 		}
 		default:
 			assert("ReadByte is trying to access an invalid address");
@@ -93,5 +95,8 @@ uint16_t MMU::ReadWord (uint16_t address) {
 	return ReadByte(address) | (ReadByte(address + 1) << 8);
 }
 
-// References
-// http://imrannazar.com/GameBoy-Emulation-in-JavaScript:-Memory
+void MMU::WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize) {
+	assert(buffer != nullptr);
+	assert(bufferSize > 0 && bufferSize < 32768);
+	std::memcpy(rom, buffer, bufferSize);
+}

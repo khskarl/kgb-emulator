@@ -1,134 +1,97 @@
 #include "context.hpp"
 
+#include <SFML/Graphics.hpp>
+
 #include <iostream>
-#include <SDL.h>
+#include <cstdlib>
+#include "../debug.hpp"
 
-static SDL_Window *window = nullptr;
-static SDL_Renderer *renderer = nullptr;
-static SDL_Texture *texture = nullptr;
+static sf::RenderWindow window;
+static sf::Texture displayTexture;
+static sf::Sprite displaySprite; // SFML needs a sprite to render a texture
+static uint8_t* displayBuffer = nullptr;
 
-static bool shouldQuit = false;
+// Placeholder
+uint8_t pixels[160 * 144 * 4];
 
-static uint8_t* keypad;
+bool Context::SetupContext (int scale = 1) {
+	window.create(sf::VideoMode(160 * scale, 144 * scale), "Hello SFML! :D");
 
-void Context::SetKeymap (uint8_t* keypadMemory) {
-	keypad = keypadMemory;
-}
+	displayTexture.create(160, 144);
+	displayTexture.setSmooth(false);
+	displaySprite.setTexture(displayTexture);
 
-bool Context::SetupContext () {
-	if (SDL_Init(SDL_INIT_VIDEO) != 0){
-		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-		return false;
+	sf::Vector2u textureSize = displayTexture.getSize();
+	sf::Vector2u windowSize = window.getSize();
+
+	float scaleX = (float) windowSize.x / textureSize.x;
+	float scaleY = (float) windowSize.y / textureSize.y;
+
+	displaySprite.setScale(scaleX, scaleY);
+
+	for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
+		int luminosity = rand() % 256;
+		pixels[i] = luminosity;
+		pixels[i + 1] = luminosity;
+		pixels[i + 2] = luminosity;
+		pixels[i + 3] = 255;
 	}
 
-	int scale = 10;
-	int flags = SDL_WINDOW_RESIZABLE;
-	window = SDL_CreateWindow("Chip8 Emulator",
-	                          SDL_WINDOWPOS_CENTERED,
-	                          SDL_WINDOWPOS_CENTERED,
-	                          64 * scale, 32 * scale,
-	                          flags);
-
-	if (window == nullptr) {
-		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
-		DestroyContext();
-		return false;
-	}
-
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (renderer == nullptr) {
-		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
-		DestroyContext();
-		return false;
-	}
-
-	texture = SDL_CreateTexture(renderer,
-	                            SDL_GetWindowPixelFormat(window),
-	                            SDL_TEXTUREACCESS_TARGET,
-	                            64, 32);
-
-	if (texture == nullptr) {
-		std::cout << "SDL_CreateTexture Error: " << SDL_GetError() << std::endl;
-		DestroyContext();
-	}
-
-	shouldQuit = false;
 
 	return true;
 }
 
 void Context::DestroyContext () {
-	if (texture)
-		SDL_DestroyTexture(texture);
-	if (renderer)
-		SDL_DestroyRenderer(renderer);
-	if (window)
-		SDL_DestroyWindow(window);
-
-	SDL_Quit();
-}
-
-void Context::UpdateKeypad () {
-	const uint8_t *keys = SDL_GetKeyboardState(NULL);
-	keypad[0x1] = keys[SDL_SCANCODE_1];
-	keypad[0x2] = keys[SDL_SCANCODE_2];
-	keypad[0x3] = keys[SDL_SCANCODE_3];
-	keypad[0xC] = keys[SDL_SCANCODE_4];
-	keypad[0x4] = keys[SDL_SCANCODE_Q];
-	keypad[0x5] = keys[SDL_SCANCODE_W];
-	keypad[0x6] = keys[SDL_SCANCODE_E];
-	keypad[0xD] = keys[SDL_SCANCODE_R];
-	keypad[0x7] = keys[SDL_SCANCODE_A];
-	keypad[0x8] = keys[SDL_SCANCODE_S];
-	keypad[0x9] = keys[SDL_SCANCODE_D];
-	keypad[0xE] = keys[SDL_SCANCODE_F];
-	keypad[0xA] = keys[SDL_SCANCODE_Z];
-	keypad[0x0] = keys[SDL_SCANCODE_X];
-	keypad[0xB] = keys[SDL_SCANCODE_C];
-	keypad[0xF] = keys[SDL_SCANCODE_V];
+	if (window.isOpen())
+		window.close();
 }
 
 void Context::HandleEvents () {
-	SDL_Event event;
-
-	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_QUIT)
-			shouldQuit = true;
-		if (event.type == SDL_KEYDOWN) {
-			switch (event.key.keysym.sym) {
-				case SDLK_ESCAPE:
-				shouldQuit = true;
-				break;
+	sf::Event event;
+	while (window.pollEvent(event)) {
+		if (event.type == sf::Event::Closed)
+			window.close();
+		else if (event.type == sf::Event::KeyPressed) {
+			if (event.key.code == sf::Keyboard::Escape) {
+				window.close();
 			}
 		}
 	}
 }
 
-void Context::Draw (uint8_t displayBuffer[64 * 32]) {
-	SDL_SetRenderTarget(renderer, texture);
+void Context::RenderDisplay () {
+	window.clear();
+	displayTexture.update(pixels);
+	window.draw(displaySprite);
 
-	SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
-	SDL_RenderClear(renderer);
+	window.display();
+}
 
-	SDL_SetRenderDrawColor(renderer, 210, 210, 210, 255);
-	for (int i = 0; i < 32; i++) {
-		for (int j = 0; j < 64; j++) {
-			if (displayBuffer[i * 64 + j]) {
-				SDL_RenderDrawPoint(renderer, j, i);
-			}
-		}
+void Context::SetTitle (std::string title) {
+	window.setTitle(title);
+}
+
+bool Context::IsOpen () {
+	return window.isOpen();
+}
+
+// TODO: Use opengl texture binding and GL_R8UI color format to use the VRAM di-
+//rectly as a pixel buffer.
+// http://fr.sfml-dev.org/forums/index.php?topic=17847.0
+// http://www.sfml-dev.org/documentation/2.4.1/classsf_1_1Texture.php
+void Context::SetDisplayBuffer (uint8_t* buffer) {
+	displayBuffer = buffer;
+}
+
+// HACK: Temporary solution
+// Instead of accessing the VRAM memory directly, we convert it's contents to a
+//color format that SFML can understand.
+void Context::CopyDisplayBuffer (uint8_t* buffer) {
+	for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
+		int luminosity = buffer[i / 4];
+		pixels[i] = luminosity;
+		pixels[i + 1] = luminosity;
+		pixels[i + 2] = luminosity;
+		pixels[i + 3] = 255;
 	}
-
-	SDL_SetRenderTarget(renderer, NULL);
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
-
-	SDL_RenderPresent(renderer);
-}
-
-void Context::Sleep (float ms) {
-	SDL_Delay(ms);
-}
-
-bool Context::ShouldQuit () {
-	return shouldQuit;
 }

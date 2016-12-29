@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 class CPU;
-
 class MMU {
 private:
 	bool inBios = true;
@@ -21,14 +20,22 @@ private:
 
 	CPU* cpu = nullptr;
 public:
-	MMU (CPU* _cpu);
+	MMU ();
 	~MMU ();
+
+	void Initialize(CPU* const  _cpu);
 
 	uint8_t  ReadByte (uint16_t address);
 	uint16_t ReadWord (uint16_t address);
 	void WriteByte (uint16_t address, uint8_t value);
 	void WriteWord (uint16_t address, uint8_t value);
 
+	void WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize);
+
 };
 
 #endif
+
+// References
+// http://imrannazar.com/GameBoy-Emulation-in-JavaScript:-Memory
+// http://gameboy.mongenel.com/dmg/asmmemmap.html

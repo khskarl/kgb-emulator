@@ -21,9 +21,9 @@ public:
 	Rom (std::string path);
 	~Rom ();
 
-	uint8_t*    GetData();
-	size_t      GetSize();
-	std::string GetName();
+	uint8_t* const    GetData() const;
+	const size_t      GetSize() const;
+	const std::string GetName() const;
 };
 
 #endif
