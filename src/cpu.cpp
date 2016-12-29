@@ -373,12 +373,22 @@ void CPU::op0x0D () {
 
 // LD C,d8
 void CPU::op0x0E () {
-	opNull();
+	BC.hi = mmu.ReadByte(PC + 1);
 	PC += 2;
 	clockCycles = 8;
 }
 // LD E,d8
+void CPU::op0x1E () {
+	DE.lo = mmu.ReadByte(PC + 1);
+	PC += 2;
+	clockCycles = 8;
+}
 // LD L,d8
+void CPU::op0x2E () {
+	HL.lo = mmu.ReadByte(PC + 1);
+	PC += 2;
+	clockCycles = 8;
+}
 // LD A,d8
 void CPU::op0x3E () {
 	AF.hi = mmu.ReadByte(PC + 1);
