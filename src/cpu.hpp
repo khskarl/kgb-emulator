@@ -12,13 +12,25 @@
 	uint8_t L = HL.lo;
 */
 
-typedef union {
+union reg16_t {
 	struct {
 		uint8_t lo;
 		uint8_t hi;
 	};
 	uint16_t word;
-} reg16_t;
+
+	reg16_t& operator=(const reg16_t& rhs)
+	{
+		word = rhs.word;
+		return *this;
+	}
+
+	reg16_t& operator=(const uint16_t& rhs)
+	{
+		word = rhs;
+		return *this;
+	}
+};
 
 class CPU {
 private:

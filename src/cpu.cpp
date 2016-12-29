@@ -11,10 +11,10 @@ CPU::CPU () {
 CPU::~CPU () {}
 
 void CPU::Initialize () {
-	AF.word = 0;
-	BC.word = 0;
-	DE.word = 0;
-	HL.word = 0;
+	AF = 0;
+	BC = 0;
+	DE = 0;
+	HL = 0;
 
 	SP = 0x0;
 	PC = 0x0;
@@ -200,12 +200,25 @@ void CPU::op0x10 () {
 
 // LD BC,D16
 void CPU::op0x01 () {
-	opNull();
+	BC = mmu.ReadWord(PC + 1);
+
 	PC += 3;
 	clockCycles = 12;
 }
 // LD DE,D16
+void CPU::op0x11 () {
+	DE = mmu.ReadWord(PC + 1);
+
+	PC += 3;
+	clockCycles = 12;
+}
 // LD HL,D16
+void CPU::op0x21 () {
+	HL = mmu.ReadWord(PC + 1);
+
+	PC += 3;
+	clockCycles = 12;
+}
 // LD SP,D16
 void CPU::op0x31 () {
 	SP = mmu.ReadWord(PC + 1);
