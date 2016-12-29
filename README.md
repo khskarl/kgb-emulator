@@ -29,3 +29,4 @@ $ ./build/gameboy.out roms/tetris.gb
 -   [RealBoy in-depth blog](https://realboyemulator.wordpress.com/)
 -   [Pan Docs GameBoy Documentation](http://bgb.bircd.org/pandocs.htm)
 -   [Pastraiser's GameBoy CPU instruction table](http://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html)
+-   [Codeslinger's GameBoy emulation guide](http://www.codeslinger.co.uk/pages/projects/gameboy.html)
