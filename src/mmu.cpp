@@ -51,10 +51,6 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 	switch (address & 0xF000) {
 		/* BIOS / ROM0 */
 		case 0x0000:
-		if (inBios) {
-			if (address < 0x0100)
-				return &bios[address];
-		}
 		return &rom[address];
 		break;
 

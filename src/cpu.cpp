@@ -23,7 +23,7 @@ void CPU::Initialize () {
 	clockCycles = 0;
 
 	mmu.Initialize(this);
-	this->InitializeOpcodeTable();
+	InitializeOpcodeTable();
 }
 
 void CPU::LoadRom (const Rom& rom) {
@@ -34,6 +34,7 @@ void CPU::EmulateCycle () {
 	uint8_t opcode = mmu.ReadByte(PC);
 
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu.GetRomRef(PC)) << '\n';
+	// std::cout << std::hex << opcode << '\n';
 	(this->*opcodes[opcode])(); // Wtf C++
 }
 
@@ -48,7 +49,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x0C] = &CPU::op0x0C; opcodes[0x0D] = &CPU::op0x0D;
 	opcodes[0x0E] = &CPU::op0x0E; opcodes[0x0F] = &CPU::op0x0F;
 
-	opcodes[0x10] = &CPU::opNull; opcodes[0x11] = &CPU::opNull;
+	opcodes[0x10] = &CPU::opNull; opcodes[0x11] = &CPU::op0x11;
 	opcodes[0x12] = &CPU::opNull; opcodes[0x13] = &CPU::opNull;
 	opcodes[0x14] = &CPU::opNull; opcodes[0x15] = &CPU::opNull;
 	opcodes[0x16] = &CPU::opNull; opcodes[0x17] = &CPU::opNull;
@@ -57,7 +58,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x1C] = &CPU::opNull; opcodes[0x1D] = &CPU::opNull;
 	opcodes[0x1E] = &CPU::opNull; opcodes[0x1F] = &CPU::opNull;
 
-	opcodes[0x20] = &CPU::opNull; opcodes[0x21] = &CPU::opNull;
+	opcodes[0x20] = &CPU::opNull; opcodes[0x21] = &CPU::op0x21;
 	opcodes[0x22] = &CPU::opNull; opcodes[0x23] = &CPU::opNull;
 	opcodes[0x24] = &CPU::opNull; opcodes[0x25] = &CPU::opNull;
 	opcodes[0x26] = &CPU::opNull; opcodes[0x27] = &CPU::opNull;
