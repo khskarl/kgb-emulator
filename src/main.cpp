@@ -32,14 +32,22 @@ int main(int argc, char const *argv[]) {
 	cpu.Initialize();
 	cpu.LoadRom(rom);
 
-
-
 	Context::SetupContext(3);
 	Context::SetTitle("MyGameBoy | " + rom.GetName());
 
+	bool isHalted = true;
 	while (Context::IsOpen()) {
 		Context::HandleEvents();
 		Context::RenderDisplay();
+
+		// Toggle halt state
+		if (Context::ShouldHalt())
+			isHalted ^= true;
+
+		if (isHalted && Context::ShouldStep() == false)
+			continue;
+
+		cpu.EmulateCycle();
 	}
 
 	Context::DestroyContext();

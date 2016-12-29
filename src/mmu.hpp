@@ -32,6 +32,8 @@ public:
 
 	void WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize);
 
+	uint8_t* GetRomRef (uint16_t address);
+
 };
 
 #endif

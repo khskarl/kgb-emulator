@@ -14,6 +14,10 @@ static uint8_t* displayBuffer = nullptr;
 // Placeholder
 uint8_t pixels[160 * 144 * 4];
 
+// Placeholder
+bool prevShouldHalt = false;
+bool prevShouldStep = false;
+
 bool Context::SetupContext (int scale = 1) {
 	window.create(sf::VideoMode(160 * scale, 144 * scale), "Hello SFML! :D");
 
@@ -67,13 +71,6 @@ void Context::RenderDisplay () {
 	window.display();
 }
 
-void Context::SetTitle (std::string title) {
-	window.setTitle(title);
-}
-
-bool Context::IsOpen () {
-	return window.isOpen();
-}
 
 // TODO: Use opengl texture binding and GL_R8UI color format to use the VRAM di-
 //rectly as a pixel buffer.
@@ -94,4 +91,26 @@ void Context::CopyDisplayBuffer (uint8_t* buffer) {
 		pixels[i + 2] = luminosity;
 		pixels[i + 3] = 255;
 	}
+}
+
+void Context::SetTitle (std::string title) {
+	window.setTitle(title);
+}
+
+bool Context::IsOpen () {
+	return window.isOpen();
+}
+
+bool Context::ShouldHalt () {
+	bool curr = sf::Keyboard::isKeyPressed(sf::Keyboard::P);
+	bool prev = prevShouldHalt;
+	prevShouldHalt = curr;
+	return curr ^ prev && curr;
+}
+
+bool Context::ShouldStep () {
+	bool curr = sf::Keyboard::isKeyPressed(sf::Keyboard::O);
+	bool prev = prevShouldStep;
+	prevShouldStep = curr;
+	return curr ^ prev && curr;
 }

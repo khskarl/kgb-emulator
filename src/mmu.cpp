@@ -100,3 +100,7 @@ void MMU::WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize) {
 	assert(bufferSize > 0 && bufferSize < 32768);
 	std::memcpy(rom, buffer, bufferSize);
 }
+
+uint8_t* MMU::GetRomRef (uint16_t address) {
+	return &rom[address];
+}

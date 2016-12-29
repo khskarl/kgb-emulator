@@ -1,6 +1,9 @@
 #include "cpu.hpp"
 #include "mmu.hpp"
+
+#include "iostream"
 #include "debug.hpp"
+#include "disassembler.hpp"
 
 CPU::CPU () {
 }
@@ -19,12 +22,21 @@ void CPU::Initialize () {
 	Z = 0, N = 0, H = 0, C = 0;
 	clockCycles = 0;
 
+	mmu.Initialize(this);
 	this->InitializeOpcodeTable();
 }
 
 void CPU::LoadRom (const Rom& rom) {
 	mmu.WriteBufferToRom(rom.GetData(), rom.GetSize());
 }
+
+void CPU::EmulateCycle () {
+	uint8_t opcode = mmu.ReadByte(PC);
+
+	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu.GetRomRef(PC)) << '\n';
+	(this->*opcodes[opcode])(); // Wtf C++
+}
+
 
 void CPU::InitializeOpcodeTable () {
 	opcodes[0x00] = &CPU::op0x00; opcodes[0x01] = &CPU::op0x01;

@@ -25,7 +25,6 @@ private:
 	MMU mmu;
 
 	void InitializeOpcodeTable ();
-
 public:
 	/* Registers */
 	reg16_t AF;
@@ -47,9 +46,6 @@ public:
 	void Initialize ();
 	void LoadRom (const Rom& rom);
 	void EmulateCycle ();
-	void FetchOpcode ();
-	void EmulateOpcode ();
-
 private:
 	/* Instruction tables */
 	void (CPU::*opcodes  [256]) ();

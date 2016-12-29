@@ -21,7 +21,9 @@ OBJ_FILES := $(addprefix $(OBJDIR)/, $(notdir $(CPP_FILES:.cpp=.o)))
 # Creates obj folder
 dummy_make_folder := $(shell mkdir -p $(OBJDIR) $(BUILDDIR))
 
-# This prints out variables OBJ_FILES and CPP_FILES
+debug: CXXFLAGS += -DDEBUG -g
+debug: $(BUILDDIR)/$(EXE)
+
 all: $(BUILDDIR)/$(EXE)
 
 $(BUILDDIR)/$(EXE): $(OBJ_FILES)
@@ -43,6 +45,7 @@ clean:
 	$(RM) $(OBJDIR)
 	$(RM) $(BUILDDIR)
 
+# This prints out variables OBJ_FILES and CPP_FILES
 print:
 	$(info $$OBJ_FILES is [$(OBJ_FILES)])
 	$(info $$CPP_FILES is [${CPP_FILES}])
