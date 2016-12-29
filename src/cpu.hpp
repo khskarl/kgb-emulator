@@ -19,17 +19,27 @@ union reg16_t {
 	};
 	uint16_t word;
 
-	reg16_t& operator=(const reg16_t& rhs)
-	{
+	reg16_t& operator=(const reg16_t& rhs) {
 		word = rhs.word;
 		return *this;
 	}
 
-	reg16_t& operator=(const uint16_t& rhs)
-	{
+	reg16_t& operator=(const uint16_t& rhs) {
 		word = rhs;
 		return *this;
 	}
+
+	reg16_t& operator-=(const uint16_t& rhs) {
+		word -= rhs;
+		return *this;
+	}
+
+	reg16_t& operator+=(const uint16_t& rhs) {
+		word += rhs;
+		return *this;
+	}
+
+	operator uint16_t() const { return word; }
 };
 
 class CPU {
@@ -39,7 +49,7 @@ private:
 	void InitializeOpcodeTable ();
 public:
 	/* Registers */
-	reg16_t AF;
+	reg16_t AF; // F is unused
 	reg16_t BC;
 	reg16_t DE;
 	reg16_t HL;
@@ -48,6 +58,7 @@ public:
 	uint16_t PC;
 
 	/* Flags */
+	/* Instead of using F from AF, we create those variables*/
 	bool Z, N, H, C;
 
 	uint8_t clockCycles;
