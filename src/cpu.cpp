@@ -367,9 +367,7 @@ void CPU::op0x04 () {
 
 // DEC B
 void CPU::op0x05 () {
-	std::cout << (int)BC.hi << '\n';
 	Decrement(BC.hi);
-	std::cout << (int)BC.hi << '\n';
 	PC += 1;
 	clockCycles = 4;
 }
@@ -379,10 +377,7 @@ void CPU::op0x05 () {
 
 // LD B,d8
 void CPU::op0x06 () {
-	std::cout << (int)BC.hi << '\n';
 	BC.hi = ReadByte();
-	std::cout << (int)BC.hi << '\n';
-
 	PC += 2;
 	clockCycles = 8;
 }
@@ -895,7 +890,6 @@ void CPU::op0xF0() {
 // POP BC
 void CPU::op0xC1 () {
 	BC = PopWord();
-	std::cout << (int)BC << '\n';
 	PC += 1;
 	clockCycles = 12;
 }
@@ -947,7 +941,6 @@ void CPU::op0xF2() {
 
 // PUSH BC
 void CPU::op0xC5() {
-	std::cout << (int)BC << '\n';
 	PushWord(BC);
 	PC += 1;
 	clockCycles += 16;
