@@ -47,8 +47,18 @@ int main(int argc, char const *argv[]) {
 		if (isHalted && Context::ShouldStep() == false)
 			continue;
 
-		cpu.EmulateCycle();
+		const int MAXCYCLES = 4194304 / 60;
+		size_t cyclesThisUpdate = 0;
+
+		while (cyclesThisUpdate < MAXCYCLES)
+		{
+			cpu.EmulateCycle();
+			cyclesThisUpdate += cpu.clockCycles;
+		}
+
 	}
+
+
 
 	Context::DestroyContext();
 
