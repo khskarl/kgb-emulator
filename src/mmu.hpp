@@ -18,6 +18,9 @@ private:
 	uint8_t vram[32768];
 	uint8_t oam[32768];
 
+
+	uint8_t io[128];
+
 	CPU* cpu = nullptr;
 public:
 	MMU ();

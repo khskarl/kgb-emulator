@@ -46,7 +46,6 @@ class CPU {
 private:
 	MMU mmu;
 
-	void InitializeOpcodeTable ();
 public:
 	/* Registers */
 	reg16_t AF; // F is unused
@@ -70,7 +69,12 @@ public:
 	void LoadRom (const Rom& rom);
 	void EmulateCycle ();
 private:
+	/* Instruction utils */
+	uint8_t  ReadByte ();
+	uint16_t ReadWord ();
+
 	/* Instruction tables */
+	void InitializeOpcodeTable ();
 	void (CPU::*opcodes  [256]) ();
 	void (CPU::*opcodesCB[256]) ();
 

@@ -48,6 +48,7 @@ uint8_t* MMU::GetRomRef (uint16_t address) {
 }
 
 uint8_t* MMU::GetMemoryRef (uint16_t address) {
+	assert(address >= 0x0000 && address <= 0xFFFF);
 	switch (address & 0xF000) {
 		/* BIOS / ROM0 */
 		case 0x0000:
@@ -104,12 +105,13 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 			else if (lo == 0xF00) {
 				if (address >= 0xFF80)
 					return &zram[address & 0x7F];
+				else
+					return &io[address & 0x7F];
 			}
-			else
-				return 0;
+
 		}
 		default:
-			assert("ReadByte is trying to access an invalid address");
+			assert("ReadByte is trying to access an invalid address" && 0 == 1);
 		return 0;
 		break;
 
