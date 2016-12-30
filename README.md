@@ -2,7 +2,7 @@
 A Game Boy emulator written in C++11 for learning purposes. It doesn't do anything interesting yet.
 
 ## Dependencies
--   SDL2
+-   SFML2
 
 ## Usage example
 A makefile is present in the repository, to build go to the project's root directory using the terminal and type the following command:
