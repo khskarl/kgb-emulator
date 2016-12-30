@@ -1307,7 +1307,10 @@ void CPU::op0xCD () {
 // CP  d8
 void CPU::op0xFE () {
 	uint8_t value = ReadByte();
+	// std::cout << "value: " << (int)value << '\n';
 	Z = (AF.hi == value);
+	// std::cout << std::hex << AF << '\n';
+	// std::cout << "Z: " << (int)Z << '\n';
 	N = 1;
 	H = (AF.hi & 0xF) < (value & 0xF);
 	PC += 2;
