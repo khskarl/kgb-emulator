@@ -361,8 +361,8 @@ std::string DisassembleOpcode(uint8_t* code) {
 
 		case 0xCE: return Format("ADC", "A,$%02x", code[0], code[1]); break;
 		case 0xDE: return Format("SBC", "A,$%02x", code[0], code[1]); break;
-		case 0xEE: return Format("XOR", "%02",     code[0], code[1]); break;
-		case 0xFE: return Format("CP",  "%02",     code[0], code[1]); break;
+		case 0xEE: return Format("XOR", "%02x",     code[0], code[1]); break;
+		case 0xFE: return Format("CP",  "%02x",     code[0], code[1]); break;
 
 		case 0xCF: return Format("RST", "$08", code[0]); break;
 		case 0xDF: return Format("RST", "$18", code[0]); break;

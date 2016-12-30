@@ -79,7 +79,8 @@ private:
 
 	/* Common Instructions */
 	void RotateLeft (uint8_t& value); // RL
-	void Decrement (uint8_t& value);  // DEC 
+	void Decrement (uint8_t& value);  // DEC
+	void Increment (uint8_t& value);  // INC
 
 	/* Instruction tables */
 	void InitializeOpcodeTable ();
