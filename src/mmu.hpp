@@ -21,12 +21,11 @@ private:
 
 	uint8_t io[128];
 
-	CPU* cpu = nullptr;
 public:
 	MMU ();
 	~MMU ();
 
-	void Initialize(CPU* const  _cpu);
+	void Initialize();
 
 	uint8_t  ReadByte  (uint16_t address);
 	uint16_t ReadWord  (uint16_t address);

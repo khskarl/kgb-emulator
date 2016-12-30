@@ -44,7 +44,7 @@ union reg16_t {
 
 class CPU {
 private:
-	MMU mmu;
+	MMU* mmu;
 
 public:
 	/* Registers */
@@ -65,16 +65,14 @@ public:
 	CPU ();
 	~CPU ();
 
-	void Initialize ();
-	void LoadRom (const Rom& rom);
+	void Initialize (MMU* _mmu);
 	void EmulateCycle ();
 private:
 	/* Instruction helpers */
 	uint8_t  ReadByte ();
 	uint16_t ReadWord ();
-	void PushByte (uint8_t  value);
-	void PushWord (uint16_t value);
-	uint8_t  PopByte ();
+	
+	void     PushWord (uint16_t value);
 	uint16_t PopWord ();
 
 	/* Common Instructions */

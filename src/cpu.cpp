@@ -10,60 +10,48 @@ CPU::CPU () {
 
 CPU::~CPU () {}
 
-void CPU::Initialize () {
+void CPU::Initialize (MMU* _mmu) {
+	/* Initialize Registers */
 	AF = 0;
 	BC = 0;
 	DE = 0;
 	HL = 0;
-
 	SP = 0x0;
 	PC = 0x0;
 
 	Z = 0, N = 0, H = 0, C = 0;
 	clockCycles = 0;
 
-	mmu.Initialize(this);
+	assert("Assigned MMU wasn't initialized" && _mmu != nullptr);
+	mmu = _mmu;
+
 	InitializeOpcodeTable();
 }
 
-void CPU::LoadRom (const Rom& rom) {
-	mmu.WriteBufferToRom(rom.GetData(), rom.GetSize());
-}
-
 void CPU::EmulateCycle () {
-	uint8_t opcode = mmu.ReadByte(PC);
+	uint8_t opcode = mmu->ReadByte(PC);
 
-	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu.GetRomRef(PC)) << '\n';
+	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetRomRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 	(this->*opcodes[opcode])(); // Wtf C++
 }
 
 uint8_t CPU::ReadByte () {
-	return mmu.ReadByte(PC + 1);
+	return mmu->ReadByte(PC + 1);
 }
 
 uint16_t CPU::ReadWord () {
-	return mmu.ReadWord(PC + 1);
-}
-
-void CPU::PushByte (uint8_t value) {
-	SP -= 1;
-	mmu.WriteByte(SP, value);
+	return mmu->ReadWord(PC + 1);
 }
 
 void CPU::PushWord (uint16_t value) {
 	SP -= 2;
-	mmu.WriteWord(SP, value);
-}
-
-uint8_t CPU::PopByte () {
-	SP += 1;
-	return mmu.ReadByte(SP - 1);
+	mmu->WriteWord(SP, value);
 }
 
 uint16_t CPU::PopWord () {
 	SP += 2;
-	return mmu.ReadWord(SP - 2);
+	return mmu->ReadWord(SP - 2);
 }
 
 void CPU::RotateLeft (uint8_t& value) {
@@ -324,21 +312,21 @@ void CPU::op0x31 () {
 
 // LD (BC),A
 void CPU::op0x02 () {
-	mmu.WriteByte(BC, AF.hi);
+	mmu->WriteByte(BC, AF.hi);
 
 	PC += 1;
 	clockCycles = 8;
 }
 // LD (DE),A
 void CPU::op0x12 () {
-	mmu.WriteByte(DE, AF.hi);
+	mmu->WriteByte(DE, AF.hi);
 
 	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL+),A
 void CPU::op0x22 () {
-	mmu.WriteByte(HL, AF.hi);
+	mmu->WriteByte(HL, AF.hi);
 	HL += 1;
 
 	PC += 1;
@@ -346,7 +334,7 @@ void CPU::op0x22 () {
 }
 // LD (HL-),A
 void CPU::op0x32 () {
-	mmu.WriteByte(HL, AF.hi);
+	mmu->WriteByte(HL, AF.hi);
 	HL -= 1;
 
 	PC += 1;
@@ -430,7 +418,7 @@ void CPU::op0x26 () {
 }
 // LD (HL),d8
 void CPU::op0x36 () {
-	mmu.WriteByte(HL, ReadByte());
+	mmu->WriteByte(HL, ReadByte());
 
 	PC += 2;
 	clockCycles = 12;
@@ -500,26 +488,26 @@ void CPU::op0x09 () {
 
 // LD A,(BC)
 void CPU::op0x0A () {
-	AF.hi = mmu.ReadByte(BC);
+	AF.hi = mmu->ReadByte(BC);
 	PC += 1;
 	clockCycles = 8;
 }
 // LD A,(DE)
 void CPU::op0x1A () {
-	AF.hi = mmu.ReadByte(DE);
+	AF.hi = mmu->ReadByte(DE);
 	PC += 1;
 	clockCycles = 8;
 }
 // LD A,(HL+)
 void CPU::op0x2A () {
-	AF.hi = mmu.ReadByte(HL);
+	AF.hi = mmu->ReadByte(HL);
 	HL += 1;
 	PC += 1;
 	clockCycles = 8;
 }
 // LD A,(HL-)
 void CPU::op0x3A () {
-	AF.hi = mmu.ReadByte(HL);
+	AF.hi = mmu->ReadByte(HL);
 	HL -= 1;
 	PC += 1;
 	clockCycles = 8;
@@ -691,7 +679,7 @@ void CPU::op0x4D () {
 }
 // LD C,(HL)
 void CPU::op0x4E () {
-	BC.lo = mmu.ReadByte(HL);
+	BC.lo = mmu->ReadByte(HL);
 	PC += 1;
 	clockCycles = 4;
 }
@@ -741,7 +729,7 @@ void CPU::op0x55 () {
 }
 // LD D,(HL)
 void CPU::op0x56 () {
-	DE.hi = mmu.ReadByte(HL);
+	DE.hi = mmu->ReadByte(HL);
 	PC += 1;
 	clockCycles = 4;
 }
@@ -789,7 +777,7 @@ void CPU::op0x5D () {
 }
 // LD E,(HL)
 void CPU::op0x5E () {
-	DE.lo = mmu.ReadByte(HL);
+	DE.lo = mmu->ReadByte(HL);
 	PC += 1;
 	clockCycles = 4;
 }
@@ -839,7 +827,7 @@ void CPU::op0x65 () {
 }
 // LD H,(HL)
 void CPU::op0x66 () {
-	HL.hi = mmu.ReadByte(HL);
+	HL.hi = mmu->ReadByte(HL);
 	PC += 1;
 	clockCycles = 4;
 }
@@ -887,7 +875,7 @@ void CPU::op0x6D () {
 }
 // LD L,(HL)
 void CPU::op0x6E () {
-	HL.lo = mmu.ReadByte(HL);
+	HL.lo = mmu->ReadByte(HL);
 	PC += 1;
 	clockCycles = 4;
 }
@@ -901,42 +889,42 @@ void CPU::op0x6F () {
 /* 7. instructions */
 // LD (HL),B
 void CPU::op0x70 () {
-	mmu.WriteByte(HL, BC.hi);
+	mmu->WriteByte(HL, BC.hi);
 
 	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),C
 void CPU::op0x71 () {
-	mmu.WriteByte(HL, BC.lo);
+	mmu->WriteByte(HL, BC.lo);
 
 	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),D
 void CPU::op0x72 () {
-	mmu.WriteByte(HL, DE.hi);
+	mmu->WriteByte(HL, DE.hi);
 
 	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),E
 void CPU::op0x73 () {
-	mmu.WriteByte(HL, DE.lo);
+	mmu->WriteByte(HL, DE.lo);
 
 	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),H
 void CPU::op0x74 () {
-	mmu.WriteByte(HL, HL.hi);
+	mmu->WriteByte(HL, HL.hi);
 
 	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),L
 void CPU::op0x75 () {
-	mmu.WriteByte(HL, HL.lo);
+	mmu->WriteByte(HL, HL.lo);
 
 	PC += 1;
 	clockCycles = 8;
@@ -944,7 +932,7 @@ void CPU::op0x75 () {
 // HALT
 // LD (HL),A
 void CPU::op0x77 () {
-	mmu.WriteByte(HL, AF.hi);
+	mmu->WriteByte(HL, AF.hi);
 
 	PC += 1;
 	clockCycles = 8;
@@ -987,7 +975,7 @@ void CPU::op0x7D () {
 }
 // LD A,(HL)
 void CPU::op0x7E () {
-	AF.hi = mmu.ReadByte(HL);
+	AF.hi = mmu->ReadByte(HL);
 	PC += 1;
 	clockCycles = 4;
 }
@@ -1099,7 +1087,7 @@ void CPU::op0xAD() {
 }
 // XOR (HL)
 void CPU::op0xAE() {
-	AF.hi ^= mmu.ReadByte(HL);
+	AF.hi ^= mmu->ReadByte(HL);
 	Z = (AF.hi == 0);
 
 	N = H = C = 0;
@@ -1140,14 +1128,14 @@ void CPU::op0xAF() {
 // RET NC
 // LDH (a8),A
 void CPU::op0xE0() {
-	mmu.WriteByte(ReadByte() + 0xFF00, AF.hi);
+	mmu->WriteByte(ReadByte() + 0xFF00, AF.hi);
 
 	PC += 2;
 	clockCycles = 12;
 }
 // LDH A,(a8)
 void CPU::op0xF0() {
-	AF.hi = mmu.ReadByte(ReadByte() + 0xFF00);
+	AF.hi = mmu->ReadByte(ReadByte() + 0xFF00);
 
 	PC += 2;
 	clockCycles = 12;
@@ -1182,14 +1170,14 @@ void CPU::op0xF1 () {
 // JP NC,a16
 // LD (C),A
 void CPU::op0xE2() {
-	mmu.WriteByte(BC.lo + 0xFF00, AF.hi);
+	mmu->WriteByte(BC.lo + 0xFF00, AF.hi);
 
 	PC += 2;
 	clockCycles = 8;
 }
 // LD A,(C)
 void CPU::op0xF2() {
-	AF.hi = mmu.ReadByte(BC.lo + 0xFF00);
+	AF.hi = mmu->ReadByte(BC.lo + 0xFF00);
 
 	PC += 2;
 	clockCycles = 8;
@@ -1258,13 +1246,13 @@ void CPU::op0xC9() {
 // JP C,a16
 // LD (a16),A
 void CPU::op0xEA () {
-	mmu.WriteByte(ReadWord(), AF.hi);
+	mmu->WriteByte(ReadWord(), AF.hi);
 	PC += 3;
 	clockCycles = 16;
 }
 // LD A,(a16)
 void CPU::op0xFA () {
-	AF.hi = mmu.ReadByte(ReadWord());
+	AF.hi = mmu->ReadByte(ReadWord());
 	PC += 3;
 	clockCycles = 16;
 }
@@ -1370,9 +1358,9 @@ void CPU::cb0x15() {
 }
 // RL (HL)
 void CPU::cb0x16() {
-	uint8_t value = mmu.ReadByte(HL);
+	uint8_t value = mmu->ReadByte(HL);
 	RotateLeft(value);
-	mmu.WriteByte(HL, value);
+	mmu->WriteByte(HL, value);
 }
 // RL A
 // RR B

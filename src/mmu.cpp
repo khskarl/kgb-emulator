@@ -7,11 +7,7 @@
 MMU::MMU () {}
 MMU::~MMU () {}
 
-void MMU::Initialize (CPU* const  _cpu) {
-	if (cpu == nullptr) {
-		assert("Invalid CPU passed as constructor argument");
-	}
-	this->cpu = _cpu;
+void MMU::Initialize () {
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {

@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 #include "context/context.hpp"
-#include "cpu.hpp"
+#include "gameboy.hpp"
 #include "disassembler.hpp"
 #include "rom.hpp"
 
@@ -28,12 +28,12 @@ int main(int argc, char const *argv[]) {
 		// std::cout << DisassembleRom(rom) << '\n';
 	}
 
-	CPU cpu;
-	cpu.Initialize();
-	cpu.LoadRom(rom);
+	GameBoy gameBoy;
+	gameBoy.Initialize();
+	gameBoy.LoadRom(rom);
 
 	Context::SetupContext(3);
-	Context::SetTitle("MyGameBoy | " + rom.GetName());
+	Context::SetTitle("MyGameBoy " + rom.GetName());
 
 	bool isHalted = true;
 	while (Context::IsOpen()) {
@@ -47,15 +47,7 @@ int main(int argc, char const *argv[]) {
 		if (isHalted && Context::ShouldStep() == false)
 			continue;
 
-		const int MAXCYCLES = 4194304 / 60;
-		size_t cyclesThisUpdate = 0;
-
-		while (cyclesThisUpdate < MAXCYCLES)
-		{
-			cpu.EmulateCycle();
-			cyclesThisUpdate += cpu.clockCycles;
-		}
-
+		gameBoy.StepUpdate();
 	}
 
 
