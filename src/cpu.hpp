@@ -53,7 +53,7 @@ public:
 	reg16_t DE;
 	reg16_t HL;
 
-	uint16_t SP;
+	uint16_t SP = 0xfffe;
 	uint16_t PC;
 
 	/* Flags */
@@ -69,9 +69,17 @@ public:
 	void LoadRom (const Rom& rom);
 	void EmulateCycle ();
 private:
-	/* Instruction utils */
+	/* Instruction helpers */
 	uint8_t  ReadByte ();
 	uint16_t ReadWord ();
+	void PushByte (uint8_t  value);
+	void PushWord (uint16_t value);
+	uint8_t  PopByte ();
+	uint16_t PopWord ();
+
+	/* Common Instructions */
+	void RotateLeft (uint8_t& value); // RL
+	void Decrement (uint8_t& value);  // DEC 
 
 	/* Instruction tables */
 	void InitializeOpcodeTable ();
