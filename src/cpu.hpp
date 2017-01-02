@@ -71,14 +71,16 @@ private:
 	/* Instruction helpers */
 	uint8_t  ReadByte ();
 	uint16_t ReadWord ();
-	
+
 	void     PushWord (uint16_t value);
 	uint16_t PopWord ();
 
 	/* Common Instructions */
 	void RotateLeft (uint8_t& value); // RL
-	void Decrement (uint8_t& value);  // DEC
-	void Increment (uint8_t& value);  // INC
+	void Decrement (uint8_t& value); // DEC
+	void Increment (uint8_t& value); // INC
+	void SubtractA (uint8_t value); // SUB
+	void CompareA  (uint8_t value); // CP
 
 	/* Instruction tables */
 	void InitializeOpcodeTable ();

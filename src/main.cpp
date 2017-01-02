@@ -44,10 +44,12 @@ int main(int argc, char const *argv[]) {
 		if (Context::ShouldHalt())
 			isHalted ^= true;
 
-		if (isHalted && Context::ShouldStep() == false)
+		if (isHalted && Context::ShouldStep() == true)
+			gameBoy.StepCycle();
+		else if (isHalted && Context::ShouldStep() == false)
 			continue;
-
-		gameBoy.StepUpdate();
+		else
+			gameBoy.StepUpdate();
 	}
 
 

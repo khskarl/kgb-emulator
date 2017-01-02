@@ -8,6 +8,9 @@ MMU::MMU () {}
 MMU::~MMU () {}
 
 void MMU::Initialize () {
+	// HACK: By setting current scanline address (0xFF44) with 144, we pretend it's
+	//always starting the V-BLANK period
+	WriteWord(0xFF44, 144);
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {

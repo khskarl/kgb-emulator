@@ -78,6 +78,21 @@ void CPU::Increment (uint8_t& value) {
 	H = (value & 0x8) ^ oldBit4 && oldBit4 == 0x8;
 }
 
+void CPU::SubtractA (uint8_t value) {
+	AF.hi -= value;
+	Z = (AF.hi == 0);
+	N = 1;
+	H = (AF.hi & 0xF) < (value & 0xF);
+	C = (AF.hi < value);
+}
+
+void CPU::CompareA (uint8_t value) {
+	Z = (AF.hi == value);
+	N = 1;
+	H = (AF.hi & 0xF) < (value & 0xF);
+	C = (AF.hi < value);
+}
+
 void CPU::InitializeOpcodeTable () {
 	opcodes[0x00] = &CPU::op0x00; opcodes[0x01] = &CPU::op0x01;
 	opcodes[0x02] = &CPU::op0x02; opcodes[0x03] = &CPU::op0x03;
@@ -90,7 +105,7 @@ void CPU::InitializeOpcodeTable () {
 
 	opcodes[0x10] = &CPU::opNull; opcodes[0x11] = &CPU::op0x11;
 	opcodes[0x12] = &CPU::op0x12; opcodes[0x13] = &CPU::op0x13;
-	opcodes[0x14] = &CPU::opNull; opcodes[0x15] = &CPU::op0x15;
+	opcodes[0x14] = &CPU::op0x14; opcodes[0x15] = &CPU::op0x15;
 	opcodes[0x16] = &CPU::op0x16; opcodes[0x17] = &CPU::op0x17;
 	opcodes[0x18] = &CPU::opNull; opcodes[0x19] = &CPU::opNull;
 	opcodes[0x1A] = &CPU::op0x1A; opcodes[0x1B] = &CPU::opNull;
@@ -99,7 +114,7 @@ void CPU::InitializeOpcodeTable () {
 
 	opcodes[0x20] = &CPU::op0x20; opcodes[0x21] = &CPU::op0x21;
 	opcodes[0x22] = &CPU::op0x22; opcodes[0x23] = &CPU::op0x23;
-	opcodes[0x24] = &CPU::opNull; opcodes[0x25] = &CPU::op0x25;
+	opcodes[0x24] = &CPU::op0x24; opcodes[0x25] = &CPU::op0x25;
 	opcodes[0x26] = &CPU::op0x26; opcodes[0x27] = &CPU::opNull;
 	opcodes[0x28] = &CPU::op0x28; opcodes[0x29] = &CPU::opNull;
 	opcodes[0x2A] = &CPU::op0x2A; opcodes[0x2B] = &CPU::opNull;
@@ -108,17 +123,17 @@ void CPU::InitializeOpcodeTable () {
 
 	opcodes[0x30] = &CPU::op0x30; opcodes[0x31] = &CPU::op0x31;
 	opcodes[0x32] = &CPU::op0x32; opcodes[0x33] = &CPU::op0x33;
-	opcodes[0x34] = &CPU::opNull; opcodes[0x35] = &CPU::opNull;
+	opcodes[0x34] = &CPU::op0x34; opcodes[0x35] = &CPU::op0x35;
 	opcodes[0x36] = &CPU::op0x36; opcodes[0x37] = &CPU::opNull;
 	opcodes[0x38] = &CPU::op0x38; opcodes[0x39] = &CPU::opNull;
 	opcodes[0x3A] = &CPU::op0x3A; opcodes[0x3B] = &CPU::opNull;
 	opcodes[0x3C] = &CPU::op0x3C; opcodes[0x3D] = &CPU::op0x3D;
 	opcodes[0x3E] = &CPU::op0x3E; opcodes[0x3F] = &CPU::opNull;
 
-	opcodes[0x40] = &CPU::opNull; opcodes[0x41] = &CPU::opNull;
-	opcodes[0x42] = &CPU::opNull; opcodes[0x43] = &CPU::opNull;
-	opcodes[0x44] = &CPU::opNull; opcodes[0x45] = &CPU::opNull;
-	opcodes[0x46] = &CPU::opNull; opcodes[0x47] = &CPU::opNull;
+	opcodes[0x40] = &CPU::op0x40; opcodes[0x41] = &CPU::op0x41;
+	opcodes[0x42] = &CPU::op0x42; opcodes[0x43] = &CPU::op0x43;
+	opcodes[0x44] = &CPU::op0x44; opcodes[0x45] = &CPU::op0x45;
+	opcodes[0x46] = &CPU::op0x46; opcodes[0x47] = &CPU::op0x47;
 	opcodes[0x48] = &CPU::op0x48; opcodes[0x49] = &CPU::op0x49;
 	opcodes[0x4A] = &CPU::op0x4A; opcodes[0x4B] = &CPU::op0x4B;
 	opcodes[0x4C] = &CPU::op0x4C; opcodes[0x4D] = &CPU::op0x4D;
@@ -160,10 +175,10 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x8C] = &CPU::opNull; opcodes[0x8D] = &CPU::opNull;
 	opcodes[0x8E] = &CPU::opNull; opcodes[0x8F] = &CPU::opNull;
 
-	opcodes[0x90] = &CPU::opNull; opcodes[0x91] = &CPU::opNull;
-	opcodes[0x92] = &CPU::opNull; opcodes[0x93] = &CPU::opNull;
-	opcodes[0x94] = &CPU::opNull; opcodes[0x95] = &CPU::opNull;
-	opcodes[0x96] = &CPU::opNull; opcodes[0x97] = &CPU::opNull;
+	opcodes[0x90] = &CPU::op0x90; opcodes[0x91] = &CPU::op0x91;
+	opcodes[0x92] = &CPU::op0x92; opcodes[0x93] = &CPU::op0x93;
+	opcodes[0x94] = &CPU::op0x94; opcodes[0x95] = &CPU::op0x95;
+	opcodes[0x96] = &CPU::op0x96; opcodes[0x97] = &CPU::op0x97;
 	opcodes[0x98] = &CPU::opNull; opcodes[0x99] = &CPU::opNull;
 	opcodes[0x9A] = &CPU::opNull; opcodes[0x9B] = &CPU::opNull;
 	opcodes[0x9C] = &CPU::opNull; opcodes[0x9D] = &CPU::opNull;
@@ -182,10 +197,10 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xB2] = &CPU::opNull; opcodes[0xB3] = &CPU::opNull;
 	opcodes[0xB4] = &CPU::opNull; opcodes[0xB5] = &CPU::opNull;
 	opcodes[0xB6] = &CPU::opNull; opcodes[0xB7] = &CPU::opNull;
-	opcodes[0xB8] = &CPU::opNull; opcodes[0xB9] = &CPU::opNull;
-	opcodes[0xBA] = &CPU::opNull; opcodes[0xBB] = &CPU::opNull;
-	opcodes[0xBC] = &CPU::opNull; opcodes[0xBD] = &CPU::opNull;
-	opcodes[0xBE] = &CPU::opNull; opcodes[0xBF] = &CPU::opNull;
+	opcodes[0xB8] = &CPU::op0xB8; opcodes[0xB9] = &CPU::op0xB9;
+	opcodes[0xBA] = &CPU::op0xBA; opcodes[0xBB] = &CPU::op0xBB;
+	opcodes[0xBC] = &CPU::op0xBC; opcodes[0xBD] = &CPU::op0xBD;
+	opcodes[0xBE] = &CPU::op0xBE; opcodes[0xBF] = &CPU::op0xBF;
 
 	opcodes[0xC0] = &CPU::opNull; opcodes[0xC1] = &CPU::op0xC1;
 	opcodes[0xC2] = &CPU::opNull; opcodes[0xC3] = &CPU::opNull;
@@ -373,8 +388,25 @@ void CPU::op0x04 () {
 	clockCycles = 4;
 }
 // INC D
+void CPU::op0x14 () {
+	Increment(DE.hi);
+	PC += 1;
+	clockCycles = 4;
+}
 // INC H
+void CPU::op0x24 () {
+	Increment(HL.hi);
+	PC += 1;
+	clockCycles = 4;
+}
 // INC (HL)
+void CPU::op0x34 () {
+	uint8_t value = mmu->ReadByte(HL);
+	Increment(value);
+	mmu->WriteByte(HL, value);
+	PC += 1;
+	clockCycles = 4;
+}
 
 // DEC B
 void CPU::op0x05 () {
@@ -395,6 +427,13 @@ void CPU::op0x25 () {
 	clockCycles = 4;
 }
 // DEC (HL)
+void CPU::op0x35 () {
+	uint8_t value = mmu->ReadByte(HL);
+	Decrement(value);
+	mmu->WriteByte(HL, value);
+	PC += 1;
+	clockCycles = 4;
+}
 
 // LD B,d8
 void CPU::op0x06 () {
@@ -634,13 +673,53 @@ void CPU::op0x0F () {
 
 /* 4. instructions */
 // LD B,B
+void CPU::op0x40 () {
+	BC.hi = BC.hi;
+	PC += 1;
+	clockCycles = 4;
+}
 // LD B,C
+void CPU::op0x41 () {
+	BC.hi = BC.lo;
+	PC += 1;
+	clockCycles = 4;
+}
 // LD B,D
+void CPU::op0x42 () {
+	BC.hi = DE.hi;
+	PC += 1;
+	clockCycles = 4;
+}
 // LD B,E
+void CPU::op0x43 () {
+	BC.hi = DE.lo;
+	PC += 1;
+	clockCycles = 4;
+}
 // LD B,H
+void CPU::op0x44 () {
+	BC.hi = HL.hi;
+	PC += 1;
+	clockCycles = 4;
+}
 // LD B,L
+void CPU::op0x45 () {
+	BC.hi = HL.lo;
+	PC += 1;
+	clockCycles = 4;
+}
 // LD B,(HL)
+void CPU::op0x46 () {
+	BC.hi = mmu->ReadByte(HL);
+	PC += 1;
+	clockCycles = 8;
+}
 // LD B,A
+void CPU::op0x47 () {
+	BC.hi = AF.hi;
+	PC += 1;
+	clockCycles = 4;
+}
 // LD C,B
 void CPU::op0x48 () {
 	BC.lo = BC.hi;
@@ -648,7 +727,7 @@ void CPU::op0x48 () {
 	clockCycles = 4;
 }
 // LD C,C
-void CPU::op0x49 () { // FIXME: Copying C to C? Is this Right?
+void CPU::op0x49 () { // Copying C to C? Is this Right?
 	BC.lo = BC.lo;
 	PC += 1;
 	clockCycles = 4;
@@ -1006,13 +1085,53 @@ void CPU::op0x7F () {
 
 /* 9. instructions */
 // SUB B
+void CPU::op0x90() {
+	SubtractA(BC.hi);
+	PC += 1;
+	clockCycles += 4;
+}
 // SUB C
+void CPU::op0x91() {
+	SubtractA(BC.lo);
+	PC += 1;
+	clockCycles += 4;
+}
 // SUB D
+void CPU::op0x92() {
+	SubtractA(DE.hi);
+	PC += 1;
+	clockCycles += 4;
+}
 // SUB E
+void CPU::op0x93() {
+	SubtractA(DE.lo);
+	PC += 1;
+	clockCycles += 4;
+}
 // SUB H
+void CPU::op0x94() {
+	SubtractA(HL.hi);
+	PC += 1;
+	clockCycles += 4;
+}
 // SUB L
+void CPU::op0x95() {
+	SubtractA(HL.lo);
+	PC += 1;
+	clockCycles += 4;
+}
 // SUB (HL)
+void CPU::op0x96() {
+	SubtractA(mmu->ReadByte(HL));
+	PC += 1;
+	clockCycles += 8;
+}
 // SUB A
+void CPU::op0x97() {
+	SubtractA(AF.hi);
+	PC += 1;
+	clockCycles += 4;
+}
 // SBC A,B
 // SBC A,C
 // SBC A,D
@@ -1114,13 +1233,53 @@ void CPU::op0xAF() {
 // OR (HL)
 // OR A
 // CP B
+void CPU::op0xB8() {
+	CompareA(BC.hi);
+	PC += 1;
+	clockCycles = 4;
+}
 // CP C
+void CPU::op0xB9() {
+	CompareA(BC.lo);
+	PC += 1;
+	clockCycles = 4;
+}
 // CP D
+void CPU::op0xBA() {
+	CompareA(DE.hi);
+	PC += 1;
+	clockCycles = 4;
+}
 // CP E
+void CPU::op0xBB() {
+	CompareA(DE.lo);
+	PC += 1;
+	clockCycles = 4;
+}
 // CP H
+void CPU::op0xBC() {
+	CompareA(HL.hi);
+	PC += 1;
+	clockCycles = 4;
+}
 // CP L
+void CPU::op0xBD() {
+	CompareA(HL.lo);
+	PC += 1;
+	clockCycles = 4;
+}
 // CP (HL)
+void CPU::op0xBE() {
+	CompareA(mmu->ReadByte(HL));
+	PC += 1;
+	clockCycles = 4;
+}
 // CP A
+void CPU::op0xBF() {
+	CompareA(AF.hi);
+	PC += 1;
+	clockCycles = 4;
+}
 
 
 /*  */
@@ -1292,15 +1451,9 @@ void CPU::op0xCD () {
 // ADC A,d8
 // SBC A,d8
 // XOR d8
-// CP  d8
+// CP d8
 void CPU::op0xFE () {
-	uint8_t value = ReadByte();
-	// std::cout << "value: " << (int)value << '\n';
-	Z = (AF.hi == value);
-	// std::cout << std::hex << AF << '\n';
-	// std::cout << "Z: " << (int)Z << '\n';
-	N = 1;
-	H = (AF.hi & 0xF) < (value & 0xF);
+	CompareA(ReadByte());
 	PC += 2;
 	clockCycles = 8;
 }
