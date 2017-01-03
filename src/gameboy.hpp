@@ -14,13 +14,15 @@ private:
 
 public:
 	GameBoy ();
-	virtual ~GameBoy ();
+	~GameBoy ();
 
 	void Initialize ();
-	void LoadRom (Rom rom);
+
+	void LoadBios (Rom bios);
+	void LoadRom  (Rom rom);
 
 	void StepUpdate ();
-	void StepCycle ();
+	void StepCycle  ();
 };
 
 #endif

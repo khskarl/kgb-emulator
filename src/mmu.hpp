@@ -6,7 +6,6 @@
 class CPU;
 class MMU {
 private:
-	bool inBios = true;
 
 	uint8_t bios[256];
 	uint8_t rom[32768];
@@ -22,6 +21,8 @@ private:
 	uint8_t io[128];
 
 public:
+	bool isInBios = true;
+
 	MMU ();
 	~MMU ();
 
@@ -32,6 +33,7 @@ public:
 	void     WriteByte (uint16_t address, uint8_t  value);
 	void     WriteWord (uint16_t address, uint16_t value);
 
+	void WriteBios (uint8_t* buffer);
 	void WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize);
 
 	uint8_t* GetRomRef (uint16_t address);

@@ -35,6 +35,10 @@ void MMU::WriteWord (uint16_t address, uint16_t value) {
 	memory[1] = (value & 0xFF00) >> 8;
 }
 
+void MMU::WriteBios (uint8_t* buffer) {
+	assert(buffer != nullptr);
+	std::memcpy(bios, buffer, 256);
+}
 
 void MMU::WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize) {
 	assert(buffer != nullptr);
@@ -51,7 +55,10 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 	switch (address & 0xF000) {
 		/* BIOS / ROM0 */
 		case 0x0000:
-		return &rom[address];
+		if (isInBios)
+			return &bios[address & 0xFF];
+		else
+			return &rom[address];
 		break;
 
 		/* ROM0 */

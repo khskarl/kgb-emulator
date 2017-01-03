@@ -24,12 +24,14 @@ int main(int argc, char const *argv[]) {
 		std::cout << "[ROM DATA]" << '\n' <<
 		             "Name: " << rom.GetName() << '\n' <<
 		             "Size: " << rom.GetSize() << " B\n";
-
 		// std::cout << DisassembleRom(rom) << '\n';
 	}
 
+	Rom bios("roms/bios.gb");
+
 	GameBoy gameBoy;
 	gameBoy.Initialize();
+	gameBoy.LoadBios(bios);
 	gameBoy.LoadRom(rom);
 
 	Context::SetupContext(3);

@@ -8,6 +8,10 @@ void GameBoy::Initialize () {
 	mmu.Initialize();
 }
 
+void GameBoy::LoadBios (Rom bios) {
+	mmu.WriteBios(bios.GetData());
+}
+
 void GameBoy::LoadRom (Rom rom) {
 	mmu.WriteBufferToRom(rom.GetData(), rom.GetSize());
 }
