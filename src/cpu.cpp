@@ -29,6 +29,9 @@ void CPU::Initialize (MMU* _mmu) {
 }
 
 void CPU::EmulateCycle () {
+	if (PC == 0x100)
+		mmu->isInBios = false;
+
 	uint8_t opcode = mmu->ReadByte(PC);
 
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
@@ -107,7 +110,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x12] = &CPU::op0x12; opcodes[0x13] = &CPU::op0x13;
 	opcodes[0x14] = &CPU::op0x14; opcodes[0x15] = &CPU::op0x15;
 	opcodes[0x16] = &CPU::op0x16; opcodes[0x17] = &CPU::op0x17;
-	opcodes[0x18] = &CPU::opNull; opcodes[0x19] = &CPU::opNull;
+	opcodes[0x18] = &CPU::op0x18; opcodes[0x19] = &CPU::opNull;
 	opcodes[0x1A] = &CPU::op0x1A; opcodes[0x1B] = &CPU::opNull;
 	opcodes[0x1C] = &CPU::op0x1C; opcodes[0x1D] = &CPU::op0x1D;
 	opcodes[0x1E] = &CPU::op0x1E; opcodes[0x1F] = &CPU::opNull;
@@ -119,7 +122,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x28] = &CPU::op0x28; opcodes[0x29] = &CPU::opNull;
 	opcodes[0x2A] = &CPU::op0x2A; opcodes[0x2B] = &CPU::opNull;
 	opcodes[0x2C] = &CPU::op0x2C; opcodes[0x2D] = &CPU::op0x2D;
-	opcodes[0x2E] = &CPU::opNull; opcodes[0x2F] = &CPU::opNull;
+	opcodes[0x2E] = &CPU::op0x2E; opcodes[0x2F] = &CPU::opNull;
 
 	opcodes[0x30] = &CPU::op0x30; opcodes[0x31] = &CPU::op0x31;
 	opcodes[0x32] = &CPU::op0x32; opcodes[0x33] = &CPU::op0x33;
