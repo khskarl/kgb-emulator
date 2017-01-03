@@ -81,6 +81,7 @@ private:
 	void Increment (uint8_t& value); // INC
 	void SubtractA (uint8_t value); // SUB
 	void CompareA  (uint8_t value); // CP
+	void AddA  (uint8_t value);     // ADD
 
 	/* Instruction tables */
 	void InitializeOpcodeTable ();

@@ -81,6 +81,14 @@ void CPU::Increment (uint8_t& value) {
 	H = (value & 0x8) ^ oldBit4 && oldBit4 == 0x8;
 }
 
+void CPU::AddA (uint8_t value) {
+	AF.hi += value;
+	Z = (AF.hi == 0);
+	N = 0;
+	H = (AF.hi & 0xF) + (value & 0xF) > 0xF;
+	C = (AF.hi + value > 0xFF);
+}
+
 void CPU::SubtractA (uint8_t value) {
 	AF.hi -= value;
 	Z = (AF.hi == 0);
@@ -169,10 +177,10 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x7C] = &CPU::op0x7C; opcodes[0x7D] = &CPU::op0x7D;
 	opcodes[0x7E] = &CPU::op0x7E; opcodes[0x7F] = &CPU::op0x7F;
 
-	opcodes[0x80] = &CPU::opNull; opcodes[0x81] = &CPU::opNull;
-	opcodes[0x82] = &CPU::opNull; opcodes[0x83] = &CPU::opNull;
-	opcodes[0x84] = &CPU::opNull; opcodes[0x85] = &CPU::opNull;
-	opcodes[0x86] = &CPU::opNull; opcodes[0x87] = &CPU::opNull;
+	opcodes[0x80] = &CPU::op0x80; opcodes[0x81] = &CPU::op0x81;
+	opcodes[0x82] = &CPU::op0x82; opcodes[0x83] = &CPU::op0x83;
+	opcodes[0x84] = &CPU::op0x84; opcodes[0x85] = &CPU::op0x85;
+	opcodes[0x86] = &CPU::op0x86; opcodes[0x87] = &CPU::op0x87;
 	opcodes[0x88] = &CPU::opNull; opcodes[0x89] = &CPU::opNull;
 	opcodes[0x8A] = &CPU::opNull; opcodes[0x8B] = &CPU::opNull;
 	opcodes[0x8C] = &CPU::opNull; opcodes[0x8D] = &CPU::opNull;
@@ -1070,13 +1078,53 @@ void CPU::op0x7F () {
 
 /* 8. instructions */
 // ADD A,B
+void CPU::op0x80() {
+	AddA(BC.hi);
+	PC += 1;
+	clockCycles += 4;
+}
 // ADD A,C
+void CPU::op0x81() {
+	AddA(BC.lo);
+	PC += 1;
+	clockCycles += 4;
+}
 // ADD A,D
+void CPU::op0x82() {
+	AddA(DE.hi);
+	PC += 1;
+	clockCycles += 4;
+}
 // ADD A,E
+void CPU::op0x83() {
+	AddA(DE.lo);
+	PC += 1;
+	clockCycles += 4;
+}
 // ADD A,H
+void CPU::op0x84() {
+	AddA(HL.hi);
+	PC += 1;
+	clockCycles += 4;
+}
 // ADD A,L
+void CPU::op0x85() {
+	AddA(HL.lo);
+	PC += 1;
+	clockCycles += 4;
+}
 // ADD A,(HL)
+void CPU::op0x86() {
+	AddA(mmu->ReadByte(HL));
+	PC += 1;
+	clockCycles += 8;
+}
 // ADD A,A
+void CPU::op0x87() {
+	AddA(AF.hi);
+	PC += 1;
+	clockCycles += 4;
+}
 // ADC A,B
 // ADC A,C
 // ADC A,D
