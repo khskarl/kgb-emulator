@@ -79,9 +79,9 @@ private:
 	void RotateLeft (uint8_t& value); // RL
 	void Decrement (uint8_t& value); // DEC
 	void Increment (uint8_t& value); // INC
+	void AddA      (uint8_t value); // ADD
 	void SubtractA (uint8_t value); // SUB
 	void CompareA  (uint8_t value); // CP
-	void AddA  (uint8_t value);     // ADD
 
 	/* Instruction tables */
 	void InitializeOpcodeTable ();
