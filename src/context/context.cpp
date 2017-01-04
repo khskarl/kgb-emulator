@@ -33,13 +33,13 @@ bool Context::SetupContext (int scale = 1) {
 
 	displaySprite.setScale(scaleX, scaleY);
 
-	for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
-		int luminosity = rand() % 256;
-		pixels[i] = luminosity;
-		pixels[i + 1] = luminosity;
-		pixels[i + 2] = luminosity;
-		pixels[i + 3] = 255;
-	}
+	// for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
+	// 	int luminosity = (rand() % 4 + 1) * 64;
+	// 	pixels[i] = luminosity;
+	// 	pixels[i + 1] = luminosity;
+	// 	pixels[i + 2] = luminosity;
+	// 	pixels[i + 3] = 255;
+	// }
 
 
 	return true;
@@ -65,6 +65,8 @@ void Context::HandleEvents () {
 
 void Context::RenderDisplay () {
 	window.clear();
+
+	CopyDisplayBuffer(displayBuffer);
 	displayTexture.update(pixels);
 	window.draw(displaySprite);
 
@@ -77,15 +79,16 @@ void Context::RenderDisplay () {
 // http://fr.sfml-dev.org/forums/index.php?topic=17847.0
 // http://www.sfml-dev.org/documentation/2.4.1/classsf_1_1Texture.php
 void Context::SetDisplayBuffer (uint8_t* buffer) {
+	assert(buffer != nullptr);
 	displayBuffer = buffer;
 }
 
 // HACK: Temporary solution
-// Instead of accessing the VRAM memory directly, we convert it's contents to a
+// Currently, Instead of accessing the VRAM memory directly, we convert it's contents to a
 //color format that SFML can understand.
 void Context::CopyDisplayBuffer (uint8_t* buffer) {
 	for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
-		int luminosity = buffer[i / 4];
+		int luminosity = (buffer[i / 4] + 1) * 64;
 		pixels[i] = luminosity;
 		pixels[i + 1] = luminosity;
 		pixels[i + 2] = luminosity;

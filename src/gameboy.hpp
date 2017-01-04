@@ -3,6 +3,7 @@
 
 #include "cpu.hpp"
 #include "mmu.hpp"
+#include "ppu.hpp"
 #include "rom.hpp"
 
 class GameBoy {
@@ -11,6 +12,7 @@ private:
 	MMU mmu;
 
 	uint32_t clockSpeed = 4194304; // Hz aka Cycles per second
+	uint32_t frequency = 4096;
 
 public:
 	GameBoy ();
@@ -23,6 +25,9 @@ public:
 
 	void StepUpdate ();
 	void StepCycle  ();
+
+	uint8_t* GetDisplayBuffer ();
+	PPU ppu;
 };
 
 #endif

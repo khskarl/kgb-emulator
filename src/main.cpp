@@ -36,11 +36,11 @@ int main(int argc, char const *argv[]) {
 
 	Context::SetupContext(3);
 	Context::SetTitle("MyGameBoy " + rom.GetName());
+	Context::SetDisplayBuffer(gameBoy.ppu.GetDisplayBuffer());
 
 	bool isHalted = true;
 	while (Context::IsOpen()) {
 		Context::HandleEvents();
-		Context::RenderDisplay();
 
 		// Toggle halt state
 		if (Context::ShouldHalt())
@@ -52,9 +52,9 @@ int main(int argc, char const *argv[]) {
 			continue;
 		else
 			gameBoy.StepUpdate();
+
+		Context::RenderDisplay();
 	}
-
-
 
 	Context::DestroyContext();
 

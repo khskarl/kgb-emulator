@@ -6,6 +6,7 @@ GameBoy::~GameBoy () {}
 void GameBoy::Initialize () {
 	cpu.Initialize(&mmu);
 	mmu.Initialize();
+	ppu.Initialize(&mmu);
 }
 
 void GameBoy::LoadBios (Rom bios) {
@@ -18,14 +19,20 @@ void GameBoy::LoadRom (Rom rom) {
 
 void GameBoy::StepUpdate () {
 	size_t cyclesThisUpdate = 0;
-	const int MAXCYCLES = 4194304 / 60;
-	while (cyclesThisUpdate < MAXCYCLES)
+	const int maxCycles = 4194304 / 65536;
+	while (cyclesThisUpdate < maxCycles)
 	{
 		StepCycle();
 		cyclesThisUpdate += cpu.clockCycles;
 	}
+
+	ppu.StepUpdate();
 }
 
 void GameBoy::StepCycle () {
 	cpu.EmulateCycle();
+}
+
+uint8_t* GameBoy::GetDisplayBuffer () {
+	return ppu.GetDisplayBuffer();
 }

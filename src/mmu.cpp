@@ -117,7 +117,7 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 
 		}
 		default:
-			assert("ReadByte is trying to access an invalid address" && 0 == 1);
+			assert("ReadByte is trying to access an invalid address" && 0);
 		return 0;
 		break;
 
