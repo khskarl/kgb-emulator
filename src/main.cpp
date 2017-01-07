@@ -36,7 +36,7 @@ int main(int argc, char const *argv[]) {
 
 	Context::SetupContext(3);
 	Context::SetTitle("MyGameBoy " + rom.GetName());
-	Context::SetDisplayBuffer(gameBoy.ppu.GetDisplayBuffer());
+	Context::SetDisplayBuffer(gameBoy.GetDisplayBuffer());
 
 	bool isHalted = true;
 	while (Context::IsOpen()) {
@@ -47,11 +47,9 @@ int main(int argc, char const *argv[]) {
 			isHalted ^= true;
 
 		if (isHalted && Context::ShouldStep() == true)
-			gameBoy.StepCycle();
-		else if (isHalted && Context::ShouldStep() == false)
-			continue;
-		else
-			gameBoy.StepUpdate();
+			gameBoy.StepInstruction();
+		else if (isHalted == false && Context::ShouldStep() == false)
+			gameBoy.StepEmulation();
 
 		Context::RenderDisplay();
 	}

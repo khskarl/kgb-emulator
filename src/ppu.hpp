@@ -14,6 +14,7 @@ private:
 
 	void FeedRandomToDisplay ();
 	void FeedRandomToBackground ();
+	void FeedPatternToBackground ();
 public:
 	PPU ();
 	virtual ~PPU ();

@@ -17,19 +17,19 @@ void GameBoy::LoadRom (Rom rom) {
 	mmu.WriteBufferToRom(rom.GetData(), rom.GetSize());
 }
 
-void GameBoy::StepUpdate () {
+void GameBoy::StepEmulation () {
 	size_t cyclesThisUpdate = 0;
-	const int maxCycles = 4194304 / 65536;
+	const int maxCycles = clockSpeed / frequency;
 	while (cyclesThisUpdate < maxCycles)
 	{
-		StepCycle();
+		StepInstruction();
 		cyclesThisUpdate += cpu.clockCycles;
 	}
 
 	ppu.StepUpdate();
 }
 
-void GameBoy::StepCycle () {
+void GameBoy::StepInstruction () {
 	cpu.EmulateCycle();
 }
 

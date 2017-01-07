@@ -10,6 +10,7 @@ class GameBoy {
 private:
 	CPU cpu;
 	MMU mmu;
+	PPU ppu;
 
 	uint32_t clockSpeed = 4194304; // Hz aka Cycles per second
 	uint32_t frequency = 4096;
@@ -23,11 +24,10 @@ public:
 	void LoadBios (Rom bios);
 	void LoadRom  (Rom rom);
 
-	void StepUpdate ();
-	void StepCycle  ();
+	void StepEmulation ();
+	void StepInstruction  ();
 
 	uint8_t* GetDisplayBuffer ();
-	PPU ppu;
 };
 
 #endif

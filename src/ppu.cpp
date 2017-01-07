@@ -1,7 +1,7 @@
 #include "ppu.hpp"
 
 #include <algorithm>
-
+#include <iostream>
 #include "debug.hpp"
 
 PPU::PPU () {}
@@ -11,10 +11,11 @@ void PPU::Initialize(MMU* _mmu) {
 	assert("MMU is nullptr" && _mmu != nullptr);
 	mmu = _mmu;
 	FeedRandomToBackground ();
+	// FeedPatternToBackground ();
 }
 
 void PPU::StepUpdate () {
-	// RenderBackgroundBuffer ();
+	RenderBackgroundBuffer ();
 	RenderBackgroundToDisplay ();
 }
 
@@ -88,5 +89,15 @@ void PPU::FeedRandomToBackground () {
 	for (size_t i = 0; i < 256 * 256; i += 1) {
 		int luminosity = rand() % 4;
 		backgroundBuffer[i] = luminosity;
+	}
+}
+
+void PPU::FeedPatternToBackground () {
+	for (size_t i = 0; i < 256; i += 1) {
+		for (size_t j = 0; j < 256; j++) {
+			int luminosity = ((i + j) % 64) / 16;
+			std::cout << luminosity << '\n';
+			backgroundBuffer[i] = luminosity;
+		}
 	}
 }
