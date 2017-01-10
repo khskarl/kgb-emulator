@@ -23,6 +23,11 @@ uint16_t MMU::ReadWord (uint16_t address) {
 	return ReadByte(address) | (ReadByte(address + 1) << 8);
 }
 
+uint8_t MMU::ReadClockFrequency () {
+	return ReadByte(TMC) & 0x3;
+}
+
+
 void MMU::WriteByte (uint16_t address, uint8_t value) {
 	assert(address >= 0x0000 && address <= 0xFFFF);
 

@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+#define DIV 0xFF04
+#define TIMA 0xFF05
+#define TMA  0xFF06
+#define TMC  0xFF07
+
 class CPU;
 class MMU {
 private:
@@ -28,10 +33,14 @@ public:
 
 	void Initialize();
 
+	/* General memory access functions */
 	uint8_t  ReadByte  (uint16_t address);
 	uint16_t ReadWord  (uint16_t address);
 	void     WriteByte (uint16_t address, uint8_t  value);
 	void     WriteWord (uint16_t address, uint16_t value);
+
+	/* Specific memory access functions */
+	uint8_t  ReadClockFrequency ();
 
 	void WriteBios (uint8_t* buffer);
 	void WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize);

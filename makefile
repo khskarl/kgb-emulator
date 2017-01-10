@@ -8,7 +8,8 @@ EXE := gameboy.out
 CXX := clang++
 RM := -rm -rf
 # Compiler and dynamic link flags:
-CXXFLAGS  := -std=c++14 -Wall
+CXXFLAGS  := -std=c++14 -Wall -mcpu=native
+# CXXFLAGS  := -std=c++14 -Wall --march=native --mtune=native
 LDFLAGS   := -lsfml-graphics -lsfml-window -lsfml-system
 # Directories
 SRCDIR := src
