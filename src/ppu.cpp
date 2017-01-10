@@ -10,6 +10,7 @@ PPU::~PPU () {}
 void PPU::Initialize(MMU* _mmu) {
 	assert("MMU is nullptr" && _mmu != nullptr);
 	mmu = _mmu;
+
 	// FeedRandomToBackground ();
 	FeedPatternToBackground ();
 }
