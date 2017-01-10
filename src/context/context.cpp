@@ -7,6 +7,7 @@
 #include "../debug.hpp"
 
 static sf::Font font;
+static sf::Text debugText;
 
 static sf::RenderWindow window;
 static sf::Texture displayTexture;
@@ -22,8 +23,12 @@ bool prevShouldStep = false;
 
 bool Context::SetupContext (int scale = 1) {
 	font.loadFromFile("./resources/fonts/OpenSans-Regular.ttf");
+	debugText.setFont(font);
+	debugText.setColor(sf::Color::Magenta);
+	debugText.setCharacterSize(20);
+	debugText.setString("Debug :D");
 
-	window.create(sf::VideoMode(160 * scale, 144 * scale), "Hello SFML! :D");
+	window.create(sf::VideoMode(160 * scale, 144 * scale), "Hello :)");
 
 	displayTexture.create(160, 144);
 	displayTexture.setSmooth(false);
@@ -67,12 +72,6 @@ void Context::HandleEvents () {
 }
 
 void Context::RenderDebugText () {
-	sf::Text debugText;
-	debugText.setFont(font);
-	debugText.setString("Debug :D");
-	debugText.setCharacterSize(20);
-	debugText.setColor(sf::Color::White);
-
 	window.draw(debugText);
 }
 
@@ -130,4 +129,8 @@ bool Context::ShouldStep () {
 	bool prev = prevShouldStep;
 	prevShouldStep = curr;
 	return curr ^ prev && curr;
+}
+
+void Context::SetDebugText (std::string text) {
+	debugText.setString(text);
 }

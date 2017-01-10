@@ -6,6 +6,8 @@
 #include "disassembler.hpp"
 #include "rom.hpp"
 
+#include "debug.hpp"
+
 int main(int argc, char const *argv[]) {
 	if (argc < 2) {
 		std::cout << "<*Error*> You didn't supply a ROM path as argument\n" <<
@@ -51,6 +53,7 @@ int main(int argc, char const *argv[]) {
 		else if (isHalted == false && Context::ShouldStep() == false)
 			gameBoy.StepEmulation();
 
+		Context::SetDebugText(Debug::GetGameboyText(gameBoy));
 		Context::RenderDisplay();
 	}
 

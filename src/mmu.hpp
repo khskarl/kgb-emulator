@@ -8,6 +8,9 @@
 #define TMA  0xFF06
 #define TMC  0xFF07
 
+#define SCROLLY 0xFF42
+#define SCROLLX 0xFF43
+
 class CPU;
 class MMU {
 private:

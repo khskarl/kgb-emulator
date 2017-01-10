@@ -22,6 +22,7 @@ bool IsOpen ();
 bool ShouldHalt ();
 bool ShouldStep ();
 
+void SetDebugText (std::string text);
 };
 
 #endif

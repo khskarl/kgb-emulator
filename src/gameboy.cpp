@@ -84,3 +84,7 @@ bool GameBoy::IsClockEnabled () {
 uint8_t* GameBoy::GetDisplayBuffer () {
 	return ppu.GetDisplayBuffer();
 }
+
+MMU* GameBoy::GetMMU () {
+	return &mmu;
+}
