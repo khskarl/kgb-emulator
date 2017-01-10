@@ -60,11 +60,10 @@ int main(int argc, char const *argv[]) {
 		Context::RenderDisplay();
 
 		int elapsedTime = timer.GetTimeInMiliseconds();
-
 		if (16 > elapsedTime)
 			std::this_thread::sleep_for(std::chrono::milliseconds(16 - elapsedTime));
-
 		elapsedTime = timer.GetTimeInMiliseconds();
+		
 		Context::SetTitle("MyGameBoy | " + std::to_string(elapsedTime) + " ms");
 	}
 
