@@ -10,8 +10,8 @@ PPU::~PPU () {}
 void PPU::Initialize(MMU* _mmu) {
 	assert("MMU is nullptr" && _mmu != nullptr);
 	mmu = _mmu;
-	FeedRandomToBackground ();
-	// FeedPatternToBackground ();
+	// FeedRandomToBackground ();
+	FeedPatternToBackground ();
 }
 
 void PPU::StepUpdate () {
@@ -94,10 +94,9 @@ void PPU::FeedRandomToBackground () {
 
 void PPU::FeedPatternToBackground () {
 	for (size_t i = 0; i < 256; i += 1) {
-		for (size_t j = 0; j < 256; j++) {
-			int luminosity = ((i + j) % 64) / 16;
-			std::cout << luminosity << '\n';
-			backgroundBuffer[i] = luminosity;
+		for (size_t j = 0; j < 256; j += 1) {
+			int luminosity = ((i * j) % 64) / 16;
+			backgroundBuffer[i * 256 + j] = luminosity;
 		}
 	}
 }

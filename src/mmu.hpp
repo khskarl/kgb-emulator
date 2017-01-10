@@ -12,18 +12,18 @@ class CPU;
 class MMU {
 private:
 
-	uint8_t bios[256];
-	uint8_t rom[32768];
-	uint8_t eram[32768];
-	uint8_t wram[32768];
-	uint8_t zram[32768];
+	uint8_t bios[0xFF];
+	uint8_t rom[0x8000];
+	uint8_t eram[0x8000];
+	uint8_t wram[0x8000];
+	uint8_t zram[0x8000];
 
 
-	uint8_t vram[32768];
-	uint8_t oam[32768];
+	uint8_t vram[0x8000];
+	uint8_t oam[0x8000];
 
 
-	uint8_t io[128];
+	uint8_t io[0x80];
 
 public:
 	bool isInBios = true;

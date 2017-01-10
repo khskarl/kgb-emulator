@@ -41,7 +41,6 @@ bool Context::SetupContext (int scale = 1) {
 	// 	pixels[i + 3] = 255;
 	// }
 
-
 	return true;
 }
 
