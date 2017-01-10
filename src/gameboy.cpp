@@ -21,7 +21,7 @@ void GameBoy::LoadRom (Rom rom) {
 
 void GameBoy::StepEmulation (const int cyclesThisUpdate) {
 	size_t cylesDone = 0;
-	while (cylesDone < cyclesThisUpdate)	{
+	while (cylesDone < cyclesThisUpdate) {
 		this->StepInstruction();
 
 		uint16_t numCycles = cpu.clockCycles;
@@ -80,7 +80,6 @@ bool GameBoy::IsClockEnabled () {
 }
 
 
-
 uint8_t* GameBoy::GetDisplayBuffer () {
 	return ppu.GetDisplayBuffer();
 }
@@ -88,7 +87,6 @@ uint8_t* GameBoy::GetDisplayBuffer () {
 MMU* GameBoy::GetMMU () {
 	return &mmu;
 }
-
 
 bool GameBoy::GetHalt () {
 	return isHalted;

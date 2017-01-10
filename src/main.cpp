@@ -10,6 +10,9 @@
 #include "timer.hpp"
 #include "debug.hpp"
 
+const int defaultCycles = 69905;
+float speed = 1.0f;
+
 int main(int argc, char const *argv[]) {
 	if (argc < 2) {
 		std::cout << "<*Error*> You didn't supply a ROM path as argument\n" <<
@@ -45,7 +48,10 @@ int main(int argc, char const *argv[]) {
 	Timer timer;
 	while (Context::IsOpen()) {
 		timer.Reset();
+
 		Context::HandleEvents();
+		speed = Context::GetSpeedInput();
+		int cyclesThisUpdate = defaultCycles * speed;
 
 		// Toggle halt state if halt button was pressed
 		if (Context::ShouldHalt())
@@ -54,7 +60,7 @@ int main(int argc, char const *argv[]) {
 		if (gameBoy.GetHalt() && Context::ShouldStep() == true)
 			gameBoy.StepInstruction();
 		else if (gameBoy.GetHalt() == false && Context::ShouldStep() == false)
-			gameBoy.StepEmulation();
+			gameBoy.StepEmulation(cyclesThisUpdate);
 
 		Context::SetDebugText(Debug::GetGameboyText(gameBoy));
 		Context::RenderDisplay();
@@ -63,8 +69,8 @@ int main(int argc, char const *argv[]) {
 		if (16 > elapsedTime)
 			std::this_thread::sleep_for(std::chrono::milliseconds(16 - elapsedTime));
 		elapsedTime = timer.GetTimeInMiliseconds();
-		
-		Context::SetTitle("MyGameBoy | " + std::to_string(elapsedTime) + " ms");
+
+		Context::SetTitle(std::to_string(cyclesThisUpdate) + " Hz | " + std::to_string(elapsedTime) + " ms");
 	}
 
 	Context::DestroyContext();

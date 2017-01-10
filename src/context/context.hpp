@@ -24,6 +24,8 @@ bool ShouldStep ();
 
 void SetDebugText (std::string text);
 
+float GetSpeedInput ();
+
 };
 
 #endif

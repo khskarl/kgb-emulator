@@ -14,6 +14,8 @@ static sf::Texture displayTexture;
 static sf::Sprite displaySprite; // SFML needs a sprite to render a texture
 static uint8_t* displayBuffer = nullptr;
 
+static float speedInput = 1.0f;
+
 // Placeholder
 uint8_t pixels[160 * 144 * 4];
 
@@ -66,6 +68,24 @@ void Context::HandleEvents () {
 		else if (event.type == sf::Event::KeyPressed) {
 			if (event.key.code == sf::Keyboard::Escape) {
 				window.close();
+			}
+			else if (event.key.code == sf::Keyboard::Num0) {
+				speedInput = 1.0f;
+			}
+			else if (event.key.code == sf::Keyboard::Num9) {
+				speedInput = 0.5f;
+			}
+			else if (event.key.code == sf::Keyboard::Num8) {
+				speedInput = 0.25f;
+			}
+			else if (event.key.code == sf::Keyboard::Num7) {
+				speedInput = 0.1f;
+			}
+			else if (event.key.code == sf::Keyboard::Num6) {
+				speedInput = 0.05f;
+			}
+			else if (event.key.code == sf::Keyboard::Num5) {
+				speedInput = 0.01f;
 			}
 		}
 	}
@@ -133,4 +153,8 @@ bool Context::ShouldStep () {
 
 void Context::SetDebugText (std::string text) {
 	debugText.setString(text);
+}
+
+float Context::GetSpeedInput () {
+	return speedInput;
 }
