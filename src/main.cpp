@@ -43,18 +43,17 @@ int main(int argc, char const *argv[]) {
 	Context::SetDisplayBuffer(gameBoy.GetDisplayBuffer());
 
 	Timer timer;
-	bool isHalted = true;
 	while (Context::IsOpen()) {
 		timer.Reset();
 		Context::HandleEvents();
 
-		// Toggle halt state
+		// Toggle halt state if halt button was pressed
 		if (Context::ShouldHalt())
-			isHalted ^= true;
+			gameBoy.ToggleHalt();
 
-		if (isHalted && Context::ShouldStep() == true)
+		if (gameBoy.GetHalt() && Context::ShouldStep() == true)
 			gameBoy.StepInstruction();
-		else if (isHalted == false && Context::ShouldStep() == false)
+		else if (gameBoy.GetHalt() == false && Context::ShouldStep() == false)
 			gameBoy.StepEmulation();
 
 		Context::SetDebugText(Debug::GetGameboyText(gameBoy));

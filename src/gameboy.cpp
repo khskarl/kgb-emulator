@@ -88,3 +88,16 @@ uint8_t* GameBoy::GetDisplayBuffer () {
 MMU* GameBoy::GetMMU () {
 	return &mmu;
 }
+
+
+bool GameBoy::GetHalt () {
+	return isHalted;
+}
+
+void GameBoy::SetHalt (bool state) {
+	this->isHalted = state;
+}
+
+void GameBoy::ToggleHalt () {
+	this->isHalted ^= 1;
+}

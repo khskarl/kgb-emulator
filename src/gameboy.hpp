@@ -17,6 +17,8 @@ private:
 
 	uint32_t timerCounter = 1024; // aka TIMA
 
+	bool isHalted = true;
+
 public:
 	GameBoy ();
 	~GameBoy ();
@@ -35,6 +37,10 @@ public:
 
 	uint8_t* GetDisplayBuffer ();
 	MMU* GetMMU ();
+
+	bool GetHalt ();
+	void SetHalt (bool state);
+	void ToggleHalt ();
 };
 
 #endif
