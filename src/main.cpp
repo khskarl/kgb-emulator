@@ -1,11 +1,13 @@
 #include <iostream>
 #include <stdint.h>
+#include <chrono>
+#include <thread>
 
 #include "context/context.hpp"
 #include "gameboy.hpp"
 #include "disassembler.hpp"
 #include "rom.hpp"
-
+#include "timer.hpp"
 #include "debug.hpp"
 
 int main(int argc, char const *argv[]) {
@@ -37,11 +39,13 @@ int main(int argc, char const *argv[]) {
 	gameBoy.LoadRom(rom);
 
 	Context::SetupContext(3);
-	Context::SetTitle("MyGameBoy " + rom.GetName());
+	Context::SetTitle("MyGameBoy");
 	Context::SetDisplayBuffer(gameBoy.GetDisplayBuffer());
 
+	Timer timer;
 	bool isHalted = true;
 	while (Context::IsOpen()) {
+		timer.Reset();
 		Context::HandleEvents();
 
 		// Toggle halt state
@@ -55,6 +59,14 @@ int main(int argc, char const *argv[]) {
 
 		Context::SetDebugText(Debug::GetGameboyText(gameBoy));
 		Context::RenderDisplay();
+
+		int elapsedTime = timer.GetTimeInMiliseconds();
+
+		if (16 > elapsedTime)
+			std::this_thread::sleep_for(std::chrono::milliseconds(16 - elapsedTime));
+
+		elapsedTime = timer.GetTimeInMiliseconds();
+		Context::SetTitle("MyGameBoy | " + std::to_string(elapsedTime) + " ms");
 	}
 
 	Context::DestroyContext();
