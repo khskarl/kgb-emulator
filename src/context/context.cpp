@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include "../debug.hpp"
 
+static sf::Font font;
+
 static sf::RenderWindow window;
 static sf::Texture displayTexture;
 static sf::Sprite displaySprite; // SFML needs a sprite to render a texture
@@ -19,6 +21,8 @@ bool prevShouldHalt = false;
 bool prevShouldStep = false;
 
 bool Context::SetupContext (int scale = 1) {
+	font.loadFromFile("./resources/fonts/OpenSans-Regular.ttf");
+
 	window.create(sf::VideoMode(160 * scale, 144 * scale), "Hello SFML! :D");
 
 	displayTexture.create(160, 144);
@@ -62,12 +66,23 @@ void Context::HandleEvents () {
 	}
 }
 
+void Context::RenderDebugText () {
+	sf::Text debugText;
+	debugText.setFont(font);
+	debugText.setString("Debug :D");
+	debugText.setCharacterSize(20);
+	debugText.setColor(sf::Color::White);
+
+	window.draw(debugText);
+}
+
 void Context::RenderDisplay () {
 	window.clear();
 
 	CopyDisplayBuffer(displayBuffer);
 	displayTexture.update(pixels);
 	window.draw(displaySprite);
+	RenderDebugText();
 
 	window.display();
 }
