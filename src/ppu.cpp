@@ -48,7 +48,7 @@ void PPU::RenderBackgroundBuffer () {
 				tileID -= 128;
 
 			for (std::size_t iPixel = 0; iPixel < 8; iPixel++) {
-				uint16_t line = mmu->ReadWord(tilesAddress + tileID + iPixel);
+				uint16_t line = mmu->ReadWord(tilesAddress + tileID * 16 + iPixel);
 
 				uint8_t i = iTile * 8 + iPixel;
 
