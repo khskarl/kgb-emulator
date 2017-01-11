@@ -12,7 +12,7 @@ void PPU::Initialize(MMU* _mmu) {
 	mmu = _mmu;
 
 	// FeedRandomToBackground ();
-	FeedPatternToBackground ();
+	// FeedPatternToBackground ();
 }
 
 void PPU::StepUpdate (uint16_t cycles) {
@@ -34,9 +34,12 @@ void PPU::StepUpdate (uint16_t cycles) {
 	if (currLine > 153)
 		ResetScanline();
 	else if (currLine < 144) {
-		// DrawScanline(currLine);
-		RenderBackgroundBuffer ();
-		RenderBackgroundToDisplay ();
+		DrawScanline(currLine);
+		// RenderBackgroundBuffer ();
+		// RenderBackgroundToDisplay ();
+	}
+	else {
+		// We are in VBLANK dude :D
 	}
 }
 
@@ -51,6 +54,11 @@ uint8_t ComputeBitColorID (uint16_t tileLine, uint8_t bitPosition) {
   //        ((tileLine & 0x8000) >> (8 + bitPosition - 1));
 }
 
+void PPU::DrawScanline (uint8_t line) {
+	for (size_t jPixel = 0; jPixel < 160; jPixel += 1) {
+		displayBuffer[line * 160 + jPixel] = 3;
+	}
+}
 
 void PPU::RenderBackgroundBuffer () {
 	// uint8_t* bgTileTable = mmu->GetMemoryRef(0x8800);
@@ -83,8 +91,8 @@ void PPU::RenderBackgroundBuffer () {
 }
 
 void PPU::RenderBackgroundToDisplay () {
-	uint8_t scrollY = mmu->ReadByte(0xFF42);
-	uint8_t scrollX = mmu->ReadByte(0xFF43);
+	uint8_t scrollY = mmu->ReadByte(SCROLLY);
+	uint8_t scrollX = mmu->ReadByte(SCROLLX);
 
 	for (size_t i = 0; i < 144; i++) {
 		uint8_t iScrolled = i + scrollY;
@@ -137,7 +145,7 @@ void PPU::FeedPatternToBackground () {
 }
 
 uint16_t PPU::GetTilesAddress () {
-	uint8_t lcdControl = mmu->ReadByte(0xFF40);
+	uint8_t lcdControl = mmu->ReadByte(LCDCTRL);
 	if ((lcdControl & 0x16) == 0x16) {
 		return 0x8000;
 	} else {
@@ -146,7 +154,7 @@ uint16_t PPU::GetTilesAddress () {
 }
 
 uint16_t PPU::GetBackgroundTilesAddress () {
-	uint8_t lcdControl = mmu->ReadByte(0xFF40);
+	uint8_t lcdControl = mmu->ReadByte(LCDCTRL);
 	if ((lcdControl & 0x8) == 0x8) {
 		return 0x9C00;
 	} else {

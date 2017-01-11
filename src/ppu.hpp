@@ -6,10 +6,11 @@ private:
 	uint8_t displayBuffer[160 * 144];
 	uint8_t backgroundBuffer[256 * 256];
 
-	int32_t scanlineCounter = 0;
+	int32_t scanlineCounter = 456; // Lasts 456 Hz (Cycles)
 
 	MMU* mmu = nullptr;
 
+	void DrawScanline (uint8_t line);
 	void RenderBackgroundToDisplay ();
 	void RenderBackgroundBuffer ();
 

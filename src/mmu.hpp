@@ -25,10 +25,8 @@ private:
 	uint8_t wram[0x8000];
 	uint8_t zram[0x8000];
 
-
 	uint8_t vram[0x8000];
 	uint8_t oam[0x8000];
-
 
 	uint8_t io[0x80];
 
