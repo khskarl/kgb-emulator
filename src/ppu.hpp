@@ -15,6 +15,9 @@ private:
 	void FeedRandomToDisplay ();
 	void FeedRandomToBackground ();
 	void FeedPatternToBackground ();
+
+	uint16_t GetTilesAddress ();
+	uint16_t GetBackgroundTilesAddress ();
 public:
 	PPU ();
 	virtual ~PPU ();

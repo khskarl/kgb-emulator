@@ -34,20 +34,29 @@ void PPU::RenderBackgroundBuffer () {
 	// uint8_t* bgTileTable = mmu->GetMemoryRef(0x8800);
 	// uint8_t scrollX = *mmu->GetMemoryRef(0xFF43);
 	// uint8_t scrollY = *mmu->GetMemoryRef(0xFF42);
-
+	uint16_t bgTilesAddress = GetBackgroundTilesAddress();
+	uint16_t tilesAddress = GetTilesAddress();
+//reinterpret_cast<int8_t&>(value);
 	for (std::size_t iTile = 0; iTile < 32; iTile++) {
 		for (std::size_t jTile = 0; jTile < 32; jTile++) {
-			uint16_t tileIDAddress = 0x9800 + iTile * 32 + jTile;
-			uint8_t tileID = mmu->ReadByte(tileIDAddress);
+			uint16_t tileIDAddress = bgTilesAddress + iTile * 32 + jTile;
+			int16_t tileID = mmu->ReadByte(tileIDAddress);
 
+			if (tilesAddress == 0x8800)
+				tileID -= 128;
 
 			for (std::size_t iPixel = 0; iPixel < 8; iPixel++) {
-				uint16_t line = mmu->ReadWord(0x8000 + tileID + iPixel);
+				uint16_t line = mmu->ReadWord(tilesAddress + tileID + iPixel);
+
 				uint8_t i = iTile + iPixel;
+
 				for (std::size_t jPixel = 0; jPixel < 8; jPixel++) {
 					uint8_t j = jTile + jPixel;
-
-					backgroundBuffer[i * 32 + j] = ComputeBitColorID(line, jPixel);
+					// backgroundBuffer[i * 256 + j] = ComputeBitColorID(line, jPixel);
+					// if (iTile % 2 == 0)
+					// 	backgroundBuffer[i * 256 + j] = 3;
+					// else
+					// 	backgroundBuffer[i * 256 + j] = 0;
 				}
 			}
 
@@ -56,25 +65,25 @@ void PPU::RenderBackgroundBuffer () {
 }
 
 void PPU::RenderBackgroundToDisplay () {
-	uint8_t scrollX = mmu->ReadByte(0xFF43);
 	uint8_t scrollY = mmu->ReadByte(0xFF42);
+	uint8_t scrollX = mmu->ReadByte(0xFF43);
 
 	for (size_t i = 0; i < 144; i++) {
 		uint8_t iScrolled = i + scrollY;
 		if (iScrolled < 0)
-			iScrolled += 144;
-		else if (iScrolled > 143)
-			iScrolled = iScrolled % 144;
+			iScrolled += 256;
+		else if (iScrolled > 255)
+			iScrolled = iScrolled % 256;
 
 		for (size_t j = 0; j < 160; j++) {
 			uint8_t jScrolled = j + scrollX;
 
 			if (jScrolled < 0)
-				jScrolled += 160;
-			else if (jScrolled > 159)
-				jScrolled = jScrolled % 160;
+				jScrolled += 256;
+			else if (jScrolled > 255)
+				jScrolled = jScrolled % 256;
 
-			displayBuffer[i * 160 + j] = backgroundBuffer[iScrolled * 160 + jScrolled];
+			displayBuffer[i * 160 + j] = backgroundBuffer[iScrolled * 256 + jScrolled];
 		}
 	}
 }
@@ -94,10 +103,35 @@ void PPU::FeedRandomToBackground () {
 }
 
 void PPU::FeedPatternToBackground () {
+	// for (size_t i = 0; i < 256; i += 1) {
+	// 	for (size_t j = 0; j < 256; j += 1) {
+	// 		int luminosity = ((i * j) % 64) / 16;
+	// 		backgroundBuffer[i * 256 + j] = luminosity;
+	// 	}
+	// }
+
 	for (size_t i = 0; i < 256; i += 1) {
 		for (size_t j = 0; j < 256; j += 1) {
-			int luminosity = ((i * j) % 64) / 16;
+			int luminosity = ((j + i) % 64) / 16;
 			backgroundBuffer[i * 256 + j] = luminosity;
 		}
+	}
+}
+
+uint16_t PPU::GetTilesAddress () {
+	uint8_t lcdControl = mmu->ReadByte(0xFF40);
+	if ((lcdControl & 0x16) == 0x16) {
+		return 0x8000;
+	} else {
+		return 0x8800;
+	}
+}
+
+uint16_t PPU::GetBackgroundTilesAddress () {
+	uint8_t lcdControl = mmu->ReadByte(0xFF40);
+	if ((lcdControl & 0x8) == 0x8) {
+		return 0x9C00;
+	} else {
+		return 0x9800;
 	}
 }

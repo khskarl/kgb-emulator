@@ -41,7 +41,7 @@ int main(int argc, char const *argv[]) {
 	gameBoy.LoadBios(bios);
 	gameBoy.LoadRom(rom);
 
-	Context::SetupContext(3);
+	Context::SetupContext(4);
 	Context::SetTitle("MyGameBoy");
 	Context::SetDisplayBuffer(gameBoy.GetDisplayBuffer());
 
@@ -50,13 +50,13 @@ int main(int argc, char const *argv[]) {
 		timer.Reset();
 
 		Context::HandleEvents();
-		speed = Context::GetSpeedInput();
-		int cyclesThisUpdate = defaultCycles * speed;
 
 		// Toggle halt state if halt button was pressed
 		if (Context::ShouldHalt())
 			gameBoy.ToggleHalt();
 
+		speed = Context::GetSpeedInput();
+		int cyclesThisUpdate = defaultCycles * speed;
 		if (gameBoy.GetHalt() && Context::ShouldStep() == true)
 			gameBoy.StepInstruction();
 		else if (gameBoy.GetHalt() == false && Context::ShouldStep() == false)

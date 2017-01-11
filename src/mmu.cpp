@@ -119,7 +119,6 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 				else
 					return &io[address & 0x7F];
 			}
-
 		}
 		default:
 			assert("ReadByte is trying to access an invalid address" && 0);
