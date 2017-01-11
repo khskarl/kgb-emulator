@@ -27,6 +27,8 @@ uint8_t* PPU::GetDisplayBuffer () {
 uint8_t ComputeBitColorID (uint16_t tileLine, uint8_t bitPosition) {
 	return ((tileLine & 0x8000) >> (8 + bitPosition - 1)) |
 	       ((tileLine & 0x80  ) >> (    bitPosition - 1));
+	// return ((tileLine & 0x80  ) >> (    bitPosition - 1)) |
+  //        ((tileLine & 0x8000) >> (8 + bitPosition - 1));
 }
 
 
@@ -48,18 +50,14 @@ void PPU::RenderBackgroundBuffer () {
 			for (std::size_t iPixel = 0; iPixel < 8; iPixel++) {
 				uint16_t line = mmu->ReadWord(tilesAddress + tileID + iPixel);
 
-				uint8_t i = iTile + iPixel;
+				uint8_t i = iTile * 8 + iPixel;
 
 				for (std::size_t jPixel = 0; jPixel < 8; jPixel++) {
-					uint8_t j = jTile + jPixel;
-					// backgroundBuffer[i * 256 + j] = ComputeBitColorID(line, jPixel);
-					// if (iTile % 2 == 0)
-					// 	backgroundBuffer[i * 256 + j] = 3;
-					// else
-					// 	backgroundBuffer[i * 256 + j] = 0;
+					uint8_t j = jTile * 8 + jPixel;
+					backgroundBuffer[i * 256 + j] = ComputeBitColorID(line, jPixel);
+
 				}
 			}
-
 		}
 	}
 }
