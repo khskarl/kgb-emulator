@@ -5,9 +5,7 @@
 #include "debug.hpp"
 #include "disassembler.hpp"
 
-CPU::CPU () {
-}
-
+CPU::CPU () {}
 CPU::~CPU () {}
 
 void CPU::Initialize (MMU* _mmu) {

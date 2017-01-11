@@ -19,25 +19,26 @@ void GameBoy::LoadRom (Rom rom) {
 	mmu.WriteBufferToRom(rom.GetData(), rom.GetSize());
 }
 
-void GameBoy::StepEmulation (const int cyclesThisUpdate) {
+void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 	size_t cylesDone = 0;
 	while (cylesDone < cyclesThisUpdate) {
 		this->StepInstruction();
 
 		uint16_t numCycles = cpu.clockCycles;
 		this->StepTimers(numCycles);
+		this->StepGraphics(numCycles);
+		ppu.StepUpdate(numCycles);
 
 		cylesDone += numCycles;
 	}
 
-	ppu.StepUpdate();
 }
 
 void GameBoy::StepInstruction () {
 	cpu.EmulateCycle();
 }
 
-void GameBoy::StepTimers (uint16_t cycles) {
+void GameBoy::StepTimers (uint32_t cycles) {
 
 	if (mmu.ReadByte(DIV) + cycles >= 255) {
 		mmu.WriteByte(DIV, 0);
@@ -64,6 +65,10 @@ void GameBoy::StepTimers (uint16_t cycles) {
 			mmu.WriteByte(TIMA, mmu.ReadByte(TIMA) + 1);
 		}
 	}
+}
+
+void GameBoy::StepGraphics (uint32_t cycles) {
+
 }
 
 void GameBoy::ResetClockFrequency () {

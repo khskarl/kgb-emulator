@@ -43,15 +43,7 @@ bool Context::SetupContext (int scale = 1) {
 	float scaleY = (float) windowSize.y / textureSize.y;
 
 	displaySprite.setScale(scaleX, scaleY);
-
-	// for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
-	// 	int luminosity = (rand() % 4 + 1) * 64;
-	// 	pixels[i] = luminosity;
-	// 	pixels[i + 1] = luminosity;
-	// 	pixels[i + 2] = luminosity;
-	// 	pixels[i + 3] = 255;
-	// }
-
+	
 	return true;
 }
 

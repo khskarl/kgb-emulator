@@ -15,9 +15,29 @@ void PPU::Initialize(MMU* _mmu) {
 	FeedPatternToBackground ();
 }
 
-void PPU::StepUpdate () {
-	RenderBackgroundBuffer ();
-	RenderBackgroundToDisplay ();
+void PPU::StepUpdate (uint16_t cycles) {
+	if (IsDisplayEnabled() == false)
+		return;
+
+	scanlineCounter -= cycles;
+
+	if (scanlineCounter > 0)
+		return;
+
+	uint8_t currLine = NextScanline();
+
+	ResetScanlineCounter();
+
+	// if (currLine == 144)
+	// 	RequestInterrupt
+
+	if (currLine > 153)
+		ResetScanline();
+	else if (currLine < 144) {
+		// DrawScanline(currLine);
+		RenderBackgroundBuffer ();
+		RenderBackgroundToDisplay ();
+	}
 }
 
 uint8_t* PPU::GetDisplayBuffer () {
@@ -132,4 +152,22 @@ uint16_t PPU::GetBackgroundTilesAddress () {
 	} else {
 		return 0x9800;
 	}
+}
+
+uint8_t PPU::NextScanline () {
+	uint8_t* pScanline = mmu->GetMemoryRef(CURLINE);
+	(*pScanline) += 1;
+	return *pScanline;
+}
+
+void PPU::ResetScanline () {
+	mmu->WriteByte(CURLINE, 0);
+}
+
+void PPU::ResetScanlineCounter () {
+	scanlineCounter = 456;
+}
+
+bool PPU::IsDisplayEnabled () {
+	return (mmu->ReadByte(LCDCTRL) & 0x80) == 0x80;
 }
