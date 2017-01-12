@@ -18,7 +18,6 @@
 class CPU;
 class MMU {
 private:
-
 	uint8_t bios[0xFF];
 	uint8_t rom[0x8000];
 	uint8_t eram[0x8000];

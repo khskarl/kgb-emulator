@@ -11,8 +11,6 @@ private:
 	MMU* mmu = nullptr;
 
 	void DrawScanline (uint8_t line);
-	void RenderBackgroundToDisplay ();
-	void RenderBackgroundBuffer ();
 
 	void FeedRandomToDisplay ();
 	void FeedRandomToBackground ();
