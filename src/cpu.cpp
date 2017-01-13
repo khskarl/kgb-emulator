@@ -193,10 +193,10 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x9C] = &CPU::opNull; opcodes[0x9D] = &CPU::opNull;
 	opcodes[0x9E] = &CPU::opNull; opcodes[0x9F] = &CPU::opNull;
 
-	opcodes[0xA0] = &CPU::opNull; opcodes[0xA1] = &CPU::opNull;
-	opcodes[0xA2] = &CPU::opNull; opcodes[0xA3] = &CPU::opNull;
-	opcodes[0xA4] = &CPU::opNull; opcodes[0xA5] = &CPU::opNull;
-	opcodes[0xA6] = &CPU::opNull; opcodes[0xA7] = &CPU::opNull;
+	opcodes[0xA0] = &CPU::op0xA0; opcodes[0xA1] = &CPU::op0xA1;
+	opcodes[0xA2] = &CPU::op0xA2; opcodes[0xA3] = &CPU::op0xA3;
+	opcodes[0xA4] = &CPU::op0xA4; opcodes[0xA5] = &CPU::op0xA5;
+	opcodes[0xA6] = &CPU::op0xA6; opcodes[0xA7] = &CPU::op0xA7;
 	opcodes[0xA8] = &CPU::op0xA8; opcodes[0xA9] = &CPU::op0xA9;
 	opcodes[0xAA] = &CPU::op0xAA; opcodes[0xAB] = &CPU::op0xAB;
 	opcodes[0xAC] = &CPU::op0xAC; opcodes[0xAD] = &CPU::op0xAD;
@@ -212,7 +212,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xBE] = &CPU::op0xBE; opcodes[0xBF] = &CPU::op0xBF;
 
 	opcodes[0xC0] = &CPU::opNull; opcodes[0xC1] = &CPU::op0xC1;
-	opcodes[0xC2] = &CPU::opNull; opcodes[0xC3] = &CPU::op0xC3;
+	opcodes[0xC2] = &CPU::op0xC2; opcodes[0xC3] = &CPU::op0xC3;
 	opcodes[0xC4] = &CPU::opNull; opcodes[0xC5] = &CPU::op0xC5;
 	opcodes[0xC6] = &CPU::opNull; opcodes[0xC7] = &CPU::opNull;
 	opcodes[0xC8] = &CPU::opNull; opcodes[0xC9] = &CPU::op0xC9;
@@ -232,7 +232,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xE0] = &CPU::op0xE0; opcodes[0xE1] = &CPU::op0xE1;
 	opcodes[0xE2] = &CPU::op0xE2; opcodes[0xE3] = &CPU::opNull;
 	opcodes[0xE4] = &CPU::opNull; opcodes[0xE5] = &CPU::op0xE5;
-	opcodes[0xE6] = &CPU::opNull; opcodes[0xE7] = &CPU::opNull;
+	opcodes[0xE6] = &CPU::op0xE6; opcodes[0xE7] = &CPU::opNull;
 	opcodes[0xE8] = &CPU::opNull; opcodes[0xE9] = &CPU::opNull;
 	opcodes[0xEA] = &CPU::op0xEA; opcodes[0xEB] = &CPU::opNull;
 	opcodes[0xEC] = &CPU::opNull; opcodes[0xED] = &CPU::opNull;
@@ -1192,18 +1192,73 @@ void CPU::op0x97() {
 
 /* A. instructions */
 // AND B
+void CPU::op0xA0() {
+	AF.hi &= BC.hi;
+	Z = (AF.hi == 0);
+	N = 0, H = 1, C = 0;
+	PC += 1;
+	clockCycles += 4;
+}
 // AND C
+void CPU::op0xA1() {
+	AF.hi &= BC.lo;
+	Z = (AF.hi == 0);
+	N = 0, H = 1, C = 0;
+	PC += 1;
+	clockCycles += 4;
+}
 // AND D
+void CPU::op0xA2() {
+	AF.hi &= DE.hi;
+	Z = (AF.hi == 0);
+	N = 0, H = 1, C = 0;
+	PC += 1;
+	clockCycles += 4;
+}
 // AND E
+void CPU::op0xA3() {
+	AF.hi &= DE.lo;
+	Z = (AF.hi == 0);
+	N = 0, H = 1, C = 0;
+	PC += 1;
+	clockCycles += 4;
+}
 // AND H
+void CPU::op0xA4() {
+	AF.hi &= HL.hi;
+	Z = (AF.hi == 0);
+	N = 0, H = 1, C = 0;
+	PC += 1;
+	clockCycles += 4;
+}
 // AND L
+void CPU::op0xA5() {
+	AF.hi &= HL.lo;
+	Z = (AF.hi == 0);
+	N = 0, H = 1, C = 0;
+	PC += 1;
+	clockCycles += 4;
+}
 // AND (HL)
+void CPU::op0xA6() {
+	AF.hi &= mmu->ReadByte(HL);
+	Z = (AF.hi == 0);
+	N = 0, H = 1, C = 0;
+	PC += 1;
+	clockCycles += 8;
+}
 // AND A
+void CPU::op0xA7() {
+	AF.hi &= AF.hi;
+	Z = (AF.hi == 0);
+	N = 0, H = 1, C = 0;
+	PC += 1;
+	clockCycles += 4;
+}
 // XOR B
 void CPU::op0xA8() {
 	AF.hi ^= BC.hi;
 	Z = (AF.hi == 0);
-
 	N = H = C = 0;
 	PC += 1;
 	clockCycles += 4;
@@ -1212,7 +1267,6 @@ void CPU::op0xA8() {
 void CPU::op0xA9() {
 	AF.hi ^= BC.lo;
 	Z = (AF.hi == 0);
-
 	N = H = C = 0;
 	PC += 1;
 	clockCycles += 4;
@@ -1221,7 +1275,6 @@ void CPU::op0xA9() {
 void CPU::op0xAA() {
 	AF.hi ^= DE.hi;
 	Z = (AF.hi == 0);
-
 	N = H = C = 0;
 	PC += 1;
 	clockCycles += 4;
@@ -1230,7 +1283,6 @@ void CPU::op0xAA() {
 void CPU::op0xAB() {
 	AF.hi ^= DE.lo;
 	Z = (AF.hi == 0);
-
 	N = H = C = 0;
 	PC += 1;
 	clockCycles += 4;
@@ -1239,7 +1291,6 @@ void CPU::op0xAB() {
 void CPU::op0xAC() {
 	AF.hi ^= HL.hi;
 	Z = (AF.hi == 0);
-
 	N = H = C = 0;
 	PC += 1;
 	clockCycles += 4;
@@ -1248,7 +1299,6 @@ void CPU::op0xAC() {
 void CPU::op0xAD() {
 	AF.hi ^= HL.lo;
 	Z = (AF.hi == 0);
-
 	N = H = C = 0;
 	PC += 1;
 	clockCycles += 4;
@@ -1257,7 +1307,6 @@ void CPU::op0xAD() {
 void CPU::op0xAE() {
 	AF.hi ^= mmu->ReadByte(HL);
 	Z = (AF.hi == 0);
-
 	N = H = C = 0;
 	PC += 1;
 	clockCycles += 8;
@@ -1266,7 +1315,6 @@ void CPU::op0xAE() {
 void CPU::op0xAF() {
 	AF.hi ^= AF.hi;
 	Z = (AF.hi == 0);
-
 	N = H = C = 0;
 	PC += 1;
 	clockCycles += 4;
@@ -1375,16 +1423,22 @@ void CPU::op0xF1 () {
 }
 
 // JP NZ,a16
+void CPU::op0xC2 () {
+	PC += 2;
+	if (Z == 0)
+		PC = ReadWord();
+	clockCycles = 12;
+}
 // JP NC,a16
 // LD (C),A
-void CPU::op0xE2() {
+void CPU::op0xE2 () {
 	mmu->WriteByte(BC.lo + 0xFF00, AF.hi);
 
 	PC += 2;
 	clockCycles = 8;
 }
 // LD A,(C)
-void CPU::op0xF2() {
+void CPU::op0xF2 () {
 	AF.hi = mmu->ReadByte(BC.lo + 0xFF00);
 
 	PC += 2;
@@ -1392,7 +1446,7 @@ void CPU::op0xF2() {
 }
 
 // JP a16
-void CPU::op0xC3() {
+void CPU::op0xC3 () {
 	PC = ReadWord();
 	clockCycles = 12;
 }
@@ -1406,25 +1460,25 @@ void CPU::op0xC3() {
 // F4..: I don't exist
 
 // PUSH BC
-void CPU::op0xC5() {
+void CPU::op0xC5 () {
 	PushWord(BC);
 	PC += 1;
 	clockCycles += 16;
 }
 // PUSH DE
-void CPU::op0xD5() {
+void CPU::op0xD5 () {
 	PushWord(DE);
 	PC += 1;
 	clockCycles += 16;
 }
 // PUSH HL
-void CPU::op0xE5() {
+void CPU::op0xE5 () {
 	PushWord(HL);
 	PC += 1;
 	clockCycles += 16;
 }
 // PUSH AF // FIXME: There is NO value in F because of our flags hack
-void CPU::op0xF5() {
+void CPU::op0xF5 () {
 	PushWord(AF);
 	PC += 1;
 	clockCycles += 16;
@@ -1433,6 +1487,13 @@ void CPU::op0xF5() {
 // ADD A,d8
 // SUB d8
 // AND d8
+void CPU::op0xE6 () {
+	AF.hi &= ReadByte();
+	Z = (AF.hi == 0);
+	N = H = C = 0;
+	PC += 2;
+	clockCycles += 8;
+}
 // OR d8
 
 // RST 00H
@@ -1446,7 +1507,7 @@ void CPU::op0xF5() {
 // LD HL,SP+r8
 
 // RET
-void CPU::op0xC9() {
+void CPU::op0xC9 () {
 	PC = PopWord();
 	clockCycles = 8;
 }
