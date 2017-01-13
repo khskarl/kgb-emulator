@@ -15,7 +15,7 @@ void CPU::Initialize (MMU* _mmu) {
 	DE = 0;
 	HL = 0;
 	SP = 0x0;
-	PC = 0x0;
+	PC = 0x100;
 
 	Z = 0, N = 0, H = 0, C = 0;
 	clockCycles = 0;
@@ -32,7 +32,7 @@ void CPU::EmulateCycle () {
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
-	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 	(this->*opcodes[opcode])(); // Wtf C++
 }
@@ -212,7 +212,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xBE] = &CPU::op0xBE; opcodes[0xBF] = &CPU::op0xBF;
 
 	opcodes[0xC0] = &CPU::opNull; opcodes[0xC1] = &CPU::op0xC1;
-	opcodes[0xC2] = &CPU::opNull; opcodes[0xC3] = &CPU::opNull;
+	opcodes[0xC2] = &CPU::opNull; opcodes[0xC3] = &CPU::op0xC3;
 	opcodes[0xC4] = &CPU::opNull; opcodes[0xC5] = &CPU::op0xC5;
 	opcodes[0xC6] = &CPU::opNull; opcodes[0xC7] = &CPU::opNull;
 	opcodes[0xC8] = &CPU::opNull; opcodes[0xC9] = &CPU::op0xC9;
@@ -1392,6 +1392,10 @@ void CPU::op0xF2() {
 }
 
 // JP a16
+void CPU::op0xC3() {
+	PC = ReadWord();
+	clockCycles = 12;
+}
 // D3..: I don't exist
 // E3..: I don't exist
 // DI

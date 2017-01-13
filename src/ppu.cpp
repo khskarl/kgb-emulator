@@ -65,8 +65,8 @@ void PPU::DrawScanline (uint8_t line) {
 		uint8_t jTile = (jScrolled) / 8;
 
 		uint16_t tileIdLocation = bgTilesMapAddress + iTile * 32 + jTile;
-		std::cout << "(" << std::dec << (int) iTile << ", " << (int) jTile << ") " << "\n";
-		std::cout << "TileIDAddress: " << std::hex << tileIdLocation << "\n";
+		// std::cout << "(" << std::dec << (int) iTile << ", " << (int) jTile << ") " << "\n";
+		// std::cout << "TileIDAddress: " << std::hex << tileIdLocation << "\n";
 		// assert(tileIdLocation != 0x9910);
 		uint8_t untreatedByte = mmu->ReadByte(tileIdLocation);
 
@@ -85,7 +85,7 @@ void PPU::DrawScanline (uint8_t line) {
 		if (tileIdLocation == 0x990F)
 			tileLocation = 0x80C0;
 		uint16_t tile = mmu->ReadWord(tileLocation + (iScrolled % 8) * 2);
-		std::cout << "[" << std::hex << tileLocation << "] " << tileID << " : " << tile  << "\n";
+		// std::cout << "[" << std::hex << tileLocation << "] " << tileID << " : " << tile  << "\n";
 
 
 		if (tileID != 0)

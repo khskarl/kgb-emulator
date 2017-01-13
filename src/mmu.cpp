@@ -8,6 +8,7 @@ MMU::MMU () {}
 MMU::~MMU () {}
 
 void MMU::Initialize () {
+	WriteByte(LCDCTRL, 0x91);
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {
