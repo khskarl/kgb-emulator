@@ -26,7 +26,6 @@ void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 
 		uint16_t numCycles = cpu.clockCycles;
 		this->StepTimers(numCycles);
-		this->StepGraphics(numCycles);
 		ppu.StepUpdate(numCycles);
 		cpu.ProcessInterrupts();
 
@@ -41,10 +40,10 @@ void GameBoy::StepInstruction () {
 
 void GameBoy::StepTimers (uint32_t cycles) {
 	uint8_t* div = mmu.GetMemoryRef(DIV);
-	if (*div + cycles >= 255) {
-		*div = 0;
+	if ( (*div) + cycles >= 255) {
+		(*div) = 0;
 	} else {
-		*div = cycles;
+		(*div) = cycles;
 	}
 
 	if (IsClockEnabled() == false)
@@ -65,10 +64,6 @@ void GameBoy::StepTimers (uint32_t cycles) {
 			mmu.WriteByte(TIMA, mmu.ReadByte(TIMA) + 1);
 		}
 	}
-}
-
-void GameBoy::StepGraphics (uint32_t cycles) {
-
 }
 
 void GameBoy::ResetClockFrequency () {

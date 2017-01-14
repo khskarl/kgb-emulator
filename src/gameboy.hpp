@@ -31,11 +31,9 @@ public:
 	void StepEmulation (const uint32_t cyclesThisUpdate = 69905);
 	void StepInstruction ();
 	void StepTimers (uint32_t cycles);
-	void StepGraphics (uint32_t cycles);
 
 	void ResetClockFrequency ();
 	bool IsClockEnabled ();
-	void ResetScanLineCounter ();
 
 	uint8_t* GetDisplayBuffer ();
 	MMU* GetMMU ();
