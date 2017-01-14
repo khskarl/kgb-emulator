@@ -6,7 +6,7 @@ GameBoy::~GameBoy () {}
 void GameBoy::Initialize () {
 	cpu.Initialize(&mmu);
 	mmu.Initialize();
-	ppu.Initialize(&mmu);
+	ppu.Initialize(&cpu, &mmu);
 
 	timerCounter = 1024;
 }
@@ -28,6 +28,7 @@ void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 		this->StepTimers(numCycles);
 		this->StepGraphics(numCycles);
 		ppu.StepUpdate(numCycles);
+		cpu.ProcessInterrupts();
 
 		cylesDone += numCycles;
 	}

@@ -1,6 +1,8 @@
 #include <cstdint>
 #include "mmu.hpp"
 
+class CPU;
+
 class PPU {
 private:
 	uint8_t displayBuffer[160 * 144];
@@ -8,7 +10,8 @@ private:
 
 	int32_t scanlineCounter = 456; // Lasts 456 Hz (Cycles)
 
-	MMU* mmu = nullptr;
+	CPU* cpu = nullptr; // For interrupts
+	MMU* mmu = nullptr; // For memory access
 
 	void DrawScanline (uint8_t line);
 
@@ -26,7 +29,7 @@ public:
 	PPU ();
 	virtual ~PPU ();
 
-	void Initialize (MMU* _mmu);
+	void Initialize (CPU* _cpu, MMU* _mmu);
 
 	void StepUpdate (uint16_t cycles);
 

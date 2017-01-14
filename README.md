@@ -1,5 +1,5 @@
 # Game Boy Emulator
-A Game Boy emulator written in C++11 for learning purposes. It doesn't do anything interesting yet.
+A Game Boy emulator written in C++14 for learning purposes. It doesn't do anything interesting yet.
 
 ## Dependencies
 -   SFML2
@@ -17,7 +17,7 @@ $ ./build/gameboy.out roms/tetris.gb
 
 ## TODO
 -   [x] Port to SFML
--   [ ] Write the emulator
+-   [ ] Tetris Title Screen
 
 
 ## Known bugs

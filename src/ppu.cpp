@@ -1,5 +1,7 @@
 #include "ppu.hpp"
 
+#include "cpu.hpp"
+
 #include <algorithm>
 #include <iostream>
 #include "debug.hpp"
@@ -7,8 +9,10 @@
 PPU::PPU () {}
 PPU::~PPU () {}
 
-void PPU::Initialize(MMU* _mmu) {
-	assert("MMU is nullptr" && _mmu != nullptr);
+void PPU::Initialize(CPU* _cpu, MMU* _mmu) {
+	assert("CPU reference invalid" && _cpu != nullptr);
+	assert("MMU reference invalid" && _mmu != nullptr);
+	cpu = _cpu;
 	mmu = _mmu;
 
 	// FeedRandomToBackground ();
@@ -16,6 +20,8 @@ void PPU::Initialize(MMU* _mmu) {
 }
 
 void PPU::StepUpdate (uint16_t cycles) {
+	// SetLCDStatus()
+
 	if (IsDisplayEnabled() == false)
 		return;
 
@@ -28,16 +34,13 @@ void PPU::StepUpdate (uint16_t cycles) {
 
 	ResetScanlineCounter();
 
-	// if (currLine == 144)
-	// 	RequestInterrupt
+	if (currLine == 144)
+		cpu->RequestInterrupt(0);
 
 	if (currLine > 153)
 		ResetScanline();
 	else if (currLine < 144) {
 		DrawScanline(currLine);
-	}
-	else {
-		// We are in VBLANK dude :D
 	}
 }
 
@@ -77,11 +80,14 @@ void PPU::DrawScanline (uint8_t line) {
 		else
 			tileID = reinterpret_cast<int8_t&>(untreatedByte);
 
-		std::cout << "i: " << std::hex << (int) iTile << '\n';
-		std::cout << "j: " << std::hex << (int) jTile << '\n';
-		std::cout << "tileIdAddress: " << std::hex << (int) tileIdAddress << '\n';
-		std::cout << "tileId:        " << std::hex << (int) tileID << '\n';
-		assert(tileIdAddress != 0x9910);
+		// std::cout << "i: " << std::hex << (int) iTile << '\n';
+		// std::cout << "j: " << std::hex << (int) jTile << '\n';
+		// std::cout << "tileIdAddress: " << std::hex << (int) tileIdAddress << '\n';
+		// std::cout << "tileId:        " << std::hex << (int) tileID << '\n';
+		// assert(tileIdAddress != 0x9910);
+		// if (tileIdAddress == 0x9910) {
+		// 	while (1) {}
+		// }
 
 		uint16_t tileLocation = tilesAddress;
 		if (tilesAddress == 0x8000)
@@ -150,13 +156,13 @@ uint16_t PPU::GetBackgroundTilesAddress () {
 }
 
 uint8_t PPU::NextScanline () {
-	uint8_t* pScanline = mmu->GetMemoryRef(CURLINE);
+	uint8_t* pScanline = mmu->GetIORef(CURLINE);
 	(*pScanline) += 1;
 	return *pScanline;
 }
 
 void PPU::ResetScanline () {
-	mmu->WriteByte(CURLINE, 0);
+	(*mmu->GetIORef(CURLINE)) = 0;
 }
 
 void PPU::ResetScanlineCounter () {

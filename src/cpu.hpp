@@ -60,6 +60,8 @@ public:
 	/* Instead of using F from AF, we create those variables*/
 	bool Z, N, H, C;
 
+	bool areInterruptsEnabled = true;
+
 	uint8_t clockCycles;
 
 	CPU ();
@@ -67,6 +69,11 @@ public:
 
 	void Initialize (MMU* _mmu);
 	void EmulateCycle ();
+
+	/* Interrupt related functions */
+	void RequestInterrupt (uint8_t id);
+	void ProcessInterrupts ();
+	void DoInterrupt (uint8_t id);
 private:
 	/* Instruction helpers */
 	uint8_t  ReadByte ();

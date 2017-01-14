@@ -15,6 +15,9 @@
 #define CURLINE 0xFF44
 #define CMPLINE 0xFF45
 
+#define IF 0xFF0F
+#define IE 0xFFFF
+
 class CPU;
 class MMU {
 private:
@@ -49,7 +52,8 @@ public:
 	void WriteBios (uint8_t* buffer);
 	void WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize);
 
-	uint8_t* GetRomRef (uint16_t address);
+	uint8_t* GetRomRef    (uint16_t address);
+	uint8_t* GetIORef     (uint16_t address);
 	uint8_t* GetMemoryRef (uint16_t address);
 };
 

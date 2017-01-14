@@ -37,6 +37,50 @@ void CPU::EmulateCycle () {
 	(this->*opcodes[opcode])(); // Wtf C++
 }
 
+void CPU::RequestInterrupt (uint8_t id) {
+	uint8_t requestRegister = mmu->ReadByte(IF);
+	requestRegister |= 0x10 >> (4 - id); // SET bit ID
+	mmu->WriteByte(IF, requestRegister);
+	std::cout << "Interrupt requested!\n" ;
+}
+
+void CPU::ProcessInterrupts () {
+	if (areInterruptsEnabled == false)
+		return;
+
+	uint8_t requestRegister = mmu->ReadByte(IF);
+	if (requestRegister == 0)
+		return;
+
+	uint8_t enabledRegister = mmu->ReadByte(IF);
+	for (size_t id = 0; id < 5; id++) {
+		bool isInterruptRequested = requestRegister & (0x10 >> (4 - id));
+		bool isInterruptEnabled   = enabledRegister & (0x10 >> (4 - id));
+
+		if (isInterruptRequested && isInterruptEnabled)
+			DoInterrupt(id);
+
+	}
+}
+
+void CPU::DoInterrupt (uint8_t id) {
+	areInterruptsEnabled = false;
+	uint8_t requestRegister = mmu->ReadByte(IF);
+	requestRegister ^= 0x10 >> (4 - id); // RESET bit ID
+	mmu->WriteByte(IF, requestRegister);
+
+	PushWord(PC);
+
+	switch (id) {
+		case 0: PC = 0x40; break;
+		case 1: PC = 0x48; break;
+		case 2: PC = 0x50; break;
+		case 4: PC = 0x60; break;
+		default: assert("Invalid interrupt ID" && 0); break;
+	}
+
+}
+
 uint8_t CPU::ReadByte () {
 	return mmu->ReadByte(PC + 1);
 }
@@ -102,6 +146,7 @@ void CPU::CompareA (uint8_t value) {
 	C = (AF.hi < value);
 }
 
+/* Instructions specific code */
 void CPU::InitializeOpcodeTable () {
 	opcodes[0x00] = &CPU::op0x00; opcodes[0x01] = &CPU::op0x01;
 	opcodes[0x02] = &CPU::op0x02; opcodes[0x03] = &CPU::op0x03;

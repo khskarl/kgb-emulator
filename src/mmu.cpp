@@ -12,13 +12,13 @@ void MMU::Initialize () {
 	WriteByte(LCDCTRL, 0x91);
 
 	for (uint8_t &v : bios) {	v = 0; }
-	for (uint8_t &v : rom) {	v = 0; }
+	for (uint8_t &v : rom)  { v = 0; }
 	for (uint8_t &v : eram) {	v = 0; }
 	for (uint8_t &v : wram) {	v = 0; }
 	for (uint8_t &v : zram) {	v = 0; }
 	for (uint8_t &v : vram) {	v = 0; }
-	for (uint8_t &v : oam) {	v = 0; }
-	for (uint8_t &v : io) {	v = 0; }
+	for (uint8_t &v : oam)  { v = 0; }
+	for (uint8_t &v : io)   {	v = 0; }
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {
@@ -40,6 +40,10 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 	assert(address >= 0x0000 && address <= 0xFFFF);
 
 	*GetMemoryRef(address) = value;
+
+	// Reset scanline if we try to write to it
+	if (address == CURLINE)
+		io[address & 0x7F] = 0;
 }
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
@@ -61,6 +65,10 @@ void MMU::WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize) {
 
 uint8_t* MMU::GetRomRef (uint16_t address) {
 	return &rom[address];
+}
+
+uint8_t* MMU::GetIORef (uint16_t address) {
+	return &io[address & 0x7F];
 }
 
 uint8_t* MMU::GetMemoryRef (uint16_t address) {
