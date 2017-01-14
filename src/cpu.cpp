@@ -15,7 +15,7 @@ void CPU::Initialize (MMU* _mmu) {
 	DE = 0;
 	HL = 0;
 	SP = 0x0;
-	PC = 0x100;
+	PC = 0x0;
 
 	Z = 0, N = 0, H = 0, C = 0;
 	clockCycles = 0;
@@ -32,7 +32,7 @@ void CPU::EmulateCycle () {
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
-	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 	(this->*opcodes[opcode])(); // Wtf C++
 }
@@ -54,7 +54,7 @@ uint16_t CPU::PopWord () {
 	SP += 2;
 	return mmu->ReadWord(SP - 2);
 }
-
+// FIXME: Double check C flag computation
 void CPU::RotateLeft (uint8_t& value) {
 	uint8_t oldBit7 = (value >> 7);
 	value = (value << 1) | oldBit7;

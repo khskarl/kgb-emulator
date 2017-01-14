@@ -18,14 +18,14 @@
 class CPU;
 class MMU {
 private:
-	uint8_t bios[0xFF];
-	uint8_t rom[0x8000];
-	uint8_t eram[0x8000];
-	uint8_t wram[0x8000];
-	uint8_t zram[0x8000];
+	uint8_t bios[0xFF+1];
+	uint8_t rom[0x4000];
+	uint8_t vram[0x2000];
+	uint8_t eram[0x2000];
+	uint8_t wram[0x1000];
+	uint8_t zram[0x1000];
 
-	uint8_t vram[0x8000];
-	uint8_t oam[0x8000];
+	uint8_t oam[0x2000];
 
 	uint8_t io[0x80];
 

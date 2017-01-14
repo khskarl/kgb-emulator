@@ -1,6 +1,7 @@
 #include "mmu.hpp"
 #include "cpu.hpp"
 
+#include <iostream>
 #include <cstring> // std::memcpy
 #include "debug.hpp"
 
@@ -9,6 +10,15 @@ MMU::~MMU () {}
 
 void MMU::Initialize () {
 	WriteByte(LCDCTRL, 0x91);
+
+	for (uint8_t &v : bios) {	v = 0; }
+	for (uint8_t &v : rom) {	v = 0; }
+	for (uint8_t &v : eram) {	v = 0; }
+	for (uint8_t &v : wram) {	v = 0; }
+	for (uint8_t &v : zram) {	v = 0; }
+	for (uint8_t &v : vram) {	v = 0; }
+	for (uint8_t &v : oam) {	v = 0; }
+	for (uint8_t &v : io) {	v = 0; }
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {
@@ -109,7 +119,7 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 				if (address < 0xFEA0)
 					return &oam[address & 0xFF];
 				else
-					return 0;
+					return nullptr;
 			}
 			else if (lo == 0xF00) {
 				if (address >= 0xFF80)

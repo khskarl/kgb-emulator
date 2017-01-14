@@ -64,11 +64,11 @@ void PPU::DrawScanline (uint8_t line) {
 		uint8_t jScrolled = scrollX + jPixel;
 		uint8_t jTile = (jScrolled) / 8;
 
-		uint16_t tileIdLocation = bgTilesMapAddress + iTile * 32 + jTile;
-		// std::cout << "(" << std::dec << (int) iTile << ", " << (int) jTile << ") " << "\n";
-		// std::cout << "TileIDAddress: " << std::hex << tileIdLocation << "\n";
-		// assert(tileIdLocation != 0x9910);
-		uint8_t untreatedByte = mmu->ReadByte(tileIdLocation);
+		// FIXME: Getting wrong tiles
+		uint16_t tileIdAddress = bgTilesMapAddress + iTile * 32 + jTile;
+		uint8_t untreatedByte = mmu->ReadByte(tileIdAddress);
+
+
 
 
 		int16_t tileID;
@@ -77,13 +77,19 @@ void PPU::DrawScanline (uint8_t line) {
 		else
 			tileID = reinterpret_cast<int8_t&>(untreatedByte);
 
+		std::cout << "i: " << std::hex << (int) iTile << '\n';
+		std::cout << "j: " << std::hex << (int) jTile << '\n';
+		std::cout << "tileIdAddress: " << std::hex << (int) tileIdAddress << '\n';
+		std::cout << "tileId:        " << std::hex << (int) tileID << '\n';
+		assert(tileIdAddress != 0x9910);
+
 		uint16_t tileLocation = tilesAddress;
 		if (tilesAddress == 0x8000)
 			tileLocation += tileID * 16;
 		else
 			tileLocation += (tileID + 128) * 16;
-		if (tileIdLocation == 0x990F)
-			tileLocation = 0x80C0;
+		// if (tileIdLocation == 0x990F)
+		// 	tileLocation = 0x80C0;
 		uint16_t tile = mmu->ReadWord(tileLocation + (iScrolled % 8) * 2);
 		// std::cout << "[" << std::hex << tileLocation << "] " << tileID << " : " << tile  << "\n";
 
