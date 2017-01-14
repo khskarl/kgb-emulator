@@ -43,7 +43,6 @@ void GameBoy::StepTimers (uint32_t cycles) {
 
 	if (mmu.ReadByte(DIV) + cycles >= 255) {
 		mmu.WriteByte(DIV, 0);
-
 	} else {
 		mmu.WriteByte(DIV, cycles);
 	}
@@ -60,7 +59,7 @@ void GameBoy::StepTimers (uint32_t cycles) {
 		// timer about to overflow
 		if (mmu.ReadByte(TIMA) == 255) {
 			mmu.WriteByte(TIMA, mmu.ReadByte(TMA));
-			// a timer interrupt should ocurr
+			cpu.RequestInterrupt(2);
 		}
 		else {
 			mmu.WriteByte(TIMA, mmu.ReadByte(TIMA) + 1);

@@ -44,6 +44,8 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 	// Reset scanline if we try to write to it
 	if (address == CURLINE)
 		io[address & 0x7F] = 0;
+	else if (address == DIV)
+		io[address & 0x7F] = 0 ;
 }
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
