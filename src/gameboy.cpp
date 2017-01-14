@@ -40,11 +40,11 @@ void GameBoy::StepInstruction () {
 }
 
 void GameBoy::StepTimers (uint32_t cycles) {
-
-	if (mmu.ReadByte(DIV) + cycles >= 255) {
-		mmu.WriteByte(DIV, 0);
+	uint8_t* div = mmu.GetMemoryRef(DIV);
+	if (*div + cycles >= 255) {
+		*div = 0;
 	} else {
-		mmu.WriteByte(DIV, cycles);
+		*div = cycles;
 	}
 
 	if (IsClockEnabled() == false)
