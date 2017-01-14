@@ -32,7 +32,7 @@ void CPU::EmulateCycle () {
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
-	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 	(this->*opcodes[opcode])(); // Wtf C++
 }
@@ -1181,7 +1181,11 @@ void CPU::op0x87() {
 /* 9. instructions */
 // SUB B
 void CPU::op0x90() {
+	std::cout << "A:   " << std::dec << (int) AF.hi << "\n";
+	std::cout << "B:   " << std::dec << (int) BC.hi << "\n";
 	SubtractA(BC.hi);
+	std::cout << "B:   " << std::dec << (int) BC.hi << "\n";
+	std::cout << "A-B: " << std::dec << (int) AF.hi << "\n";
 	PC += 1;
 	clockCycles += 4;
 }

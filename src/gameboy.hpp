@@ -36,6 +36,7 @@ public:
 	bool IsClockEnabled ();
 
 	uint8_t* GetDisplayBuffer ();
+	CPU* GetCPU ();
 	MMU* GetMMU ();
 
 	bool GetHalt ();

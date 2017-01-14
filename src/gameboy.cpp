@@ -84,6 +84,10 @@ uint8_t* GameBoy::GetDisplayBuffer () {
 	return ppu.GetDisplayBuffer();
 }
 
+CPU* GameBoy::GetCPU () {
+	return &cpu;
+}
+
 MMU* GameBoy::GetMMU () {
 	return &mmu;
 }
