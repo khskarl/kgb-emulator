@@ -9,9 +9,9 @@
 #define TMC  0xFF07
 
 #define LCDCTRL 0xFF40
+#define LCDSTAT 0xFF41
 #define SCROLLY 0xFF42
 #define SCROLLX 0xFF43
-
 #define CURLINE 0xFF44
 #define CMPLINE 0xFF45
 

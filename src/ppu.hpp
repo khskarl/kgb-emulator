@@ -13,11 +13,11 @@ private:
 	CPU* cpu = nullptr; // For interrupts
 	MMU* mmu = nullptr; // For memory access
 
+	void SetDisplayStatus ();
+
 	void DrawScanline (uint8_t line);
 
 	void FeedRandomToDisplay ();
-	void FeedRandomToBackground ();
-	void FeedPatternToBackground ();
 
 	uint16_t GetTilesAddress ();
 	uint16_t GetBackgroundTilesAddress ();

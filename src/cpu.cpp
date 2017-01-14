@@ -41,7 +41,7 @@ void CPU::RequestInterrupt (uint8_t id) {
 	uint8_t requestRegister = mmu->ReadByte(IF);
 	requestRegister |= 0x10 >> (4 - id); // SET bit ID
 	mmu->WriteByte(IF, requestRegister);
-	std::cout << "Interrupt requested!\n" ;
+	// std::cout << "Interrupt requested!\n" ;
 }
 
 void CPU::ProcessInterrupts () {
@@ -66,7 +66,8 @@ void CPU::ProcessInterrupts () {
 void CPU::DoInterrupt (uint8_t id) {
 	areInterruptsEnabled = false;
 	uint8_t requestRegister = mmu->ReadByte(IF);
-	requestRegister ^= 0x10 >> (4 - id); // RESET bit ID
+	// Reset bit id, we use XOR because the bit has to be 1 before this function
+	requestRegister ^= 0x10 >> (4 - id);
 	mmu->WriteByte(IF, requestRegister);
 
 	PushWord(PC);

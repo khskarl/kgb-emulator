@@ -19,8 +19,69 @@ void PPU::Initialize(CPU* _cpu, MMU* _mmu) {
 	// FeedPatternToBackground ();
 }
 
+void PPU::SetDisplayStatus () {
+	uint8_t status = mmu->ReadByte(LCDSTAT);
+	// If display is disabled, set mode to 1 and reset scanline
+	if (IsDisplayEnabled() == false) {
+		ResetScanline();
+		ResetScanlineCounter();
+
+		status &= 252;
+		status |= 0x1;
+		mmu->WriteByte(LCDSTAT, status);
+		return;
+	}
+
+	uint8_t currLine = mmu->ReadByte(CURLINE);
+	uint8_t currMode = status & 0x3;
+
+	uint8_t nextMode = 0;
+	bool requestInterrupt = false;
+
+	/* If in VBLANK, set mode to 1 */
+	if (currLine >= 144) {
+		nextMode = 1;
+		status = (status & ~0x3) | 0x1;
+		requestInterrupt = ((status & 0x10) == 0x10);
+	}
+	/* Mode 2 */
+	else if (scanlineCounter >= 376) {
+		nextMode = 2;
+		status = (status & ~0x3) | 0x2;
+		requestInterrupt = ((status & 0x20) == 0x20);
+	}
+	/* Mode 3 */
+	else if (scanlineCounter >= 204) {
+		nextMode = 3;
+		status = (status & ~0x3) | 0x3;
+	}
+	/* Mode 0 */
+	else {
+		nextMode = 0;
+		status = (status & ~0x3);
+		requestInterrupt = ((status & 0x8) == 0x8);
+	}
+
+	// Request an interrupt if we changed modes
+	if (requestInterrupt && nextMode != currMode) {
+		cpu->RequestInterrupt(1);
+	}
+
+	// Coincidence Flag
+	if (currLine == mmu->ReadByte(CMPLINE)) {
+		status |= 0x4;
+		if ((status & 0x20) == 0x20)
+			cpu->RequestInterrupt(1);
+	}
+	else {
+		status = (status & ~0x4);
+	}
+
+	mmu->WriteByte(LCDSTAT, status);
+}
+
 void PPU::StepUpdate (uint16_t cycles) {
-	// SetLCDStatus()
+	SetDisplayStatus();
 
 	if (IsDisplayEnabled() == false)
 		return;
@@ -61,7 +122,6 @@ void PPU::DrawScanline (uint8_t line) {
 
 	uint8_t iScrolled = scrollY + line;
 	uint8_t iTile = (iScrolled) / 8;
-	// uint8_t iTilePixel = iTile * 32;
 
 	for (size_t jPixel = 0; jPixel < 160; jPixel += 1) {
 		uint8_t jScrolled = scrollX + jPixel;
@@ -70,9 +130,6 @@ void PPU::DrawScanline (uint8_t line) {
 		// FIXME: Getting wrong tiles
 		uint16_t tileIdAddress = bgTilesMapAddress + iTile * 32 + jTile;
 		uint8_t untreatedByte = mmu->ReadByte(tileIdAddress);
-
-
-
 
 		int16_t tileID;
 		if (tilesAddress == 0x8000)
@@ -111,29 +168,6 @@ void PPU::FeedRandomToDisplay () {
 	for (size_t i = 0; i < 160 * 144; i += 1) {
 		int luminosity = rand() % 4;
 		displayBuffer[i] = luminosity;
-	}
-}
-
-void PPU::FeedRandomToBackground () {
-	for (size_t i = 0; i < 256 * 256; i += 1) {
-		int luminosity = rand() % 4;
-		backgroundBuffer[i] = luminosity;
-	}
-}
-
-void PPU::FeedPatternToBackground () {
-	// for (size_t i = 0; i < 256; i += 1) {
-	// 	for (size_t j = 0; j < 256; j += 1) {
-	// 		int luminosity = ((i * j) % 64) / 16;
-	// 		backgroundBuffer[i * 256 + j] = luminosity;
-	// 	}
-	// }
-
-	for (size_t i = 0; i < 256; i += 1) {
-		for (size_t j = 0; j < 256; j += 1) {
-			int luminosity = ((j + i) % 64) / 16;
-			backgroundBuffer[i * 256 + j] = luminosity;
-		}
 	}
 }
 
