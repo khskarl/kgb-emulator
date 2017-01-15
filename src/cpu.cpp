@@ -500,14 +500,12 @@ void CPU::op0x36 () {
 // RLCA
 void CPU::op0x07 () {
 	opNull();
-
 	clockCycles = 4;
 }
 // RLA
 // FIXME: Maybe RLA isn't the same as RL A, check Flags on pastraiser
 void CPU::op0x17 () {
 	RotateLeft(AF.hi);
-
 	clockCycles = 4;
 }
 // DAA
@@ -516,7 +514,6 @@ void CPU::op0x17 () {
 // LD (a16),SP
 void CPU::op0x08 () {
 	opNull();
-
 	clockCycles = 20;
 }
 // JR r8
@@ -562,34 +559,29 @@ void CPU::op0x09 () {
 // LD A,(BC)
 void CPU::op0x0A () {
 	AF.hi = mmu->ReadByte(BC);
-
 	clockCycles = 8;
 }
 // LD A,(DE)
 void CPU::op0x1A () {
 	AF.hi = mmu->ReadByte(DE);
-
 	clockCycles = 8;
 }
 // LD A,(HL+)
 void CPU::op0x2A () {
 	AF.hi = mmu->ReadByte(HL);
 	HL += 1;
-
 	clockCycles = 8;
 }
 // LD A,(HL-)
 void CPU::op0x3A () {
 	AF.hi = mmu->ReadByte(HL);
 	HL -= 1;
-
 	clockCycles = 8;
 }
 
 // DEC BC
 void CPU::op0x0B () {
 	opNull();
-
 	clockCycles = 8;
 }
 // DEC DE
@@ -640,57 +632,48 @@ void CPU::op0x3C () {
 // DEC C
 void CPU::op0x0D () {
 	Decrement(BC.lo);
-
 	clockCycles = 4;
 }
 // DEC E
 void CPU::op0x1D () {
 	Decrement(DE.lo);
-
 	clockCycles = 4;
 }
 // DEC L
 void CPU::op0x2D () {
 	Decrement(HL.lo);
-
 	clockCycles = 4;
 }
 // DEC A
 void CPU::op0x3D () {
 	Decrement(AF.lo);
-
 	clockCycles = 4;
 }
 
 // LD C,d8
 void CPU::op0x0E () {
 	BC.lo = ReadByte();
-
 	clockCycles = 8;
 }
 // LD E,d8
 void CPU::op0x1E () {
 	DE.lo = ReadByte();
-
 	clockCycles = 8;
 }
 // LD L,d8
 void CPU::op0x2E () {
 	HL.lo = ReadByte();
-
 	clockCycles = 8;
 }
 // LD A,d8
 void CPU::op0x3E () {
 	AF.hi = ReadByte();
-
 	clockCycles = 8;
 }
 
 // RRCA
 void CPU::op0x0F () {
 	opNull();
-
 	clockCycles = 4;
 }
 // RRA
@@ -701,97 +684,81 @@ void CPU::op0x0F () {
 // LD B,B
 void CPU::op0x40 () {
 	BC.hi = BC.hi;
-
 	clockCycles = 4;
 }
 // LD B,C
 void CPU::op0x41 () {
 	BC.hi = BC.lo;
-
 	clockCycles = 4;
 }
 // LD B,D
 void CPU::op0x42 () {
 	BC.hi = DE.hi;
-
 	clockCycles = 4;
 }
 // LD B,E
 void CPU::op0x43 () {
 	BC.hi = DE.lo;
-
 	clockCycles = 4;
 }
 // LD B,H
 void CPU::op0x44 () {
 	BC.hi = HL.hi;
-
 	clockCycles = 4;
 }
 // LD B,L
 void CPU::op0x45 () {
 	BC.hi = HL.lo;
-
 	clockCycles = 4;
 }
 // LD B,(HL)
 void CPU::op0x46 () {
 	BC.hi = mmu->ReadByte(HL);
-
 	clockCycles = 8;
 }
 // LD B,A
 void CPU::op0x47 () {
 	BC.hi = AF.hi;
-
 	clockCycles = 4;
 }
 // LD C,B
 void CPU::op0x48 () {
 	BC.lo = BC.hi;
-
 	clockCycles = 4;
 }
 // LD C,C
 void CPU::op0x49 () { // Copying C to C? Is this Right?
 	BC.lo = BC.lo;
-
 	clockCycles = 4;
 }
 // LD C,D
 void CPU::op0x4A () {
 	BC.lo = DE.hi;
-
 	clockCycles = 4;
 }
 // LD C,E
 void CPU::op0x4B () {
 	BC.lo = DE.lo;
-
 	clockCycles = 4;
 }
 // LD C,H
 void CPU::op0x4C () {
 	BC.lo = HL.hi;
-
 	clockCycles = 4;
 }
 // LD C,L
 void CPU::op0x4D () {
 	BC.lo = HL.lo;
-
 	clockCycles = 4;
 }
 // LD C,(HL)
 void CPU::op0x4E () {
 	BC.lo = mmu->ReadByte(HL);
-
 	clockCycles = 4;
 }
 // LD C,A
 void CPU::op0x4F () {
 	BC.lo = AF.hi;
-
 	clockCycles = 4;
 }
 
@@ -799,97 +766,81 @@ void CPU::op0x4F () {
 // LD D,B
 void CPU::op0x50 () {
 	DE.hi = BC.hi;
-
 	clockCycles = 4;
 }
 // LD D,C
 void CPU::op0x51 () {
 	DE.hi = BC.lo;
-
 	clockCycles = 4;
 }
 // LD D,D
 void CPU::op0x52 () {
 	DE.hi = DE.hi;
-
 	clockCycles = 4;
 }
 // LD D,E
 void CPU::op0x53 () {
 	DE.hi = HL.hi;
-
 	clockCycles = 4;
 }
 // LD D,H
 void CPU::op0x54 () {
 	DE.hi = HL.hi;
-
 	clockCycles = 4;
 }
 // LD D,L
 void CPU::op0x55 () {
 	DE.hi = HL.lo;
-
 	clockCycles = 4;
 }
 // LD D,(HL)
 void CPU::op0x56 () {
 	DE.hi = mmu->ReadByte(HL);
-
 	clockCycles = 4;
 }
 // LD D,A
 void CPU::op0x57 () {
 	DE.hi = AF.hi;
-
 	clockCycles = 4;
 }
 // LD E,B
 void CPU::op0x58 () {
 	DE.lo = BC.hi;
-
 	clockCycles = 4;
 }
 // LD E,C
 void CPU::op0x59 () {
 	DE.lo = BC.lo;
-
 	clockCycles = 4;
 }
 // LD E,D
 void CPU::op0x5A () {
 	DE.lo = DE.hi;
-
 	clockCycles = 4;
 }
 // LD E,E
 void CPU::op0x5B () {
 	DE.lo = DE.lo;
-
 	clockCycles = 4;
 }
 // LD E,H
 void CPU::op0x5C () {
 	DE.lo = HL.hi;
-
 	clockCycles = 4;
 }
 // LD E,L
 void CPU::op0x5D () {
 	DE.lo = HL.lo;
-
 	clockCycles = 4;
 }
 // LD E,(HL)
 void CPU::op0x5E () {
 	DE.lo = mmu->ReadByte(HL);
-
 	clockCycles = 4;
 }
 // LD E,A
 void CPU::op0x5F () {
 	DE.lo = AF.hi;
-
 	clockCycles = 4;
 }
 
@@ -897,97 +848,81 @@ void CPU::op0x5F () {
 // LD H,B
 void CPU::op0x60 () {
 	HL.hi = BC.hi;
-
 	clockCycles = 4;
 }
 // LD H,C
 void CPU::op0x61 () {
 	HL.hi = BC.lo;
-
 	clockCycles = 4;
 }
 // LD H,D
 void CPU::op0x62 () {
 	HL.hi = DE.hi;
-
 	clockCycles = 4;
 }
 // LD H,E
 void CPU::op0x63 () {
 	HL.hi = DE.lo;
-
 	clockCycles = 4;
 }
 // LD H,H
 void CPU::op0x64 () {
 	HL.hi = HL.hi;
-
 	clockCycles = 4;
 }
 // LD H,L
 void CPU::op0x65 () {
 	AF.lo = HL.lo;
-
 	clockCycles = 4;
 }
 // LD H,(HL)
 void CPU::op0x66 () {
 	HL.hi = mmu->ReadByte(HL);
-
 	clockCycles = 4;
 }
 // LD H,A
 void CPU::op0x67 () {
 	HL.hi = AF.hi;
-
 	clockCycles = 4;
 }
 // LD L,B
 void CPU::op0x68 () {
 	HL.lo = BC.hi;
-
 	clockCycles = 4;
 }
 // LD L,C
 void CPU::op0x69 () {
 	HL.lo = BC.lo;
-
 	clockCycles = 4;
 }
 // LD L,D
 void CPU::op0x6A () {
 	HL.lo = DE.hi;
-
 	clockCycles = 4;
 }
 // LD L,E
 void CPU::op0x6B () {
 	HL.lo = DE.lo;
-
 	clockCycles = 4;
 }
 // LD L,H
 void CPU::op0x6C () {
 	HL.lo = HL.hi;
-
 	clockCycles = 4;
 }
 // LD L,L
 void CPU::op0x6D () {
 	HL.lo = HL.lo;
-
 	clockCycles = 4;
 }
 // LD L,(HL)
 void CPU::op0x6E () {
 	HL.lo = mmu->ReadByte(HL);
-
 	clockCycles = 4;
 }
 // LD L,A
 void CPU::op0x6F () {
 	HL.lo = AF.hi;
-
 	clockCycles = 4;
 }
 
