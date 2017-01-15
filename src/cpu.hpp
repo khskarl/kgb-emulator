@@ -60,7 +60,8 @@ public:
 	/* Instead of using F from AF, we create those variables*/
 	bool Z, N, H, C;
 
-	bool areInterruptsEnabled = true;
+	bool areInterruptsEnabled = false;
+	bool isHalted = false;
 
 	uint8_t clockCycles;
 

@@ -27,14 +27,24 @@ void CPU::Initialize (MMU* _mmu) {
 }
 
 void CPU::EmulateCycle () {
-	if (PC == 0x100)
+	if (PC == 0x100) {
 		mmu->isInBios = false;
+		areInterruptsEnabled = true;
+	}
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 	(this->*opcodes[opcode])(); // Wtf C++
+
+	static uint8_t lastScrollY = 0;
+	uint8_t scrollY = mmu->ReadByte(SCROLLY);
+	if ((scrollY == 15)) {
+		std::cout << "scrollY: " << (int) scrollY << '\n';
+		isHalted = true;
+		lastScrollY = scrollY;
+	}
 }
 
 void CPU::RequestInterrupt (uint8_t id) {
@@ -59,7 +69,6 @@ void CPU::ProcessInterrupts () {
 
 		if (isInterruptRequested && isInterruptEnabled)
 			DoInterrupt(id);
-
 	}
 }
 
@@ -71,7 +80,8 @@ void CPU::DoInterrupt (uint8_t id) {
 	mmu->WriteByte(IF, requestRegister);
 
 	PushWord(PC);
-
+	std::cout << "Interrupting!" << "\n";
+	isHalted = true;
 	switch (id) {
 		case 0: PC = 0x40; break;
 		case 1: PC = 0x48; break;
@@ -693,7 +703,7 @@ void CPU::op0x3D () {
 
 // LD C,d8
 void CPU::op0x0E () {
-	BC.hi = ReadByte();
+	BC.lo = ReadByte();
 	PC += 2;
 	clockCycles = 8;
 }
@@ -1181,11 +1191,7 @@ void CPU::op0x87() {
 /* 9. instructions */
 // SUB B
 void CPU::op0x90() {
-	std::cout << "A:   " << std::dec << (int) AF.hi << "\n";
-	std::cout << "B:   " << std::dec << (int) BC.hi << "\n";
 	SubtractA(BC.hi);
-	std::cout << "B:   " << std::dec << (int) BC.hi << "\n";
-	std::cout << "A-B: " << std::dec << (int) AF.hi << "\n";
 	PC += 1;
 	clockCycles += 4;
 }
@@ -1484,14 +1490,14 @@ void CPU::op0xC2 () {
 void CPU::op0xE2 () {
 	mmu->WriteByte(BC.lo + 0xFF00, AF.hi);
 
-	PC += 2;
+	PC += 1;
 	clockCycles = 8;
 }
 // LD A,(C)
 void CPU::op0xF2 () {
 	AF.hi = mmu->ReadByte(BC.lo + 0xFF00);
 
-	PC += 2;
+	PC += 1;
 	clockCycles = 8;
 }
 
