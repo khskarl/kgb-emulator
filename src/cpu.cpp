@@ -272,11 +272,11 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xBC] = &CPU::op0xBC; opcodes[0xBD] = &CPU::op0xBD;
 	opcodes[0xBE] = &CPU::op0xBE; opcodes[0xBF] = &CPU::op0xBF;
 
-	opcodes[0xC0] = &CPU::opNull; opcodes[0xC1] = &CPU::op0xC1;
+	opcodes[0xC0] = &CPU::op0xC0; opcodes[0xC1] = &CPU::op0xC1;
 	opcodes[0xC2] = &CPU::op0xC2; opcodes[0xC3] = &CPU::op0xC3;
 	opcodes[0xC4] = &CPU::opNull; opcodes[0xC5] = &CPU::op0xC5;
 	opcodes[0xC6] = &CPU::opNull; opcodes[0xC7] = &CPU::opNull;
-	opcodes[0xC8] = &CPU::opNull; opcodes[0xC9] = &CPU::op0xC9;
+	opcodes[0xC8] = &CPU::op0xC8; opcodes[0xC9] = &CPU::op0xC9;
 	opcodes[0xCA] = &CPU::opNull; opcodes[0xCB] = &CPU::op0xCB;
 	opcodes[0xCC] = &CPU::opNull; opcodes[0xCD] = &CPU::op0xCD;
 	opcodes[0xCE] = &CPU::opNull; opcodes[0xCF] = &CPU::opNull;
@@ -300,11 +300,11 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xEE] = &CPU::opNull; opcodes[0xEF] = &CPU::opNull;
 
 	opcodes[0xF0] = &CPU::op0xF0; opcodes[0xF1] = &CPU::op0xF1;
-	opcodes[0xF2] = &CPU::op0xF2; opcodes[0xF3] = &CPU::opNull;
+	opcodes[0xF2] = &CPU::op0xF2; opcodes[0xF3] = &CPU::op0xF3;
 	opcodes[0xF4] = &CPU::opNull; opcodes[0xF5] = &CPU::op0xF5;
 	opcodes[0xF6] = &CPU::opNull; opcodes[0xF7] = &CPU::opNull;
 	opcodes[0xF8] = &CPU::opNull; opcodes[0xF9] = &CPU::opNull;
-	opcodes[0xFA] = &CPU::op0xFA; opcodes[0xFB] = &CPU::opNull;
+	opcodes[0xFA] = &CPU::op0xFA; opcodes[0xFB] = &CPU::op0xFB;
 	opcodes[0xFC] = &CPU::opNull; opcodes[0xFD] = &CPU::opNull;
 	opcodes[0xFE] = &CPU::op0xFE; opcodes[0xFF] = &CPU::op0xFF;
 
@@ -1317,14 +1317,19 @@ void CPU::op0xBF() {
 }
 /*  */
 // RET NZ
+void CPU::op0xC0 () {
+	if (Z == 0)
+		PC = PopWord();
+	clockCycles = 8;
+}
 // RET NC
 // LDH (a8),A
-void CPU::op0xE0() {
+void CPU::op0xE0 () {
 	mmu->WriteByte(ReadByte() + 0xFF00, AF.hi);
 	clockCycles = 12;
 }
 // LDH A,(a8)
-void CPU::op0xF0() {
+void CPU::op0xF0 () {
 	AF.hi = mmu->ReadByte(ReadByte() + 0xFF00);
 	clockCycles = 12;
 }
@@ -1381,6 +1386,10 @@ void CPU::op0xC3 () {
 // D3..: I don't exist
 // E3..: I don't exist
 // DI
+void CPU::op0xF3 () {
+	areInterruptsEnabled = false;
+	clockCycles = 4;
+}
 
 // CALL NZ,a16
 // CALL NC,a16
@@ -1430,6 +1439,11 @@ void CPU::op0xE6 () {
 // RST 30H
 
 // RET Z
+void CPU::op0xC8 () {
+	if (Z != 0)
+		PC = PopWord();
+	clockCycles = 8;
+}
 // RET C
 // ADD SP,r8
 // LD HL,SP+r8
@@ -1471,7 +1485,10 @@ void CPU::op0xCB () {
 // DB..: I don't exist
 // EB..: I don't exist
 // EI
-
+void CPU::op0xFB () {
+	areInterruptsEnabled = true;
+	clockCycles = 4;
+}
 // CALL Z,a16
 // CALL C,a16
 // EC..: I don't exist
