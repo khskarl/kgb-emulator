@@ -38,13 +38,13 @@ void CPU::EmulateCycle () {
 	// std::cout << std::hex << opcode << '\n';
 	PC += 1;
 	(this->*opcodes[opcode])(); // Wtf C++
-
-	static uint8_t lastScrollY = 0;
-	uint8_t scrollY = mmu->ReadByte(SCROLLY);
-	// if ((scrollY == 15)) {
-	// 	std::cout << "scrollY: " << (int) scrollY << '\n';
-	// 	isHalted = true;
-	// 	lastScrollY = scrollY;
+	//PC <= 0xA4 && PC >= 0x95
+	// if (PC == 0x5D) {
+	// 	for (size_t i = 0x9910; i >= 0x9904; i -= 2) {
+	// 		uint16_t data = mmu->ReadWord(i);
+	// 		std::cout << std::hex << "[" << i << "] " << data << "\n";
+	// 		isHalted = true;
+	// 	}
 	// }
 }
 
@@ -117,7 +117,7 @@ uint16_t CPU::PopWord () {
 // FIXME: Double check C flag computation
 void CPU::RotateLeft (uint8_t& value) {
 	uint8_t oldBit7 = (value >> 7);
-	value = (value << 1) | oldBit7;
+	value = (value << 1) | C;
 	Z = (value == 0);
 	N = 0, H = 0;
 	C = oldBit7;
@@ -646,7 +646,7 @@ void CPU::op0x2D () {
 }
 // DEC A
 void CPU::op0x3D () {
-	Decrement(AF.lo);
+	Decrement(AF.hi);
 	clockCycles = 4;
 }
 
