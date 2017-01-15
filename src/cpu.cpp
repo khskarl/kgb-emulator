@@ -36,15 +36,16 @@ void CPU::EmulateCycle () {
 
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
+	PC += 1;
 	(this->*opcodes[opcode])(); // Wtf C++
 
 	static uint8_t lastScrollY = 0;
 	uint8_t scrollY = mmu->ReadByte(SCROLLY);
-	if ((scrollY == 15)) {
-		std::cout << "scrollY: " << (int) scrollY << '\n';
-		isHalted = true;
-		lastScrollY = scrollY;
-	}
+	// if ((scrollY == 15)) {
+	// 	std::cout << "scrollY: " << (int) scrollY << '\n';
+	// 	isHalted = true;
+	// 	lastScrollY = scrollY;
+	// }
 }
 
 void CPU::RequestInterrupt (uint8_t id) {
@@ -80,8 +81,6 @@ void CPU::DoInterrupt (uint8_t id) {
 	mmu->WriteByte(IF, requestRegister);
 
 	PushWord(PC);
-	std::cout << "Interrupting!" << "\n";
-	isHalted = true;
 	switch (id) {
 		case 0: PC = 0x40; break;
 		case 1: PC = 0x48; break;
@@ -90,14 +89,20 @@ void CPU::DoInterrupt (uint8_t id) {
 		default: assert("Invalid interrupt ID" && 0); break;
 	}
 
+	// std::cout << "Interrupting!" << "\n";
+	// isHalted = true;
 }
 
 uint8_t CPU::ReadByte () {
-	return mmu->ReadByte(PC + 1);
+	uint8_t value = mmu->ReadByte(PC);
+	PC += 1;
+	return value;
 }
 
 uint16_t CPU::ReadWord () {
-	return mmu->ReadWord(PC + 1);
+	uint16_t value = mmu->ReadWord(PC);
+	PC += 2;
+	return value;
 }
 
 void CPU::PushWord (uint16_t value) {
@@ -328,18 +333,18 @@ void CPU::InitializeOpcodeTable () {
 
 // NOP
 void CPU::op0x00 () {
-	PC += 1;
+
 	clockCycles = 4;
 }
 // STOP 0
 void CPU::op0x10 () {
-	PC += 2;
+
 	clockCycles = 4;
 }
 // JR NZ,r8
 void CPU::op0x20 () {
 	uint8_t value = ReadByte();
-	PC += 2;
+
 	if (Z == 0) {
 		PC += reinterpret_cast<int8_t&>(value);
 		clockCycles = 12;
@@ -350,7 +355,7 @@ void CPU::op0x20 () {
 // JR NC,r8
 void CPU::op0x30 () {
 	uint8_t value = ReadByte();
-	PC += 2;
+
 	if (C == 0) {
 		PC += reinterpret_cast<int16_t&>(value);
 		clockCycles = 12;
@@ -362,106 +367,81 @@ void CPU::op0x30 () {
 // LD BC,D16
 void CPU::op0x01 () {
 	BC = ReadWord();
-
-	PC += 3;
 	clockCycles = 12;
 }
 // LD DE,D16
 void CPU::op0x11 () {
 	DE = ReadWord();
-
-	PC += 3;
 	clockCycles = 12;
 }
 // LD HL,D16
 void CPU::op0x21 () {
 	HL = ReadWord();
-
-	PC += 3;
 	clockCycles = 12;
 }
 // LD SP,D16
 void CPU::op0x31 () {
 	SP = ReadWord();
-
-	PC += 3;
 	clockCycles = 12;
 }
-
-
 
 // LD (BC),A
 void CPU::op0x02 () {
 	mmu->WriteByte(BC, AF.hi);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD (DE),A
 void CPU::op0x12 () {
 	mmu->WriteByte(DE, AF.hi);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL+),A
 void CPU::op0x22 () {
 	mmu->WriteByte(HL, AF.hi);
 	HL += 1;
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL-),A
 void CPU::op0x32 () {
 	mmu->WriteByte(HL, AF.hi);
 	HL -= 1;
-
-	PC += 1;
 	clockCycles = 8;
 }
 
 // INC BC
 void CPU::op0x03 () {
 	BC += 1;
-	PC += 1;
 	clockCycles = 8;
 }
 // INC DE
 void CPU::op0x13 () {
 	DE += 1;
-	PC += 1;
 	clockCycles = 8;
 }
 // INC HL
 void CPU::op0x23 () {
 	HL += 1;
-	PC += 1;
 	clockCycles = 8;
 }
 // INC SP
 void CPU::op0x33 () {
 	SP += 1;
-	PC += 1;
 	clockCycles = 8;
 }
 
 // INC B
 void CPU::op0x04 () {
 	Increment(BC.hi);
-	PC += 1;
 	clockCycles = 4;
 }
 // INC D
 void CPU::op0x14 () {
 	Increment(DE.hi);
-	PC += 1;
 	clockCycles = 4;
 }
 // INC H
 void CPU::op0x24 () {
 	Increment(HL.hi);
-	PC += 1;
 	clockCycles = 4;
 }
 // INC (HL)
@@ -469,26 +449,22 @@ void CPU::op0x34 () {
 	uint8_t value = mmu->ReadByte(HL);
 	Increment(value);
 	mmu->WriteByte(HL, value);
-	PC += 1;
 	clockCycles = 4;
 }
 
 // DEC B
 void CPU::op0x05 () {
 	Decrement(BC.hi);
-	PC += 1;
 	clockCycles = 4;
 }
 // DEC D
 void CPU::op0x15 () {
 	Decrement(DE.hi);
-	PC += 1;
 	clockCycles = 4;
 }
 // DEC H
 void CPU::op0x25 () {
 	Decrement(HL.hi);
-	PC += 1;
 	clockCycles = 4;
 }
 // DEC (HL)
@@ -496,49 +472,42 @@ void CPU::op0x35 () {
 	uint8_t value = mmu->ReadByte(HL);
 	Decrement(value);
 	mmu->WriteByte(HL, value);
-	PC += 1;
 	clockCycles = 4;
 }
 
 // LD B,d8
 void CPU::op0x06 () {
 	BC.hi = ReadByte();
-	PC += 2;
+
 	clockCycles = 8;
 }
 // LD D,d8
 void CPU::op0x16 () {
 	DE.hi = ReadByte();
-
-	PC += 2;
 	clockCycles = 12;
 }
 // LD H,d8
 void CPU::op0x26 () {
 	HL.hi = ReadByte();
-
-	PC += 2;
 	clockCycles = 12;
 }
 // LD (HL),d8
 void CPU::op0x36 () {
 	mmu->WriteByte(HL, ReadByte());
-
-	PC += 2;
 	clockCycles = 12;
 }
 
 // RLCA
 void CPU::op0x07 () {
 	opNull();
-	PC += 1;
+
 	clockCycles = 4;
 }
 // RLA
 // FIXME: Maybe RLA isn't the same as RL A, check Flags on pastraiser
 void CPU::op0x17 () {
 	RotateLeft(AF.hi);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // DAA
@@ -547,20 +516,20 @@ void CPU::op0x17 () {
 // LD (a16),SP
 void CPU::op0x08 () {
 	opNull();
-	PC += 3;
+
 	clockCycles = 20;
 }
 // JR r8
 void CPU::op0x18 () {
 	uint8_t value = ReadByte();
-	PC += 2;
+
 	PC += reinterpret_cast<int8_t&>(value);
 	clockCycles = 12;
 }
 // JR Z,r8
 void CPU::op0x28 () {
 	uint8_t value = ReadByte();
-	PC += 2;
+
 	if (Z == 1) {
 		PC += reinterpret_cast<int8_t&>(value);
 		clockCycles = 12;
@@ -571,7 +540,7 @@ void CPU::op0x28 () {
 // JR C,r8
 void CPU::op0x38 () {
 	uint8_t value = ReadByte();
-	PC += 2;
+
 	if (C == 1) {
 		PC += reinterpret_cast<int8_t&>(value);
 		clockCycles = 12;
@@ -583,7 +552,7 @@ void CPU::op0x38 () {
 // ADD HL,BC
 void CPU::op0x09 () {
 	opNull();
-	PC += 1;
+
 	clockCycles = 8;
 }
 // ADD HL,DE
@@ -593,34 +562,34 @@ void CPU::op0x09 () {
 // LD A,(BC)
 void CPU::op0x0A () {
 	AF.hi = mmu->ReadByte(BC);
-	PC += 1;
+
 	clockCycles = 8;
 }
 // LD A,(DE)
 void CPU::op0x1A () {
 	AF.hi = mmu->ReadByte(DE);
-	PC += 1;
+
 	clockCycles = 8;
 }
 // LD A,(HL+)
 void CPU::op0x2A () {
 	AF.hi = mmu->ReadByte(HL);
 	HL += 1;
-	PC += 1;
+
 	clockCycles = 8;
 }
 // LD A,(HL-)
 void CPU::op0x3A () {
 	AF.hi = mmu->ReadByte(HL);
 	HL -= 1;
-	PC += 1;
+
 	clockCycles = 8;
 }
 
 // DEC BC
 void CPU::op0x0B () {
 	opNull();
-	PC += 1;
+
 	clockCycles = 8;
 }
 // DEC DE
@@ -635,8 +604,6 @@ void CPU::op0x0C () {
 	Z = (BC.lo == 0);
 	N = 0;
 	H = (prev & 0xF) == 0xF;
-
-	PC += 1;
 	clockCycles = 4;
 }
 // INC E
@@ -647,8 +614,6 @@ void CPU::op0x1C () {
 	Z = (DE.lo == 0);
 	N = 0;
 	H = (prev & 0xF) == 0xF;
-
-	PC += 1;
 	clockCycles = 4;
 }
 // INC L
@@ -659,8 +624,6 @@ void CPU::op0x2C () {
 	Z = (HL.lo == 0);
 	N = 0;
 	H = (prev & 0xF) == 0xF;
-
-	PC += 1;
 	clockCycles = 4;
 }
 // INC A
@@ -671,65 +634,63 @@ void CPU::op0x3C () {
 	Z = (AF.hi == 0);
 	N = 0;
 	H = (prev & 0xF) == 0xF;
-
-	PC += 1;
 	clockCycles = 4;
 }
 
 // DEC C
 void CPU::op0x0D () {
 	Decrement(BC.lo);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // DEC E
 void CPU::op0x1D () {
 	Decrement(DE.lo);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // DEC L
 void CPU::op0x2D () {
 	Decrement(HL.lo);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // DEC A
 void CPU::op0x3D () {
 	Decrement(AF.lo);
-	PC += 1;
+
 	clockCycles = 4;
 }
 
 // LD C,d8
 void CPU::op0x0E () {
 	BC.lo = ReadByte();
-	PC += 2;
+
 	clockCycles = 8;
 }
 // LD E,d8
 void CPU::op0x1E () {
 	DE.lo = ReadByte();
-	PC += 2;
+
 	clockCycles = 8;
 }
 // LD L,d8
 void CPU::op0x2E () {
 	HL.lo = ReadByte();
-	PC += 2;
+
 	clockCycles = 8;
 }
 // LD A,d8
 void CPU::op0x3E () {
 	AF.hi = ReadByte();
-	PC += 2;
+
 	clockCycles = 8;
 }
 
 // RRCA
 void CPU::op0x0F () {
 	opNull();
-	PC += 1;
+
 	clockCycles = 4;
 }
 // RRA
@@ -740,97 +701,97 @@ void CPU::op0x0F () {
 // LD B,B
 void CPU::op0x40 () {
 	BC.hi = BC.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD B,C
 void CPU::op0x41 () {
 	BC.hi = BC.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD B,D
 void CPU::op0x42 () {
 	BC.hi = DE.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD B,E
 void CPU::op0x43 () {
 	BC.hi = DE.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD B,H
 void CPU::op0x44 () {
 	BC.hi = HL.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD B,L
 void CPU::op0x45 () {
 	BC.hi = HL.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD B,(HL)
 void CPU::op0x46 () {
 	BC.hi = mmu->ReadByte(HL);
-	PC += 1;
+
 	clockCycles = 8;
 }
 // LD B,A
 void CPU::op0x47 () {
 	BC.hi = AF.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD C,B
 void CPU::op0x48 () {
 	BC.lo = BC.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD C,C
 void CPU::op0x49 () { // Copying C to C? Is this Right?
 	BC.lo = BC.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD C,D
 void CPU::op0x4A () {
 	BC.lo = DE.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD C,E
 void CPU::op0x4B () {
 	BC.lo = DE.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD C,H
 void CPU::op0x4C () {
 	BC.lo = HL.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD C,L
 void CPU::op0x4D () {
 	BC.lo = HL.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD C,(HL)
 void CPU::op0x4E () {
 	BC.lo = mmu->ReadByte(HL);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD C,A
 void CPU::op0x4F () {
 	BC.lo = AF.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 
@@ -838,97 +799,97 @@ void CPU::op0x4F () {
 // LD D,B
 void CPU::op0x50 () {
 	DE.hi = BC.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD D,C
 void CPU::op0x51 () {
 	DE.hi = BC.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD D,D
 void CPU::op0x52 () {
 	DE.hi = DE.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD D,E
 void CPU::op0x53 () {
 	DE.hi = HL.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD D,H
 void CPU::op0x54 () {
 	DE.hi = HL.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD D,L
 void CPU::op0x55 () {
 	DE.hi = HL.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD D,(HL)
 void CPU::op0x56 () {
 	DE.hi = mmu->ReadByte(HL);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD D,A
 void CPU::op0x57 () {
 	DE.hi = AF.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD E,B
 void CPU::op0x58 () {
 	DE.lo = BC.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD E,C
 void CPU::op0x59 () {
 	DE.lo = BC.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD E,D
 void CPU::op0x5A () {
 	DE.lo = DE.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD E,E
 void CPU::op0x5B () {
 	DE.lo = DE.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD E,H
 void CPU::op0x5C () {
 	DE.lo = HL.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD E,L
 void CPU::op0x5D () {
 	DE.lo = HL.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD E,(HL)
 void CPU::op0x5E () {
 	DE.lo = mmu->ReadByte(HL);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD E,A
 void CPU::op0x5F () {
 	DE.lo = AF.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 
@@ -936,97 +897,97 @@ void CPU::op0x5F () {
 // LD H,B
 void CPU::op0x60 () {
 	HL.hi = BC.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD H,C
 void CPU::op0x61 () {
 	HL.hi = BC.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD H,D
 void CPU::op0x62 () {
 	HL.hi = DE.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD H,E
 void CPU::op0x63 () {
 	HL.hi = DE.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD H,H
 void CPU::op0x64 () {
 	HL.hi = HL.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD H,L
 void CPU::op0x65 () {
 	AF.lo = HL.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD H,(HL)
 void CPU::op0x66 () {
 	HL.hi = mmu->ReadByte(HL);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD H,A
 void CPU::op0x67 () {
 	HL.hi = AF.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD L,B
 void CPU::op0x68 () {
 	HL.lo = BC.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD L,C
 void CPU::op0x69 () {
 	HL.lo = BC.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD L,D
 void CPU::op0x6A () {
 	HL.lo = DE.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD L,E
 void CPU::op0x6B () {
 	HL.lo = DE.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD L,H
 void CPU::op0x6C () {
 	HL.lo = HL.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD L,L
 void CPU::op0x6D () {
 	HL.lo = HL.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD L,(HL)
 void CPU::op0x6E () {
 	HL.lo = mmu->ReadByte(HL);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD L,A
 void CPU::op0x6F () {
 	HL.lo = AF.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 
@@ -1034,99 +995,85 @@ void CPU::op0x6F () {
 // LD (HL),B
 void CPU::op0x70 () {
 	mmu->WriteByte(HL, BC.hi);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),C
 void CPU::op0x71 () {
 	mmu->WriteByte(HL, BC.lo);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),D
 void CPU::op0x72 () {
 	mmu->WriteByte(HL, DE.hi);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),E
 void CPU::op0x73 () {
 	mmu->WriteByte(HL, DE.lo);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),H
 void CPU::op0x74 () {
 	mmu->WriteByte(HL, HL.hi);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD (HL),L
 void CPU::op0x75 () {
 	mmu->WriteByte(HL, HL.lo);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // HALT
 // LD (HL),A
 void CPU::op0x77 () {
 	mmu->WriteByte(HL, AF.hi);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD A,B
 void CPU::op0x78 () {
 	AF.hi = BC.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD A,C
 void CPU::op0x79 () {
 	AF.hi = BC.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD A,D
 void CPU::op0x7A () {
 	AF.hi = DE.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD A,E
 void CPU::op0x7B () {
 	AF.hi = DE.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD A,H
 void CPU::op0x7C () {
 	AF.hi = HL.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD A,L
 void CPU::op0x7D () {
 	AF.hi = HL.lo;
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD A,(HL)
 void CPU::op0x7E () {
 	AF.hi = mmu->ReadByte(HL);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // LD A,A
 void CPU::op0x7F () {
 	AF.hi = AF.hi;
-	PC += 1;
+
 	clockCycles = 4;
 }
 
@@ -1134,49 +1081,49 @@ void CPU::op0x7F () {
 // ADD A,B
 void CPU::op0x80() {
 	AddA(BC.hi);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // ADD A,C
 void CPU::op0x81() {
 	AddA(BC.lo);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // ADD A,D
 void CPU::op0x82() {
 	AddA(DE.hi);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // ADD A,E
 void CPU::op0x83() {
 	AddA(DE.lo);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // ADD A,H
 void CPU::op0x84() {
 	AddA(HL.hi);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // ADD A,L
 void CPU::op0x85() {
 	AddA(HL.lo);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // ADD A,(HL)
 void CPU::op0x86() {
 	AddA(mmu->ReadByte(HL));
-	PC += 1;
+
 	clockCycles += 8;
 }
 // ADD A,A
 void CPU::op0x87() {
 	AddA(AF.hi);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // ADC A,B
@@ -1192,49 +1139,49 @@ void CPU::op0x87() {
 // SUB B
 void CPU::op0x90() {
 	SubtractA(BC.hi);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // SUB C
 void CPU::op0x91() {
 	SubtractA(BC.lo);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // SUB D
 void CPU::op0x92() {
 	SubtractA(DE.hi);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // SUB E
 void CPU::op0x93() {
 	SubtractA(DE.lo);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // SUB H
 void CPU::op0x94() {
 	SubtractA(HL.hi);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // SUB L
 void CPU::op0x95() {
 	SubtractA(HL.lo);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // SUB (HL)
 void CPU::op0x96() {
 	SubtractA(mmu->ReadByte(HL));
-	PC += 1;
+
 	clockCycles += 8;
 }
 // SUB A
 void CPU::op0x97() {
 	SubtractA(AF.hi);
-	PC += 1;
+
 	clockCycles += 4;
 }
 // SBC A,B
@@ -1252,7 +1199,7 @@ void CPU::op0xA0() {
 	AF.hi &= BC.hi;
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // AND C
@@ -1260,7 +1207,7 @@ void CPU::op0xA1() {
 	AF.hi &= BC.lo;
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // AND D
@@ -1268,7 +1215,7 @@ void CPU::op0xA2() {
 	AF.hi &= DE.hi;
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // AND E
@@ -1276,7 +1223,7 @@ void CPU::op0xA3() {
 	AF.hi &= DE.lo;
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // AND H
@@ -1284,7 +1231,7 @@ void CPU::op0xA4() {
 	AF.hi &= HL.hi;
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // AND L
@@ -1292,7 +1239,7 @@ void CPU::op0xA5() {
 	AF.hi &= HL.lo;
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // AND (HL)
@@ -1300,7 +1247,7 @@ void CPU::op0xA6() {
 	AF.hi &= mmu->ReadByte(HL);
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
-	PC += 1;
+
 	clockCycles += 8;
 }
 // AND A
@@ -1308,7 +1255,7 @@ void CPU::op0xA7() {
 	AF.hi &= AF.hi;
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // XOR B
@@ -1316,7 +1263,7 @@ void CPU::op0xA8() {
 	AF.hi ^= BC.hi;
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // XOR C
@@ -1324,7 +1271,7 @@ void CPU::op0xA9() {
 	AF.hi ^= BC.lo;
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // XOR D
@@ -1332,7 +1279,7 @@ void CPU::op0xAA() {
 	AF.hi ^= DE.hi;
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // XOR E
@@ -1340,7 +1287,7 @@ void CPU::op0xAB() {
 	AF.hi ^= DE.lo;
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // XOR H
@@ -1348,7 +1295,7 @@ void CPU::op0xAC() {
 	AF.hi ^= HL.hi;
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // XOR L
@@ -1356,7 +1303,7 @@ void CPU::op0xAD() {
 	AF.hi ^= HL.lo;
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 // XOR (HL)
@@ -1364,7 +1311,7 @@ void CPU::op0xAE() {
 	AF.hi ^= mmu->ReadByte(HL);
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 1;
+
 	clockCycles += 8;
 }
 // XOR A
@@ -1372,7 +1319,7 @@ void CPU::op0xAF() {
 	AF.hi ^= AF.hi;
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 1;
+
 	clockCycles += 4;
 }
 
@@ -1388,116 +1335,106 @@ void CPU::op0xAF() {
 // CP B
 void CPU::op0xB8() {
 	CompareA(BC.hi);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // CP C
 void CPU::op0xB9() {
 	CompareA(BC.lo);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // CP D
 void CPU::op0xBA() {
 	CompareA(DE.hi);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // CP E
 void CPU::op0xBB() {
 	CompareA(DE.lo);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // CP H
 void CPU::op0xBC() {
 	CompareA(HL.hi);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // CP L
 void CPU::op0xBD() {
 	CompareA(HL.lo);
-	PC += 1;
+
 	clockCycles = 4;
 }
 // CP (HL)
 void CPU::op0xBE() {
 	CompareA(mmu->ReadByte(HL));
-	PC += 1;
+
 	clockCycles = 4;
 }
 // CP A
 void CPU::op0xBF() {
 	CompareA(AF.hi);
-	PC += 1;
+
 	clockCycles = 4;
 }
-
-
 /*  */
 // RET NZ
 // RET NC
 // LDH (a8),A
 void CPU::op0xE0() {
 	mmu->WriteByte(ReadByte() + 0xFF00, AF.hi);
-
-	PC += 2;
 	clockCycles = 12;
 }
 // LDH A,(a8)
 void CPU::op0xF0() {
 	AF.hi = mmu->ReadByte(ReadByte() + 0xFF00);
-
-	PC += 2;
 	clockCycles = 12;
 }
 
 // POP BC
 void CPU::op0xC1 () {
 	BC = PopWord();
-	PC += 1;
+
 	clockCycles = 12;
 }
 // POP DE
 void CPU::op0xD1 () {
 	DE = PopWord();
-	PC += 1;
+
 	clockCycles = 12;
 }
 // POP HL
 void CPU::op0xE1 () {
 	DE = PopWord();
-	PC += 1;
+
 	clockCycles = 12;
 }
 // POP AF
 void CPU::op0xF1 () {
 	AF = PopWord();
-	PC += 1;
+
 	clockCycles = 12;
 }
 
 // JP NZ,a16
 void CPU::op0xC2 () {
-	PC += 2;
+	uint16_t value = ReadWord();
 	if (Z == 0)
-		PC = ReadWord();
+		PC = value;
 	clockCycles = 12;
 }
 // JP NC,a16
 // LD (C),A
 void CPU::op0xE2 () {
 	mmu->WriteByte(BC.lo + 0xFF00, AF.hi);
-
-	PC += 1;
 	clockCycles = 8;
 }
 // LD A,(C)
 void CPU::op0xF2 () {
 	AF.hi = mmu->ReadByte(BC.lo + 0xFF00);
-
-	PC += 1;
 	clockCycles = 8;
 }
 
@@ -1518,25 +1455,25 @@ void CPU::op0xC3 () {
 // PUSH BC
 void CPU::op0xC5 () {
 	PushWord(BC);
-	PC += 1;
+
 	clockCycles += 16;
 }
 // PUSH DE
 void CPU::op0xD5 () {
 	PushWord(DE);
-	PC += 1;
+
 	clockCycles += 16;
 }
 // PUSH HL
 void CPU::op0xE5 () {
 	PushWord(HL);
-	PC += 1;
+
 	clockCycles += 16;
 }
 // PUSH AF // FIXME: There is NO value in F because of our flags hack
 void CPU::op0xF5 () {
 	PushWord(AF);
-	PC += 1;
+
 	clockCycles += 16;
 }
 
@@ -1547,7 +1484,7 @@ void CPU::op0xE6 () {
 	AF.hi &= ReadByte();
 	Z = (AF.hi == 0);
 	N = H = C = 0;
-	PC += 2;
+
 	clockCycles += 8;
 }
 // OR d8
@@ -1576,22 +1513,20 @@ void CPU::op0xC9 () {
 // LD (a16),A
 void CPU::op0xEA () {
 	mmu->WriteByte(ReadWord(), AF.hi);
-	PC += 3;
+
 	clockCycles = 16;
 }
 // LD A,(a16)
 void CPU::op0xFA () {
 	AF.hi = mmu->ReadByte(ReadWord());
-	PC += 3;
+
 	clockCycles = 16;
 }
 
 // PREFIX CB
 void CPU::op0xCB () {
 	uint8_t secondByte = ReadByte();
-
 	(this->*opcodesCB[secondByte])();
-	PC += 2;
 	clockCycles = 8;
 	/* In very few instructions, 16 cycles are needed instead,
 	which are added when the instruction is called.
@@ -1606,11 +1541,9 @@ void CPU::op0xCB () {
 // CALL C,a16
 // EC..: I don't exist
 // FC..: I don't exist
-
-
 // CALL a16
 void CPU::op0xCD () {
-	PushWord(PC + 3);
+	PushWord(PC + 2);
 	PC = ReadWord();
 	clockCycles = 24;
 }
@@ -1624,7 +1557,7 @@ void CPU::op0xCD () {
 // CP d8
 void CPU::op0xFE () {
 	CompareA(ReadByte());
-	PC += 2;
+
 	clockCycles = 8;
 }
 
@@ -1957,8 +1890,6 @@ void CPU::cb0x7F () {
 // SET 7,L
 // SET 7,(HL)
 // SET 7,A
-
-
 
 /* Not implemented instructions call this function */
 void CPU::opNull () {
