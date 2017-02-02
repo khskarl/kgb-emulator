@@ -67,10 +67,12 @@ void MMU::WriteBios (uint8_t* buffer) {
 	std::memcpy(bios, buffer, 256);
 }
 
-void MMU::WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize) {
+void MMU::WriteBufferToRom (uint8_t* buffer, uint32_t bufferSize) {
 	assert(buffer != nullptr);
-	assert(bufferSize > 0 && bufferSize <= 0x8000);
-	std::memcpy(rom, buffer, bufferSize);
+	std::cout << bufferSize << '\n';
+	assert(bufferSize > 0);
+	std::memcpy(rom, buffer, 0x4000);
+	// std::memcpy(romBanks[1], buffer + 0x4000, 0x4000);
 }
 
 uint8_t* MMU::GetRomRef (uint16_t address) {

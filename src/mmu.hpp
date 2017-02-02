@@ -40,7 +40,7 @@ public:
 	uint8_t  ReadClockFrequency ();
 
 	void WriteBios (uint8_t* buffer);
-	void WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize);
+	void WriteBufferToRom (uint8_t* buffer, uint32_t bufferSize);
 
 	uint8_t* GetRomRef    (uint16_t address);
 	uint8_t* GetIORef     (uint16_t address);

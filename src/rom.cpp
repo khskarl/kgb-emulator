@@ -105,3 +105,7 @@ const std::string Rom::GetCatridgeType () const {
 	}
 
 }
+
+const uint8_t Rom::GetNumRomBanks() const {
+	return (this->size / 65536) * 4;
+}

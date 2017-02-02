@@ -26,6 +26,7 @@ public:
 	const size_t      GetSize() const;
 	const std::string GetName() const;
 	const std::string GetCatridgeType() const;
+	const uint8_t     GetNumRomBanks () const;
 };
 
 #endif

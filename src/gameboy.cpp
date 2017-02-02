@@ -1,5 +1,5 @@
 #include "gameboy.hpp"
-
+#include <iostream>
 GameBoy::GameBoy () {}
 GameBoy::~GameBoy () {}
 
