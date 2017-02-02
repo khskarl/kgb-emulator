@@ -3,20 +3,7 @@
 
 #include <stdint.h>
 
-#define DIV  0xFF04
-#define TIMA 0xFF05
-#define TMA  0xFF06
-#define TMC  0xFF07
-
-#define LCDCTRL 0xFF40
-#define LCDSTAT 0xFF41
-#define SCROLLY 0xFF42
-#define SCROLLX 0xFF43
-#define CURLINE 0xFF44
-#define CMPLINE 0xFF45
-
-#define IF 0xFF0F
-#define IE 0xFFFF
+#include "common_memory_addresses.hpp"
 
 class CPU;
 class MMU {
@@ -32,6 +19,9 @@ private:
 
 	uint8_t io[0x80];
 
+	// uint8_t romBanks[8][0x4000];
+
+	void HandleRomBankSwitch (uint16_t address);
 public:
 	bool isInBios = true;
 

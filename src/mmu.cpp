@@ -39,13 +39,21 @@ uint8_t MMU::ReadClockFrequency () {
 void MMU::WriteByte (uint16_t address, uint8_t value) {
 	assert(address >= 0x0000 && address <= 0xFFFF);
 
-	*GetMemoryRef(address) = value;
-
+	if (0x4000 <= address && address <= 0x7FFF) {
+		HandleRomBankSwitch(address);
+		return;
+	}
 	// Reset scanline if we try to write to it
-	if (address == CURLINE)
+	else if (address == CURLINE) {
 		io[address & 0x7F] = 0;
-	else if (address == DIV)
-		io[address & 0x7F] = 0 ;
+		return;
+	}
+	else if (address == DIV) {
+		io[address & 0x7F] = 0;
+		return;
+	}
+
+	*GetMemoryRef(address) = value;
 }
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
@@ -61,7 +69,7 @@ void MMU::WriteBios (uint8_t* buffer) {
 
 void MMU::WriteBufferToRom (uint8_t* buffer, uint16_t bufferSize) {
 	assert(buffer != nullptr);
-	assert(bufferSize > 0 && bufferSize <= 32768);
+	assert(bufferSize > 0 && bufferSize <= 0x8000);
 	std::memcpy(rom, buffer, bufferSize);
 }
 
@@ -96,7 +104,7 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 		case 0x5000:
 		case 0x6000:
 		case 0x7000:
-		return &rom[address];
+		return &rom[address & 0x3FFF];
 		break;
 
 		/* VRAM (8k) */
@@ -144,4 +152,8 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 		break;
 
 	}
+}
+
+void MMU::HandleRomBankSwitch(uint16_t address) {
+	assert("Unimplemented bank switch!" && 0);
 }

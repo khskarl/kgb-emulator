@@ -15,7 +15,7 @@ void CPU::Initialize (MMU* _mmu) {
 	DE = 0;
 	HL = 0;
 	SP = 0x0;
-	PC = 0x0;
+	PC = 0x100;
 
 	Z = 0, N = 0, H = 0, C = 0;
 	clockCycles = 0;
@@ -284,7 +284,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xD0] = &CPU::opNull; opcodes[0xD1] = &CPU::op0xD1;
 	opcodes[0xD2] = &CPU::opNull; opcodes[0xD3] = &CPU::opNull;
 	opcodes[0xD4] = &CPU::opNull; opcodes[0xD5] = &CPU::op0xD5;
-	opcodes[0xD6] = &CPU::opNull; opcodes[0xD7] = &CPU::opNull;
+	opcodes[0xD6] = &CPU::op0xD6; opcodes[0xD7] = &CPU::opNull;
 	opcodes[0xD8] = &CPU::opNull; opcodes[0xD9] = &CPU::opNull;
 	opcodes[0xDA] = &CPU::opNull; opcodes[0xDB] = &CPU::opNull;
 	opcodes[0xDC] = &CPU::opNull; opcodes[0xDD] = &CPU::opNull;
@@ -1423,6 +1423,10 @@ void CPU::op0xF5 () {
 
 // ADD A,d8
 // SUB d8
+void CPU::op0xD6 () {
+	SubtractA(ReadByte());
+	clockCycles += 8;
+}
 // AND d8
 void CPU::op0xE6 () {
 	AF.hi &= ReadByte();
@@ -1845,5 +1849,7 @@ void CPU::cb0x7F () {
 
 /* Not implemented instructions call this function */
 void CPU::opNull () {
-	assert("Not implemented" && 0);
+	isHalted = true;
+	std::cout << "Instruction not implemented\n";
+	// assert("Not implemented" && 0);
 }
