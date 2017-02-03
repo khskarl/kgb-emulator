@@ -54,7 +54,7 @@ std::string DisassembleRom(Rom rom) {
 	char buffer[64];
 	pc = 0x100;
 	std::string disassembledRom = "";
-	while (pc < rom.GetSize() && pc < 0x105) {
+	while (pc < rom.GetSize()) {
 		sprintf(buffer, "%04x ", pc);
 		std::string address(buffer);
 

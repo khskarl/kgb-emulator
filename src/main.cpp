@@ -33,7 +33,7 @@ int main(int argc, char const *argv[]) {
 		"Size:      " << rom.GetSize() << " B\n" <<
 		"#RomBanks: " << (int) rom.GetNumRomBanks() << '\n' <<
 		"Type:      " << rom.GetCatridgeType() << '\n';
-	std::cout << DisassembleRom(rom) << '\n';
+	// std::cout << DisassembleRom(rom) << '\n';
 
 	Rom bios("roms/bios.gb");
 

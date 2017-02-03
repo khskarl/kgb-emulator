@@ -39,20 +39,6 @@ void CPU::EmulateCycle () {
 	PC += 1;
 	(this->*opcodes[opcode])(); // Wtf C++
 
-	if (PC == 0xFF || PC == 0x215) {
-		std::cout << std::hex << (int) mmu->ReadByte(0x101) << "\n";
-		std::cout << std::hex << (int) mmu->ReadByte(0x102) << "\n";
-		std::cout << std::hex << (int) mmu->ReadByte(0x103) << "\n";
-		isHalted = true;
-	}
-	//PC <= 0xA4 && PC >= 0x95
-	// if (PC == 0x5D) {
-	// 	for (size_t i = 0x9910; i >= 0x9904; i -= 2) {
-	// 		uint16_t data = mmu->ReadWord(i);
-	// 		std::cout << std::hex << "[" << i << "] " << data << "\n";
-	// 		isHalted = true;
-	// 	}
-	// }
 }
 
 void CPU::RequestInterrupt (uint8_t id) {
