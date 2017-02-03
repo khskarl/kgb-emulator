@@ -58,6 +58,21 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
 	uint8_t* memory = GetMemoryRef(address);
+
+	if (0x4000 <= address && address <= 0x7FFF) {
+		HandleRomBankSwitch(address);
+		return;
+	}
+	// Reset scanline if we try to write to it
+	else if (address == CURLINE) {
+		io[address & 0x7F] = 0;
+		return;
+	}
+	else if (address == DIV) {
+		io[address & 0x7F] = 0;
+		return;
+	}
+
 	memory[0] =  value & 0x00FF;
 	memory[1] = (value & 0xFF00) >> 8;
 }
@@ -67,12 +82,12 @@ void MMU::WriteBios (uint8_t* buffer) {
 	std::memcpy(bios, buffer, 256);
 }
 
+// TODO: Rename it to "WriteRom"
 void MMU::WriteBufferToRom (uint8_t* buffer, uint32_t bufferSize) {
 	assert(buffer != nullptr);
-	std::cout << bufferSize << '\n';
 	assert(bufferSize > 0);
 	std::memcpy(rom, buffer, 0x4000);
-	// std::memcpy(romBanks[1], buffer + 0x4000, 0x4000);
+	std::memcpy(romBanks[0], buffer + 0x4000, 0x4000);
 }
 
 uint8_t* MMU::GetRomRef (uint16_t address) {
@@ -106,7 +121,7 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 		case 0x5000:
 		case 0x6000:
 		case 0x7000:
-		return &rom[address & 0x3FFF];
+		return &romBanks[0][address & 0x3FFF];
 		break;
 
 		/* VRAM (8k) */
@@ -139,7 +154,7 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 				if (address < 0xFEA0)
 					return &oam[address & 0xFF];
 				else
-					return nullptr;
+					return &unused[address & 0x7F];
 			}
 			else if (lo == 0xF00) {
 				if (address >= 0xFF80)

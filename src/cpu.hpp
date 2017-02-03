@@ -85,9 +85,14 @@ private:
 
 	/* Common Instructions */
 	void RotateLeft (uint8_t& value); // RL
-	void Decrement (uint8_t& value); // DEC
-	void Increment (uint8_t& value); // INC
+	void Decrement (uint8_t&  value); // DEC
+	void Decrement (uint16_t& value); // DEC
+	void Decrement (reg16_t& value); // DEC
+	void Increment (uint8_t&  value); // INC
+	void Increment (uint16_t& value); // INC
+	void Increment (reg16_t& value); // INC
 	void AddA      (uint8_t value); // ADD
+	void Add       (uint16_t& x, uint16_t value); // ADD
 	void SubtractA (uint8_t value); // SUB
 	void CompareA  (uint8_t value); // CP
 

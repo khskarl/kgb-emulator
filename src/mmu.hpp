@@ -10,6 +10,7 @@ class MMU {
 private:
 	uint8_t bios[0xFF+1];
 	uint8_t rom[0x4000];
+	uint8_t romBanks[96][0x4000];
 	uint8_t vram[0x2000];
 	uint8_t eram[0x2000];
 	uint8_t wram[0x1000];
@@ -19,7 +20,7 @@ private:
 
 	uint8_t io[0x80];
 
-	// uint8_t romBanks[8][0x4000];
+	uint8_t unused[0x60];
 
 	void HandleRomBankSwitch (uint16_t address);
 public:

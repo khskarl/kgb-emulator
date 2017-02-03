@@ -52,9 +52,9 @@ std::string DisassembleRom(Rom rom) {
 	uint8_t* code = rom.GetData();
 
 	char buffer[64];
-	pc = 0x0;
+	pc = 0x100;
 	std::string disassembledRom = "";
-	while (pc < rom.GetSize()) {
+	while (pc < rom.GetSize() && pc < 0x105) {
 		sprintf(buffer, "%04x ", pc);
 		std::string address(buffer);
 
