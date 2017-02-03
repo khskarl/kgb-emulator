@@ -43,7 +43,8 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
-	if (PC == 0x100 || PC == 0x86) {
+	if (PC == 0x100 || PC == 0xFE) {
+		std::cout << std::hex << (int)mmu->ReadByte(HL) << '\n';
 		isHalted = true;
 	}
 
@@ -209,7 +210,7 @@ void CPU::AddA (uint8_t value) {
 	AF.hi += value;
 	SetZ(AF.hi == 0);
 	SetN(0);
-	SetH((AF.hi & 0xF) + (value & 0xF) > 0xF);
+	SetH((oldA & 0xF) + (value & 0xF) > 0xF);
 	SetC(oldA + value > 0xFF);
 }
 
@@ -218,7 +219,7 @@ void CPU::Add (uint16_t& x, uint16_t value) {
 	x += value;
 	SetZ(x == 0);
 	SetN(0);
-	SetH((x & 0xF) + (value & 0xF) > 0xF);
+	SetH((oldX & 0xF) + (value & 0xF) > 0xF);
 	SetC(oldX + value > 0xFF);
 }
 
