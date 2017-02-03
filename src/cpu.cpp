@@ -8,16 +8,27 @@
 CPU::CPU () {}
 CPU::~CPU () {}
 
-void CPU::Initialize (MMU* _mmu) {
+void CPU::Initialize (MMU* _mmu, bool doBootrom) {
 	/* Initialize Registers */
-	AF = 0;
-	BC = 0;
-	DE = 0;
-	HL = 0;
-	SP = 0x0;
-	PC = 0x150;
+	if (doBootrom) {
+		AF = 0;
+		BC = 0;
+		DE = 0;
+		HL = 0;
+		SP = 0x0;
+		PC = 0x0;
+		Z = 0, N = 0, H = 0, C = 0;
+	}
+	else {
+		AF = 0x01B0;
+		BC = 0x0013;
+		DE = 0x00D8;
+		HL = 0x014D;
+		SP = 0xFFFE;
+		PC = 0x100;
+		Z = 0, N = 0, H = 0, C = 0;
+	}
 
-	Z = 0, N = 0, H = 0, C = 0;
 	clockCycles = 0;
 
 	assert("Assigned MMU wasn't initialized" && _mmu != nullptr);
@@ -32,12 +43,17 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
+	if (PC == 0x100 || PC == 0xC16B) {
+		isHalted = true;
+	}
+
 	uint8_t opcode = mmu->ReadByte(PC);
 
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 	PC += 1;
 	(this->*opcodes[opcode])(); // Wtf C++
+
 
 }
 
@@ -85,6 +101,7 @@ void CPU::DoInterrupt (uint8_t id) {
 	// std::cout << "Interrupting!" << "\n";
 	// isHalted = true;
 }
+
 
 uint8_t CPU::ReadByte () {
 	uint8_t value = mmu->ReadByte(PC);
@@ -195,6 +212,18 @@ void CPU::CompareA (uint8_t value) {
 	C = (AF.hi < value);
 }
 
+void CPU::OrA (uint8_t value) {
+	AF.hi |= value;
+	Z = (AF.hi == 0);
+	N = H = C = 0;
+}
+
+void CPU::Swap (uint8_t& value) {
+	uint8_t hi = value & 0xF0;
+	uint8_t lo = value & 0x0F;
+	value = (hi >> 4) | (lo << 4);
+}
+
 /* Instructions specific code */
 void CPU::InitializeOpcodeTable () {
 	opcodes[0x00] = &CPU::op0x00; opcodes[0x01] = &CPU::op0x01;
@@ -222,7 +251,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x28] = &CPU::op0x28; opcodes[0x29] = &CPU::op0x29;
 	opcodes[0x2A] = &CPU::op0x2A; opcodes[0x2B] = &CPU::op0x2B;
 	opcodes[0x2C] = &CPU::op0x2C; opcodes[0x2D] = &CPU::op0x2D;
-	opcodes[0x2E] = &CPU::op0x2E; opcodes[0x2F] = &CPU::opNull;
+	opcodes[0x2E] = &CPU::op0x2E; opcodes[0x2F] = &CPU::op0x2F;
 
 	opcodes[0x30] = &CPU::op0x30; opcodes[0x31] = &CPU::op0x31;
 	opcodes[0x32] = &CPU::op0x32; opcodes[0x33] = &CPU::op0x33;
@@ -296,10 +325,10 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xAC] = &CPU::op0xAC; opcodes[0xAD] = &CPU::op0xAD;
 	opcodes[0xAE] = &CPU::op0xAE; opcodes[0xAF] = &CPU::op0xAF;
 
-	opcodes[0xB0] = &CPU::opNull; opcodes[0xB1] = &CPU::opNull;
-	opcodes[0xB2] = &CPU::opNull; opcodes[0xB3] = &CPU::opNull;
-	opcodes[0xB4] = &CPU::opNull; opcodes[0xB5] = &CPU::opNull;
-	opcodes[0xB6] = &CPU::opNull; opcodes[0xB7] = &CPU::opNull;
+	opcodes[0xB0] = &CPU::op0xB0; opcodes[0xB1] = &CPU::op0xB1;
+	opcodes[0xB2] = &CPU::op0xB2; opcodes[0xB3] = &CPU::op0xB3;
+	opcodes[0xB4] = &CPU::op0xB4; opcodes[0xB5] = &CPU::op0xB5;
+	opcodes[0xB6] = &CPU::op0xB6; opcodes[0xB7] = &CPU::op0xB7;
 	opcodes[0xB8] = &CPU::op0xB8; opcodes[0xB9] = &CPU::op0xB9;
 	opcodes[0xBA] = &CPU::op0xBA; opcodes[0xBB] = &CPU::op0xBB;
 	opcodes[0xBC] = &CPU::op0xBC; opcodes[0xBD] = &CPU::op0xBD;
@@ -308,41 +337,42 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xC0] = &CPU::op0xC0; opcodes[0xC1] = &CPU::op0xC1;
 	opcodes[0xC2] = &CPU::op0xC2; opcodes[0xC3] = &CPU::op0xC3;
 	opcodes[0xC4] = &CPU::opNull; opcodes[0xC5] = &CPU::op0xC5;
-	opcodes[0xC6] = &CPU::opNull; opcodes[0xC7] = &CPU::opNull;
+	opcodes[0xC6] = &CPU::opNull; opcodes[0xC7] = &CPU::op0xC7;
 	opcodes[0xC8] = &CPU::op0xC8; opcodes[0xC9] = &CPU::op0xC9;
 	opcodes[0xCA] = &CPU::op0xCA; opcodes[0xCB] = &CPU::op0xCB;
 	opcodes[0xCC] = &CPU::opNull; opcodes[0xCD] = &CPU::op0xCD;
-	opcodes[0xCE] = &CPU::opNull; opcodes[0xCF] = &CPU::opNull;
+	opcodes[0xCE] = &CPU::opNull; opcodes[0xCF] = &CPU::op0xCF;
 
 	opcodes[0xD0] = &CPU::opNull; opcodes[0xD1] = &CPU::op0xD1;
 	opcodes[0xD2] = &CPU::opNull; opcodes[0xD3] = &CPU::opNull;
 	opcodes[0xD4] = &CPU::opNull; opcodes[0xD5] = &CPU::op0xD5;
-	opcodes[0xD6] = &CPU::op0xD6; opcodes[0xD7] = &CPU::opNull;
-	opcodes[0xD8] = &CPU::opNull; opcodes[0xD9] = &CPU::opNull;
+	opcodes[0xD6] = &CPU::op0xD6; opcodes[0xD7] = &CPU::op0xD7;
+	opcodes[0xD8] = &CPU::opNull; opcodes[0xD9] = &CPU::op0xD9;
 	opcodes[0xDA] = &CPU::op0xDA; opcodes[0xDB] = &CPU::opNull;
 	opcodes[0xDC] = &CPU::opNull; opcodes[0xDD] = &CPU::opNull;
-	opcodes[0xDE] = &CPU::opNull; opcodes[0xDF] = &CPU::opNull;
+	opcodes[0xDE] = &CPU::opNull; opcodes[0xDF] = &CPU::op0xDF;
 
 	opcodes[0xE0] = &CPU::op0xE0; opcodes[0xE1] = &CPU::op0xE1;
 	opcodes[0xE2] = &CPU::op0xE2; opcodes[0xE3] = &CPU::opNull;
 	opcodes[0xE4] = &CPU::opNull; opcodes[0xE5] = &CPU::op0xE5;
-	opcodes[0xE6] = &CPU::op0xE6; opcodes[0xE7] = &CPU::opNull;
-	opcodes[0xE8] = &CPU::opNull; opcodes[0xE9] = &CPU::opNull;
+	opcodes[0xE6] = &CPU::op0xE6; opcodes[0xE7] = &CPU::op0xE7;
+	opcodes[0xE8] = &CPU::opNull; opcodes[0xE9] = &CPU::op0xE9;
 	opcodes[0xEA] = &CPU::op0xEA; opcodes[0xEB] = &CPU::opNull;
 	opcodes[0xEC] = &CPU::opNull; opcodes[0xED] = &CPU::opNull;
-	opcodes[0xEE] = &CPU::opNull; opcodes[0xEF] = &CPU::opNull;
+	opcodes[0xEE] = &CPU::opNull; opcodes[0xEF] = &CPU::op0xEF;
 
 	opcodes[0xF0] = &CPU::op0xF0; opcodes[0xF1] = &CPU::op0xF1;
 	opcodes[0xF2] = &CPU::op0xF2; opcodes[0xF3] = &CPU::op0xF3;
 	opcodes[0xF4] = &CPU::opNull; opcodes[0xF5] = &CPU::op0xF5;
-	opcodes[0xF6] = &CPU::opNull; opcodes[0xF7] = &CPU::opNull;
+	opcodes[0xF6] = &CPU::opNull; opcodes[0xF7] = &CPU::op0xF7;
 	opcodes[0xF8] = &CPU::opNull; opcodes[0xF9] = &CPU::op0xF9;
 	opcodes[0xFA] = &CPU::op0xFA; opcodes[0xFB] = &CPU::op0xFB;
 	opcodes[0xFC] = &CPU::opNull; opcodes[0xFD] = &CPU::opNull;
 	opcodes[0xFE] = &CPU::op0xFE; opcodes[0xFF] = &CPU::op0xFF;
 
-
+	/* -------------------------------------- */
 	/* Initialize CB prefixed functions table */
+	/* -------------------------------------- */
 	opcodesCB[0x10] = &CPU::cb0x10; opcodesCB[0x11] = &CPU::cb0x11;
 	opcodesCB[0x12] = &CPU::cb0x12; opcodesCB[0x13] = &CPU::cb0x13;
 	opcodesCB[0x14] = &CPU::cb0x14; opcodesCB[0x15] = &CPU::cb0x15;
@@ -351,6 +381,15 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0x1A] = &CPU::opNull; opcodesCB[0x1B] = &CPU::opNull;
 	opcodesCB[0x1C] = &CPU::opNull; opcodesCB[0x1D] = &CPU::opNull;
 	opcodesCB[0x1E] = &CPU::opNull; opcodesCB[0x1F] = &CPU::opNull;
+
+	opcodesCB[0x30] = &CPU::opNull; opcodesCB[0x31] = &CPU::opNull;
+	opcodesCB[0x32] = &CPU::opNull; opcodesCB[0x33] = &CPU::opNull;
+	opcodesCB[0x34] = &CPU::opNull; opcodesCB[0x35] = &CPU::opNull;
+	opcodesCB[0x36] = &CPU::opNull; opcodesCB[0x37] = &CPU::cb0x37;
+	opcodesCB[0x38] = &CPU::opNull; opcodesCB[0x39] = &CPU::opNull;
+	opcodesCB[0x3A] = &CPU::opNull; opcodesCB[0x3B] = &CPU::opNull;
+	opcodesCB[0x3C] = &CPU::opNull; opcodesCB[0x3D] = &CPU::opNull;
+	opcodesCB[0x3E] = &CPU::opNull; opcodesCB[0x3F] = &CPU::opNull;
 
 	opcodesCB[0x70] = &CPU::opNull; opcodesCB[0x71] = &CPU::opNull;
 	opcodesCB[0x72] = &CPU::opNull; opcodesCB[0x73] = &CPU::opNull;
@@ -734,6 +773,11 @@ void CPU::op0x0F () {
 }
 // RRA
 // CPL
+void CPU::op0x2F () {
+	AF.hi ^= 0xFF;
+	N = H = 1;
+	clockCycles = 4;
+}
 // CCF
 
 /* 4. instructions */
@@ -1073,49 +1117,49 @@ void CPU::op0x7F () {
 void CPU::op0x80() {
 	AddA(BC.hi);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // ADD A,C
 void CPU::op0x81() {
 	AddA(BC.lo);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // ADD A,D
 void CPU::op0x82() {
 	AddA(DE.hi);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // ADD A,E
 void CPU::op0x83() {
 	AddA(DE.lo);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // ADD A,H
 void CPU::op0x84() {
 	AddA(HL.hi);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // ADD A,L
 void CPU::op0x85() {
 	AddA(HL.lo);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // ADD A,(HL)
 void CPU::op0x86() {
 	AddA(mmu->ReadByte(HL));
 
-	clockCycles += 8;
+	clockCycles = 8;
 }
 // ADD A,A
 void CPU::op0x87() {
 	AddA(AF.hi);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // ADC A,B
 // ADC A,C
@@ -1131,49 +1175,49 @@ void CPU::op0x87() {
 void CPU::op0x90() {
 	SubtractA(BC.hi);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // SUB C
 void CPU::op0x91() {
 	SubtractA(BC.lo);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // SUB D
 void CPU::op0x92() {
 	SubtractA(DE.hi);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // SUB E
 void CPU::op0x93() {
 	SubtractA(DE.lo);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // SUB H
 void CPU::op0x94() {
 	SubtractA(HL.hi);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // SUB L
 void CPU::op0x95() {
 	SubtractA(HL.lo);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // SUB (HL)
 void CPU::op0x96() {
 	SubtractA(mmu->ReadByte(HL));
 
-	clockCycles += 8;
+	clockCycles = 8;
 }
 // SUB A
 void CPU::op0x97() {
 	SubtractA(AF.hi);
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // SBC A,B
 // SBC A,C
@@ -1191,7 +1235,7 @@ void CPU::op0xA0() {
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // AND C
 void CPU::op0xA1() {
@@ -1199,7 +1243,7 @@ void CPU::op0xA1() {
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // AND D
 void CPU::op0xA2() {
@@ -1207,7 +1251,7 @@ void CPU::op0xA2() {
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // AND E
 void CPU::op0xA3() {
@@ -1215,7 +1259,7 @@ void CPU::op0xA3() {
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // AND H
 void CPU::op0xA4() {
@@ -1223,7 +1267,7 @@ void CPU::op0xA4() {
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // AND L
 void CPU::op0xA5() {
@@ -1231,7 +1275,7 @@ void CPU::op0xA5() {
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // AND (HL)
 void CPU::op0xA6() {
@@ -1239,7 +1283,7 @@ void CPU::op0xA6() {
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
 
-	clockCycles += 8;
+	clockCycles = 8;
 }
 // AND A
 void CPU::op0xA7() {
@@ -1247,7 +1291,7 @@ void CPU::op0xA7() {
 	Z = (AF.hi == 0);
 	N = 0, H = 1, C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // XOR B
 void CPU::op0xA8() {
@@ -1255,7 +1299,7 @@ void CPU::op0xA8() {
 	Z = (AF.hi == 0);
 	N = H = C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // XOR C
 void CPU::op0xA9() {
@@ -1263,7 +1307,7 @@ void CPU::op0xA9() {
 	Z = (AF.hi == 0);
 	N = H = C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // XOR D
 void CPU::op0xAA() {
@@ -1271,7 +1315,7 @@ void CPU::op0xAA() {
 	Z = (AF.hi == 0);
 	N = H = C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // XOR E
 void CPU::op0xAB() {
@@ -1279,7 +1323,7 @@ void CPU::op0xAB() {
 	Z = (AF.hi == 0);
 	N = H = C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // XOR H
 void CPU::op0xAC() {
@@ -1287,7 +1331,7 @@ void CPU::op0xAC() {
 	Z = (AF.hi == 0);
 	N = H = C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // XOR L
 void CPU::op0xAD() {
@@ -1295,7 +1339,7 @@ void CPU::op0xAD() {
 	Z = (AF.hi == 0);
 	N = H = C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 // XOR (HL)
 void CPU::op0xAE() {
@@ -1303,7 +1347,7 @@ void CPU::op0xAE() {
 	Z = (AF.hi == 0);
 	N = H = C = 0;
 
-	clockCycles += 8;
+	clockCycles = 8;
 }
 // XOR A
 void CPU::op0xAF() {
@@ -1311,64 +1355,88 @@ void CPU::op0xAF() {
 	Z = (AF.hi == 0);
 	N = H = C = 0;
 
-	clockCycles += 4;
+	clockCycles = 4;
 }
 
 /* B. instructions */
 // OR B
+void CPU::op0xB0 () {
+	OrA(BC.hi);
+	clockCycles = 4;
+}
 // OR C
+void CPU::op0xB1 () {
+	OrA(BC.lo);
+	clockCycles = 4;
+}
 // OR D
+void CPU::op0xB2 () {
+	OrA(DE.hi);
+	clockCycles = 4;
+}
 // OR E
+void CPU::op0xB3 () {
+	OrA(DE.lo);
+	clockCycles = 4;
+}
 // OR H
+void CPU::op0xB4 () {
+	OrA(HL.hi);
+	clockCycles = 4;
+}
 // OR L
+void CPU::op0xB5 () {
+	OrA(HL.lo);
+	clockCycles = 4;
+}
 // OR (HL)
+void CPU::op0xB6 () {
+	OrA(mmu->ReadByte(HL));
+	clockCycles = 4;
+}
 // OR A
+void CPU::op0xB7 () {
+	OrA(AF.hi);
+	clockCycles = 4;
+}
 // CP B
 void CPU::op0xB8() {
 	CompareA(BC.hi);
-
 	clockCycles = 4;
 }
 // CP C
 void CPU::op0xB9() {
 	CompareA(BC.lo);
-
 	clockCycles = 4;
 }
 // CP D
 void CPU::op0xBA() {
 	CompareA(DE.hi);
-
 	clockCycles = 4;
 }
 // CP E
 void CPU::op0xBB() {
 	CompareA(DE.lo);
-
 	clockCycles = 4;
 }
 // CP H
 void CPU::op0xBC() {
 	CompareA(HL.hi);
-
 	clockCycles = 4;
 }
 // CP L
 void CPU::op0xBD() {
 	CompareA(HL.lo);
-
 	clockCycles = 4;
 }
 // CP (HL)
 void CPU::op0xBE() {
 	CompareA(mmu->ReadByte(HL));
-
 	clockCycles = 4;
 }
 // CP A
 void CPU::op0xBF() {
 	CompareA(AF.hi);
-
 	clockCycles = 4;
 }
 /*  */
@@ -1494,9 +1562,29 @@ void CPU::op0xE6 () {
 // OR d8
 
 // RST 00H
+void CPU::op0xC7 () {
+	PushWord(PC);
+	PC = 0x00;
+	clockCycles = 32;
+}
 // RST 10H
+void CPU::op0xD7 () {
+	PushWord(PC);
+	PC = 0x10;
+	clockCycles = 32;
+}
 // RST 20H
+void CPU::op0xE7 () {
+	PushWord(PC);
+	PC = 0x20;
+	clockCycles = 32;
+}
 // RST 30H
+void CPU::op0xF7 () {
+	PushWord(PC);
+	PC = 0x30;
+	clockCycles = 32;
+}
 
 // RET Z
 void CPU::op0xC8 () {
@@ -1514,7 +1602,16 @@ void CPU::op0xC9 () {
 	clockCycles = 8;
 }
 // RETI
+void CPU::op0xD9 () {
+	PC = PopWord();
+	areInterruptsEnabled = true;
+	clockCycles = 8;
+}
 // JP (HL)
+void CPU::op0xE9 () {
+	PC = HL;
+	clockCycles = 4;
+}
 // LD SP,HL
 void CPU::op0xF9 () {
 	SP = HL;
@@ -1590,13 +1687,28 @@ void CPU::op0xFE () {
 }
 
 // RST 08H
+void CPU::op0xCF () {
+	PushWord(PC);
+	PC = 0x08;
+	clockCycles = 32;
+}
 // RST 18H
+void CPU::op0xDF () {
+	PushWord(PC);
+	PC = 0x18;
+	clockCycles = 32;
+}
 // RST 28H
+void CPU::op0xEF () {
+	PushWord(PC);
+	PC = 0x28;
+	clockCycles = 32;
+}
 // RST 38H
 void CPU::op0xFF () {
 	PushWord(PC);
 	PC = 0x38;
-	clockCycles = 8;
+	clockCycles = 32;
 }
 // CB0. instructions
 // RLC B
@@ -1681,6 +1793,9 @@ void CPU::cb0x16() {
 // SWAP L
 // SWAP (HL)
 // SWAP A
+void CPU::cb0x37 () {
+	Swap(AF.hi);
+}
 // SRL B
 // SRL C
 // SRL D

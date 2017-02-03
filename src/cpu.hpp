@@ -68,7 +68,7 @@ public:
 	CPU ();
 	~CPU ();
 
-	void Initialize (MMU* _mmu);
+	void Initialize (MMU* _mmu, bool doBootrom);
 	void EmulateCycle ();
 
 	/* Interrupt related functions */
@@ -95,6 +95,8 @@ private:
 	void Add       (uint16_t& x, uint16_t value); // ADD
 	void SubtractA (uint8_t value); // SUB
 	void CompareA  (uint8_t value); // CP
+	void OrA       (uint8_t value); // OR
+	void Swap (uint8_t& value); // SWAP
 
 	/* Instruction tables */
 	void InitializeOpcodeTable ();

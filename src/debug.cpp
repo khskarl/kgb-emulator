@@ -7,17 +7,22 @@ std::string Debug::GetGameboyText (GameBoy& gameboy) {
 	MMU* mmu = gameboy.GetMMU();
 
 	std::string text = "";
-	text += "ScrollY: " + std::to_string(mmu->ReadByte(SCROLLY)) + "\n";
-	text += "ScrollX: " + std::to_string(mmu->ReadByte(SCROLLX)) + "\n";
-	text += "CurLine: " + std::to_string(mmu->ReadByte(CURLINE)) + "\n";
+	// text += "ScrollY: " + std::to_string(mmu->ReadByte(SCROLLY)) + "\n";
+	// text += "ScrollX: " + std::to_string(mmu->ReadByte(SCROLLX)) + "\n";
+	// text += "CurLine: " + std::to_string(mmu->ReadByte(CURLINE)) + "\n";
 
-	text += "A: " + std::to_string(cpu->AF.hi) + "\n";
-	text += "B: " + std::to_string(cpu->BC.hi) + "\n";
-	text += "C: " + std::to_string(cpu->BC.lo) + "\n";
-	text += "D: " + std::to_string(cpu->DE.hi) + "\n";
-	text += "E: " + std::to_string(cpu->DE.lo) + "\n";
-	text += "H: " + std::to_string(cpu->HL.hi) + "\n";
-	text += "L: " + std::to_string(cpu->HL.lo) + "\n";
+	char buffer[8];
+	sprintf(buffer, "%04X", cpu->AF.word);
+	text += "AF: " + std::string(buffer) + "\n";
+	sprintf(buffer, "%04X", cpu->BC.word);
+	text += "BC: " + std::string(buffer) + "\n";
+	sprintf(buffer, "%04X", cpu->DE.word);
+	text += "DE: " + std::string(buffer) + "\n";
+	sprintf(buffer, "%04X", cpu->HL.word);
+	text += "HL: " + std::string(buffer) + "\n";
+
+	sprintf(buffer, "%04X", cpu->SP);
+	text += "SP: " + std::string(buffer) + "\n";
 
 	return text;
 }
