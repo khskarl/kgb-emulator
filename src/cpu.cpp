@@ -43,7 +43,7 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
-	if (PC == 0x100 || PC == 0xC16B) {
+	if (PC == 0x100 || PC == 0x86) {
 		isHalted = true;
 	}
 
@@ -205,27 +205,30 @@ void CPU::Increment (reg16_t& value) {
 }
 
 void CPU::AddA (uint8_t value) {
+	uint8_t oldA = AF.hi;
 	AF.hi += value;
 	SetZ(AF.hi == 0);
 	SetN(0);
 	SetH((AF.hi & 0xF) + (value & 0xF) > 0xF);
-	SetC(AF.hi + value > 0xFF);
+	SetC(oldA + value > 0xFF);
 }
 
 void CPU::Add (uint16_t& x, uint16_t value) {
+	uint8_t oldX = x;
 	x += value;
 	SetZ(x == 0);
 	SetN(0);
 	SetH((x & 0xF) + (value & 0xF) > 0xF);
-	SetC(x + value > 0xFF);
+	SetC(oldX + value > 0xFF);
 }
 
 void CPU::SubtractA (uint8_t value) {
+	uint8_t oldA = AF.hi;
 	AF.hi -= value;
 	SetZ(AF.hi == 0);
 	SetN(1);
-	SetH((AF.hi & 0xF) < (value & 0xF));
-	SetC(AF.hi < value);
+	SetH((oldA & 0xF) < (value & 0xF));
+	SetC(oldA < value);
 }
 
 void CPU::CompareA (uint8_t value) {
