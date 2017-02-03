@@ -17,7 +17,7 @@ void CPU::Initialize (MMU* _mmu, bool doBootrom) {
 		HL = 0;
 		SP = 0x0;
 		PC = 0x0;
-		Z = 0, N = 0, H = 0, C = 0;
+		SetZ(0); SetN(0); SetH(0); SetC(0);
 	}
 	else {
 		AF = 0x01B0;
@@ -26,7 +26,7 @@ void CPU::Initialize (MMU* _mmu, bool doBootrom) {
 		HL = 0x014D;
 		SP = 0xFFFE;
 		PC = 0x100;
-		Z = 0, N = 0, H = 0, C = 0;
+		SetZ(1); SetN(0); SetH(1); SetC(1);
 	}
 
 	clockCycles = 0;
@@ -102,6 +102,37 @@ void CPU::DoInterrupt (uint8_t id) {
 	// isHalted = true;
 }
 
+void CPU::SetZ (bool value) {
+	AF.lo = (AF.lo & ~0x80) | 0x80 * value;
+}
+
+void CPU::SetN (bool value) {
+	AF.lo = (AF.lo & ~0x40) | 0x40 * value;
+}
+
+void CPU::SetH (bool value) {
+	AF.lo = (AF.lo & ~0x20) | 0x20 * value;
+}
+
+void CPU::SetC (bool value) {
+	AF.lo = (AF.lo & ~0x10) | 0x10 * value;
+}
+
+bool CPU::GetZ () {
+	return (AF.lo & 0x80);
+}
+
+bool CPU::GetN () {
+	return (AF.lo & 0x40);
+}
+
+bool CPU::GetH () {
+	return (AF.lo & 0x20);
+}
+
+bool CPU::GetC () {
+	return (AF.lo & 0x10);
+}
 
 uint8_t CPU::ReadByte () {
 	uint8_t value = mmu->ReadByte(PC);
@@ -127,95 +158,87 @@ uint16_t CPU::PopWord () {
 // FIXME: Double check C flag computation
 void CPU::RotateLeft (uint8_t& value) {
 	uint8_t oldBit7 = (value >> 7);
-	value = (value << 1) | C;
-	Z = (value == 0);
-	N = 0, H = 0;
-	C = oldBit7;
+	value = (value << 1) | GetC();
+	SetZ(value == 0);
+	SetN(0), SetH(0);
+	SetC(oldBit7);
 }
 
 void CPU::Decrement (uint8_t& value) {
 	uint8_t oldBit4 = value & 0x8;
 	value -= 1;
-	Z = (value == 0);
-	N = 1;
-	H = (value & 0x8) ^ oldBit4 && oldBit4 != 0x8;
+	SetZ(value == 0);
+	SetN(1);
+	SetH( (value & 0x8) ^ oldBit4 && oldBit4 != 0x8 );
 }
 
 void CPU::Decrement (uint16_t& value) {
 	uint8_t oldBit4 = value & 0x8;
 	value -= 1;
-	Z = (value == 0);
-	N = 1;
-	H = (value & 0x8) ^ oldBit4 && oldBit4 != 0x8;
+	SetZ(value == 0);
+	SetN(1);
+	SetH( (value & 0x8) ^ oldBit4 && oldBit4 != 0x8 );
 }
 
 void CPU::Decrement (reg16_t& value) {
-	uint8_t oldBit4 = value & 0x8;
-	value -= 1;
-	Z = (value == 0);
-	N = 1;
-	H = (value & 0x8) ^ oldBit4 && oldBit4 != 0x8;
+	Decrement(value.word);
 }
 
 void CPU::Increment (uint8_t& value) {
-	uint8_t oldBit4 = value & 0x8;
+	uint8_t prev = value;
 	value += 1;
-	Z = (value == 0);
-	N = 0;
-	H = (value & 0x8) ^ oldBit4 && oldBit4 == 0x8;
+	SetZ(value == 0);
+	SetN(0);
+	SetH((prev & 0xF) == 0xF);
 }
-
+// FIXME: Halfcarry in a 16bit value isn't on bit 4
 void CPU::Increment (uint16_t& value) {
-	uint8_t oldBit4 = value & 0x8;
+	uint16_t prev = value;
 	value += 1;
-	Z = (value == 0);
-	N = 0;
-	H = (value & 0x8) ^ oldBit4 && oldBit4 == 0x8;
+	SetZ(value == 0);
+	SetN(0);
+	SetH((prev & 0xFF) == 0xFF);
 }
 
 void CPU::Increment (reg16_t& value) {
-	uint8_t oldBit4 = value & 0x8;
-	value += 1;
-	Z = (value == 0);
-	N = 0;
-	H = (value & 0x8) ^ oldBit4 && oldBit4 == 0x8;
+	Increment(value.word);
 }
 
 void CPU::AddA (uint8_t value) {
 	AF.hi += value;
-	Z = (AF.hi == 0);
-	N = 0;
-	H = (AF.hi & 0xF) + (value & 0xF) > 0xF;
-	C = (AF.hi + value > 0xFF);
+	SetZ(AF.hi == 0);
+	SetN(0);
+	SetH((AF.hi & 0xF) + (value & 0xF) > 0xF);
+	SetC(AF.hi + value > 0xFF);
 }
 
 void CPU::Add (uint16_t& x, uint16_t value) {
 	x += value;
-	Z = (x == 0);
-	N = 0;
-	H = (x & 0xF) + (value & 0xF) > 0xF;
-	C = (x + value > 0xFF);
+	SetZ(x == 0);
+	SetN(0);
+	SetH((x & 0xF) + (value & 0xF) > 0xF);
+	SetC(x + value > 0xFF);
 }
 
 void CPU::SubtractA (uint8_t value) {
 	AF.hi -= value;
-	Z = (AF.hi == 0);
-	N = 1;
-	H = (AF.hi & 0xF) < (value & 0xF);
-	C = (AF.hi < value);
+	SetZ(AF.hi == 0);
+	SetN(1);
+	SetH((AF.hi & 0xF) < (value & 0xF));
+	SetC(AF.hi < value);
 }
 
 void CPU::CompareA (uint8_t value) {
-	Z = (AF.hi == value);
-	N = 1;
-	H = (AF.hi & 0xF) < (value & 0xF);
-	C = (AF.hi < value);
+	SetZ(AF.hi == value);
+	SetN(1);
+	SetH((AF.hi & 0xF) < (value & 0xF));
+	SetC(AF.hi < value);
 }
 
 void CPU::OrA (uint8_t value) {
 	AF.hi |= value;
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 }
 
 void CPU::Swap (uint8_t& value) {
@@ -405,19 +428,17 @@ void CPU::InitializeOpcodeTable () {
 
 // NOP
 void CPU::op0x00 () {
-
 	clockCycles = 4;
 }
 // STOP 0
 void CPU::op0x10 () {
-
 	clockCycles = 4;
 }
 // JR NZ,r8
 void CPU::op0x20 () {
 	uint8_t value = ReadByte();
 
-	if (Z == 0) {
+	if (GetZ() == 0) {
 		PC += reinterpret_cast<int8_t&>(value);
 		clockCycles = 12;
 	}
@@ -428,7 +449,7 @@ void CPU::op0x20 () {
 void CPU::op0x30 () {
 	uint8_t value = ReadByte();
 
-	if (C == 0) {
+	if (GetC() == 0) {
 		PC += value;
 		clockCycles = 12;
 	}
@@ -599,7 +620,7 @@ void CPU::op0x18 () {
 void CPU::op0x28 () {
 	uint8_t value = ReadByte();
 
-	if (Z == 1) {
+	if (GetZ() == 1) {
 		PC += reinterpret_cast<int8_t&>(value);
 		clockCycles = 12;
 	}
@@ -610,7 +631,7 @@ void CPU::op0x28 () {
 void CPU::op0x38 () {
 	uint8_t value = ReadByte();
 
-	if (C == 1) {
+	if (GetC() == 1) {
 		PC += reinterpret_cast<int8_t&>(value);
 		clockCycles = 12;
 	}
@@ -685,42 +706,22 @@ void CPU::op0x3B () {
 
 // INC C
 void CPU::op0x0C () {
-	uint8_t prev = BC.lo;
-	BC.lo += 1;
-
-	Z = (BC.lo == 0);
-	N = 0;
-	H = (prev & 0xF) == 0xF;
+	Increment(BC.lo);
 	clockCycles = 4;
 }
 // INC E
 void CPU::op0x1C () {
-	uint8_t prev = DE.lo;
-	DE.lo += 1;
-
-	Z = (DE.lo == 0);
-	N = 0;
-	H = (prev & 0xF) == 0xF;
+	Increment(DE.lo);
 	clockCycles = 4;
 }
 // INC L
 void CPU::op0x2C () {
-	uint8_t prev = HL.lo;
-	HL.lo += 1;
-
-	Z = (HL.lo == 0);
-	N = 0;
-	H = (prev & 0xF) == 0xF;
+	Increment(HL.lo);
 	clockCycles = 4;
 }
 // INC A
 void CPU::op0x3C () {
-	uint8_t prev = AF.hi;
-	AF.hi += 1;
-
-	Z = (AF.hi == 0);
-	N = 0;
-	H = (prev & 0xF) == 0xF;
+	Increment(AF.hi);
 	clockCycles = 4;
 }
 
@@ -775,7 +776,7 @@ void CPU::op0x0F () {
 // CPL
 void CPU::op0x2F () {
 	AF.hi ^= 0xFF;
-	N = H = 1;
+	SetN(1), SetH(1);
 	clockCycles = 4;
 }
 // CCF
@@ -1232,128 +1233,128 @@ void CPU::op0x97() {
 // AND B
 void CPU::op0xA0() {
 	AF.hi &= BC.hi;
-	Z = (AF.hi == 0);
-	N = 0, H = 1, C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles = 4;
 }
 // AND C
 void CPU::op0xA1() {
 	AF.hi &= BC.lo;
-	Z = (AF.hi == 0);
-	N = 0, H = 1, C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles = 4;
 }
 // AND D
 void CPU::op0xA2() {
 	AF.hi &= DE.hi;
-	Z = (AF.hi == 0);
-	N = 0, H = 1, C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles = 4;
 }
 // AND E
 void CPU::op0xA3() {
 	AF.hi &= DE.lo;
-	Z = (AF.hi == 0);
-	N = 0, H = 1, C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles = 4;
 }
 // AND H
 void CPU::op0xA4() {
 	AF.hi &= HL.hi;
-	Z = (AF.hi == 0);
-	N = 0, H = 1, C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles = 4;
 }
 // AND L
 void CPU::op0xA5() {
 	AF.hi &= HL.lo;
-	Z = (AF.hi == 0);
-	N = 0, H = 1, C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles = 4;
 }
 // AND (HL)
 void CPU::op0xA6() {
 	AF.hi &= mmu->ReadByte(HL);
-	Z = (AF.hi == 0);
-	N = 0, H = 1, C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles = 8;
 }
 // AND A
 void CPU::op0xA7() {
 	AF.hi &= AF.hi;
-	Z = (AF.hi == 0);
-	N = 0, H = 1, C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles = 4;
 }
 // XOR B
 void CPU::op0xA8() {
 	AF.hi ^= BC.hi;
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles = 4;
 }
 // XOR C
 void CPU::op0xA9() {
 	AF.hi ^= BC.lo;
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles = 4;
 }
 // XOR D
 void CPU::op0xAA() {
 	AF.hi ^= DE.hi;
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles = 4;
 }
 // XOR E
 void CPU::op0xAB() {
 	AF.hi ^= DE.lo;
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles = 4;
 }
 // XOR H
 void CPU::op0xAC() {
 	AF.hi ^= HL.hi;
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles = 4;
 }
 // XOR L
 void CPU::op0xAD() {
 	AF.hi ^= HL.lo;
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles = 4;
 }
 // XOR (HL)
 void CPU::op0xAE() {
 	AF.hi ^= mmu->ReadByte(HL);
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles = 8;
 }
 // XOR A
 void CPU::op0xAF() {
 	AF.hi ^= AF.hi;
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles = 4;
 }
@@ -1442,7 +1443,7 @@ void CPU::op0xBF() {
 /*  */
 // RET NZ
 void CPU::op0xC0 () {
-	if (Z == 0)
+	if (GetZ() == 0)
 		PC = PopWord();
 	clockCycles = 8;
 }
@@ -1486,7 +1487,7 @@ void CPU::op0xF1 () {
 // JP NZ,a16
 void CPU::op0xC2 () {
 	uint16_t value = ReadWord();
-	if (Z == 0)
+	if (GetZ() == 0)
 		PC = value;
 	clockCycles = 12;
 }
@@ -1523,25 +1524,21 @@ void CPU::op0xF3 () {
 // PUSH BC
 void CPU::op0xC5 () {
 	PushWord(BC);
-
 	clockCycles += 16;
 }
 // PUSH DE
 void CPU::op0xD5 () {
 	PushWord(DE);
-
 	clockCycles += 16;
 }
 // PUSH HL
 void CPU::op0xE5 () {
 	PushWord(HL);
-
 	clockCycles += 16;
 }
 // PUSH AF // FIXME: There is NO value in F because of our flags hack
 void CPU::op0xF5 () {
 	PushWord(AF);
-
 	clockCycles += 16;
 }
 
@@ -1554,8 +1551,8 @@ void CPU::op0xD6 () {
 // AND d8
 void CPU::op0xE6 () {
 	AF.hi &= ReadByte();
-	Z = (AF.hi == 0);
-	N = H = C = 0;
+	SetZ(AF.hi == 0);
+	SetN(0), SetH(0), SetC(0);
 
 	clockCycles += 8;
 }
@@ -1588,7 +1585,7 @@ void CPU::op0xF7 () {
 
 // RET Z
 void CPU::op0xC8 () {
-	if (Z != 0)
+	if (GetZ() != 0)
 		PC = PopWord();
 	clockCycles = 8;
 }
@@ -1621,14 +1618,14 @@ void CPU::op0xF9 () {
 // JP Z,a16
 void CPU::op0xCA () {
 	uint16_t address = ReadWord();
-	if (Z != 0)
+	if (GetZ() != 0)
 		PC = address;
 	clockCycles = 16;
 }
 // JP C,a16
 void CPU::op0xDA () {
 	uint16_t address = ReadWord();
-	if (C != 0)
+	if (GetC() != 0)
 		PC = address;
 	clockCycles = 16;
 }
@@ -1868,34 +1865,34 @@ void CPU::cb0x37 () {
 // BIT 7,C
 // BIT 7,D
 void CPU::cb0x7A () {
-	Z = (DE.hi & 0x80) == 0;
-	N = 0, H = 1;
+	SetZ((DE.hi & 0x80) == 0);
+	SetN(0), SetH(1);
 }
 // BIT 7,E
 void CPU::cb0x7B () {
-	Z = (DE.lo & 0x80) == 0;
-	N = 0, H = 1;
+	SetZ((DE.lo & 0x80) == 0);
+	SetN(0), SetH(1);
 }
 // BIT 7,H
 void CPU::cb0x7C () {
-	Z = (HL.hi & 0x80) == 0;
-	N = 0, H = 1;
+	SetZ((HL.hi & 0x80) == 0);
+	SetN(0), SetH(1);
 }
 // BIT 7,L
 void CPU::cb0x7D () {
-	Z = (HL.lo & 0x80) == 0;
-	N = 0, H = 1;
+	SetZ((HL.lo & 0x80) == 0);
+	SetN(0), SetH(1);
 }
 // BIT 7,(HL)
 void CPU::cb0x7E () {
-	Z = (HL.lo & 0x80) == 0;
-	N = 0, H = 1;
+	SetZ((HL.lo & 0x80) == 0);
+	SetN(0), SetH(1);
 	clockCycles = 16;
 }
 // BIT 7,A
 void CPU::cb0x7F () {
-	Z = (AF.hi & 0x80) == 0;
-	N = 0, H = 1;
+	SetZ((AF.hi & 0x80) == 0);
+	SetN(0), SetH(1);
 }
 // CB8. instructions
 // RES 0,B

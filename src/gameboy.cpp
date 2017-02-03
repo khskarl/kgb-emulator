@@ -4,7 +4,7 @@ GameBoy::GameBoy () {}
 GameBoy::~GameBoy () {}
 
 void GameBoy::Initialize () {
-	cpu.Initialize(&mmu);
+	cpu.Initialize(&mmu, true);
 	mmu.Initialize();
 	ppu.Initialize(&cpu, &mmu);
 

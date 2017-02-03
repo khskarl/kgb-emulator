@@ -56,10 +56,6 @@ public:
 	uint16_t SP = 0xfffe;
 	uint16_t PC;
 
-	/* Flags */
-	/* Instead of using F from AF, we create those variables*/
-	bool Z, N, H, C;
-
 	bool areInterruptsEnabled = false;
 	bool isHalted = false;
 
@@ -76,6 +72,16 @@ public:
 	void ProcessInterrupts ();
 	void DoInterrupt (uint8_t id);
 private:
+	/* Flag helpers */
+	void SetZ (bool value);
+	void SetN (bool value);
+	void SetH (bool value);
+	void SetC (bool value);
+	bool GetZ ();
+	bool GetN ();
+	bool GetH ();
+	bool GetC ();
+
 	/* Instruction helpers */
 	uint8_t  ReadByte ();
 	uint16_t ReadWord ();
