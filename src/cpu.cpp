@@ -43,8 +43,7 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
-	if (PC == 0x100 || PC == 0xFE) {
-		std::cout << std::hex << (int)mmu->ReadByte(HL) << '\n';
+	if (PC == 0x286) {
 		isHalted = true;
 	}
 
@@ -63,6 +62,7 @@ void CPU::RequestInterrupt (uint8_t id) {
 	requestRegister |= 0x10 >> (4 - id); // SET bit ID
 	mmu->WriteByte(IF, requestRegister);
 	// std::cout << "Interrupt requested!\n" ;
+	// isHalted = true;
 }
 
 void CPU::ProcessInterrupts () {
@@ -73,20 +73,24 @@ void CPU::ProcessInterrupts () {
 	if (requestRegister == 0)
 		return;
 
-	uint8_t enabledRegister = mmu->ReadByte(IF);
+
+	uint8_t enabledRegister = mmu->ReadByte(IE);
 	for (size_t id = 0; id < 5; id++) {
 		bool isInterruptRequested = requestRegister & (0x10 >> (4 - id));
 		bool isInterruptEnabled   = enabledRegister & (0x10 >> (4 - id));
 
-		if (isInterruptRequested && isInterruptEnabled)
+		if (isInterruptRequested && isInterruptEnabled) {
 			DoInterrupt(id);
+			std::cout << "Doing interrupt " << id << "\n";
+			isHalted = true;
+		}
 	}
 }
 
 void CPU::DoInterrupt (uint8_t id) {
 	areInterruptsEnabled = false;
 	uint8_t requestRegister = mmu->ReadByte(IF);
-	// Reset bit id, we use XOR because the bit has to be 1 before this function
+	// Reset bit id, we use XOR because the bit has to be 1 before this function, so it always resets it
 	requestRegister ^= 0x10 >> (4 - id);
 	mmu->WriteByte(IF, requestRegister);
 
@@ -1477,7 +1481,7 @@ void CPU::op0xD1 () {
 }
 // POP HL
 void CPU::op0xE1 () {
-	DE = PopWord();
+	HL = PopWord();
 
 	clockCycles = 12;
 }
