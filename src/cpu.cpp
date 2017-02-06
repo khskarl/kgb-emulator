@@ -43,9 +43,9 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
-	if (PC == 0x286) {
-		isHalted = true;
-	}
+	// if (PC == 0x2876) {
+	// 	isHalted = true;
+	// }
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
@@ -367,20 +367,20 @@ void CPU::InitializeOpcodeTable () {
 
 	opcodes[0xC0] = &CPU::op0xC0; opcodes[0xC1] = &CPU::op0xC1;
 	opcodes[0xC2] = &CPU::op0xC2; opcodes[0xC3] = &CPU::op0xC3;
-	opcodes[0xC4] = &CPU::opNull; opcodes[0xC5] = &CPU::op0xC5;
+	opcodes[0xC4] = &CPU::op0xC4; opcodes[0xC5] = &CPU::op0xC5;
 	opcodes[0xC6] = &CPU::opNull; opcodes[0xC7] = &CPU::op0xC7;
 	opcodes[0xC8] = &CPU::op0xC8; opcodes[0xC9] = &CPU::op0xC9;
 	opcodes[0xCA] = &CPU::op0xCA; opcodes[0xCB] = &CPU::op0xCB;
-	opcodes[0xCC] = &CPU::opNull; opcodes[0xCD] = &CPU::op0xCD;
+	opcodes[0xCC] = &CPU::op0xCC; opcodes[0xCD] = &CPU::op0xCD;
 	opcodes[0xCE] = &CPU::opNull; opcodes[0xCF] = &CPU::op0xCF;
 
 	opcodes[0xD0] = &CPU::opNull; opcodes[0xD1] = &CPU::op0xD1;
 	opcodes[0xD2] = &CPU::opNull; opcodes[0xD3] = &CPU::opNull;
-	opcodes[0xD4] = &CPU::opNull; opcodes[0xD5] = &CPU::op0xD5;
+	opcodes[0xD4] = &CPU::op0xD4; opcodes[0xD5] = &CPU::op0xD5;
 	opcodes[0xD6] = &CPU::op0xD6; opcodes[0xD7] = &CPU::op0xD7;
 	opcodes[0xD8] = &CPU::opNull; opcodes[0xD9] = &CPU::op0xD9;
 	opcodes[0xDA] = &CPU::op0xDA; opcodes[0xDB] = &CPU::opNull;
-	opcodes[0xDC] = &CPU::opNull; opcodes[0xDD] = &CPU::opNull;
+	opcodes[0xDC] = &CPU::op0xDC; opcodes[0xDD] = &CPU::opNull;
 	opcodes[0xDE] = &CPU::opNull; opcodes[0xDF] = &CPU::op0xDF;
 
 	opcodes[0xE0] = &CPU::op0xE0; opcodes[0xE1] = &CPU::op0xE1;
@@ -1525,7 +1525,23 @@ void CPU::op0xF3 () {
 }
 
 // CALL NZ,a16
+void CPU::op0xC4 () {
+	if (GetZ() == false) {
+		PC = ReadWord();
+		clockCycles = 24;
+	} else {
+		clockCycles = 12;
+	}
+}
 // CALL NC,a16
+void CPU::op0xD4 () {
+	if (GetC() == false) {
+		PC = ReadWord();
+		clockCycles = 24;
+	} else {
+		clockCycles = 12;
+	}
+}
 // E4..: I don't exist
 // F4..: I don't exist
 
@@ -1668,7 +1684,23 @@ void CPU::op0xFB () {
 	clockCycles = 4;
 }
 // CALL Z,a16
+void CPU::op0xCC () {
+	if (GetZ() == true) {
+		PC = ReadWord();
+		clockCycles = 24;
+	} else {
+		clockCycles = 12;
+	}
+}
 // CALL C,a16
+void CPU::op0xDC () {
+	if (GetC() == true) {
+		PC = ReadWord();
+		clockCycles = 24;
+	} else {
+		clockCycles = 12;
+	}
+}
 // EC..: I don't exist
 // FC..: I don't exist
 // CALL a16
