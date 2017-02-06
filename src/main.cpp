@@ -17,6 +17,7 @@ int main(int argc, char const *argv[]) {
 	if (argc < 2) {
 		std::cout << "<*Error*> You didn't supply a ROM path as argument\n" <<
 		             "Usage example: ./build/gbemu.out roms/tetris.gb\n";
+		return EXIT_FAILURE;
 	}
 
 	const char* filepath = argv[1];
@@ -24,7 +25,7 @@ int main(int argc, char const *argv[]) {
 	Rom rom(filepath);
 	if (rom.isLoaded == false) {
 		std::cout << "<*Error*> Failed to load: " << filepath << " \n";
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	std::cout <<
@@ -76,5 +77,5 @@ int main(int argc, char const *argv[]) {
 
 	Context::DestroyContext();
 
-	return 0;
+	return EXIT_SUCCESS;
 }
