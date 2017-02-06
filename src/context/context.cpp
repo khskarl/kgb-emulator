@@ -26,7 +26,7 @@ bool prevShouldStep = false;
 bool Context::SetupContext (int scale = 1) {
 	font.loadFromFile("./resources/fonts/OpenSans-Bold.ttf");
 	debugText.setFont(font);
-	debugText.setFillColor(sf::Color::Magenta);
+	debugText.setColor(sf::Color::Magenta);
 	debugText.setCharacterSize(20);
 	debugText.setString("Debug :D");
 
