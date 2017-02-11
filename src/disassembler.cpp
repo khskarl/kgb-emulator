@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+
 #include "disassembler.hpp"
 /*
 	Reference:
@@ -48,8 +49,8 @@ std::string Format (const char* mnemonic, const char* args, uint8_t op, uint8_t 
 	return std::string(buffer);
 }
 
-std::string DisassembleRom(Rom rom) {
-	uint8_t* code = rom.GetData();
+std::string DisassembleRom(const Rom& rom) {
+	const uint8_t* code = rom.GetData();
 
 	char buffer[64];
 	pc = 0x100;
@@ -65,9 +66,9 @@ std::string DisassembleRom(Rom rom) {
 	return disassembledRom;
 }
 
-std::string DisassembleCB(uint8_t* code);
+std::string DisassembleCB(const uint8_t* code);
 
-std::string DisassembleOpcode(uint8_t* code) {
+std::string DisassembleOpcode(const uint8_t* code) {
 	switch (code[0]) {
 		case 0x00: return Format("NOP",  "",  code[0]); break;
 		case 0x10: return Format("STOP",	 "0", code[0]); break;
@@ -373,7 +374,7 @@ std::string DisassembleOpcode(uint8_t* code) {
 	}
 }
 
-std::string DisassembleCB(uint8_t* code) {
+std::string DisassembleCB(const uint8_t* code) {
 
 	/* Every 0xCB.. instruction is 2 bytes, so we add one byte more to PC */
 	pc += 1;

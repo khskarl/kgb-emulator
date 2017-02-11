@@ -1,8 +1,9 @@
+#include <iostream>
+#include <cstring> // std::memcpy
+
 #include "mmu.hpp"
 #include "cpu.hpp"
 
-#include <iostream>
-#include <cstring> // std::memcpy
 #include "debug.hpp"
 
 MMU::MMU () {}
@@ -77,13 +78,13 @@ void MMU::WriteWord (uint16_t address, uint16_t value) {
 	memory[1] = (value & 0xFF00) >> 8;
 }
 
-void MMU::WriteBios (uint8_t* buffer) {
+void MMU::WriteBios (const uint8_t* buffer) {
 	assert(buffer != nullptr);
-	std::memcpy(bios, buffer, 256);
+	std::memcpy(bios, buffer, 0x100);
 }
 
 // TODO: Rename it to "WriteRom"
-void MMU::WriteBufferToRom (uint8_t* buffer, uint32_t bufferSize) {
+void MMU::WriteBufferToRom (const uint8_t* buffer, size_t bufferSize) {
 	assert(buffer != nullptr);
 	assert(bufferSize > 0);
 	std::memcpy(rom, buffer, 0x4000);
@@ -99,7 +100,7 @@ uint8_t* MMU::GetIORef (uint16_t address) {
 }
 
 uint8_t* MMU::GetMemoryRef (uint16_t address) {
-	assert(address >= 0x0000 && address <= 0xFFFF);
+
 	switch (address & 0xF000) {
 		/* BIOS / ROM0 */
 		case 0x0000:
@@ -171,6 +172,6 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 	}
 }
 
-void MMU::HandleRomBankSwitch(uint16_t address) {
+void MMU::HandleRomBankSwitch(uint16_t /*address*/) {
 	assert("Unimplemented bank switch!" && 0);
 }

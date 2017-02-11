@@ -2,13 +2,15 @@
 #define MMU_HPP
 
 #include <stdint.h>
+#include <stddef.h>
 
 #include "common_memory_addresses.hpp"
 
 class CPU;
+
 class MMU {
 private:
-	uint8_t bios[0xFF+1];
+	uint8_t bios[0x100];
 	uint8_t rom[0x4000];
 	uint8_t romBanks[96][0x4000];
 	uint8_t vram[0x2000];
@@ -40,8 +42,8 @@ public:
 	/* Specific memory access functions */
 	uint8_t  ReadClockFrequency ();
 
-	void WriteBios (uint8_t* buffer);
-	void WriteBufferToRom (uint8_t* buffer, uint32_t bufferSize);
+	void WriteBios (const uint8_t* buffer);
+	void WriteBufferToRom (const uint8_t* buffer, size_t bufferSize);
 
 	uint8_t* GetRomRef    (uint16_t address);
 	uint8_t* GetIORef     (uint16_t address);

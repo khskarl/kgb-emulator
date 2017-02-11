@@ -1,5 +1,8 @@
-#include "gameboy.hpp"
 #include <iostream>
+#include "bios.hpp"
+#include "gameboy.hpp"
+
+
 GameBoy::GameBoy () {}
 GameBoy::~GameBoy () {}
 
@@ -7,12 +10,8 @@ void GameBoy::Initialize () {
 	cpu.Initialize(&mmu, false);
 	mmu.Initialize();
 	ppu.Initialize(&cpu, &mmu);
-
+	mmu.WriteBios(kGameboyDMGBios);
 	timerCounter = 1024;
-}
-
-void GameBoy::LoadBios (Rom bios) {
-	mmu.WriteBios(bios.GetData());
 }
 
 void GameBoy::LoadRom (Rom rom) {

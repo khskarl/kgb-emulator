@@ -1,11 +1,11 @@
 #ifndef DISASSEMBLER_HPP
 #define DISASSEMBLER_HPP
-#include <string>
 #include <stdint.h>
+#include <string>
 #include "rom.hpp"
 
 
-std::string DisassembleRom(Rom rom);
-std::string DisassembleOpcode(uint8_t* code);
+extern std::string DisassembleRom(const Rom& rom);
+extern std::string DisassembleOpcode(const uint8_t* code);
 
 #endif

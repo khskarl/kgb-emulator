@@ -1,7 +1,8 @@
+#include <iostream>
+
 #include "cpu.hpp"
 #include "mmu.hpp"
 
-#include "iostream"
 #include "debug.hpp"
 #include "disassembler.hpp"
 
