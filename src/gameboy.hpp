@@ -25,7 +25,6 @@ public:
 
 	void Initialize ();
 
-	void LoadBios (Rom bios);
 	void LoadRom  (Rom rom);
 
 	void StepEmulation (const uint32_t cyclesThisUpdate = 69905);

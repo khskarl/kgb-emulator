@@ -1,9 +1,8 @@
-#include "ppu.hpp"
-
-#include "cpu.hpp"
-
-#include <algorithm>
 #include <iostream>
+#include <algorithm>
+
+#include "ppu.hpp"
+#include "cpu.hpp"
 #include "debug.hpp"
 
 PPU::PPU () {}

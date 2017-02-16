@@ -13,34 +13,20 @@
 const int defaultCycles = 69905;
 float speed = 1.0f;
 
-int main(int argc, char const *argv[]) {
-	if (argc < 2) {
-		std::cout << "<*Error*> You didn't supply a ROM path as argument\n" <<
-		             "Usage example: ./build/gbemu.out roms/tetris.gb\n";
-		return EXIT_FAILURE;
-	}
 
-	const char* filepath = argv[1];
-
+void run_emulator(const std::string& filepath) {
 	Rom rom(filepath);
-	if (rom.isLoaded == false) {
-		std::cout << "<*Error*> Failed to load: " << filepath << " \n";
-		return EXIT_FAILURE;
-	}
 
 	std::cout <<
 		"[ROM DATA]" << '\n' <<
 		"Name:      " << rom.GetName() << '\n' <<
 		"Size:      " << rom.GetSize() << " B\n" <<
 		"#RomBanks: " << (int) rom.GetNumRomBanks() << '\n' <<
-		"Type:      " << rom.GetCatridgeType() << '\n';
+		"Type:      " << rom.GetType() << '\n';
 	// std::cout << DisassembleRom(rom) << '\n';
-
-	Rom bios("roms/bios.gb");
 
 	GameBoy gameBoy;
 	gameBoy.Initialize();
-	gameBoy.LoadBios(bios);
 	gameBoy.LoadRom(rom);
 
 	Context::SetupContext(4);
@@ -76,6 +62,29 @@ int main(int argc, char const *argv[]) {
 	}
 
 	Context::DestroyContext();
+}
 
-	return EXIT_SUCCESS;
+
+
+
+int main(int argc, char const *argv[]) {
+
+	if (argc < 2) {
+		std::cerr << "<*Error*> You didn't supply a ROM path as argument\n" <<
+		             "Usage example: ./build/gameboy.out roms/tetris.gb\n";
+		return EXIT_FAILURE;
+	}
+
+
+	try {
+		run_emulator(argv[1]);
+		return EXIT_SUCCESS;
+	} catch (std::exception& err) {
+		std::cerr << "<*Error*> Fatal Exception: " << err.what() << '\n';
+	} catch (...) {
+		std::cerr << "<*Error*> Unknown Exception.\n";
+	}
+
+	// return failure in case of exception
+	return EXIT_FAILURE;
 }
