@@ -98,11 +98,14 @@ private:
 	void Increment (uint16_t& value); // INC
 	void Increment (reg16_t& value); // INC
 	void AddA      (uint8_t value); // ADD
-	void Add       (uint16_t& x, uint16_t value); // ADD
+	void Add       (uint16_t& target, uint16_t value); // ADD
 	void SubtractA (uint8_t value); // SUB
 	void CompareA  (uint8_t value); // CP
 	void OrA       (uint8_t value); // OR
 	void Swap (uint8_t& value); // SWAP
+
+	/* Common CB Instructions */
+	void SetBit (uint8_t& target, uint8_t bit, bool value);
 
 	/* Instruction tables */
 	void InitializeOpcodeTable ();

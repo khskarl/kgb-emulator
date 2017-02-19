@@ -70,20 +70,20 @@ void CPU::ProcessInterrupts () {
 	if (areInterruptsEnabled == false)
 		return;
 
-	uint8_t requestRegister = mmu->ReadByte(IF);
+	const uint8_t requestRegister = mmu->ReadByte(IF);
 	if (requestRegister == 0)
 		return;
 
 
-	uint8_t enabledRegister = mmu->ReadByte(IE);
+	const uint8_t enabledRegister = mmu->ReadByte(IE);
 	for (size_t id = 0; id < 5; id++) {
-		bool isInterruptRequested = requestRegister & (0x10 >> (4 - id));
-		bool isInterruptEnabled   = enabledRegister & (0x10 >> (4 - id));
+		const bool isInterruptRequested = requestRegister & (0x10 >> (4 - id));
+		const bool isInterruptEnabled   = enabledRegister & (0x10 >> (4 - id));
 
 		if (isInterruptRequested && isInterruptEnabled) {
 			DoInterrupt(id);
-			std::cout << "Doing interrupt " << id << "\n";
-			isHalted = true;
+			// std::cout << "Doing interrupt " << id << "\n";
+			// isHalted = true;
 		}
 	}
 }
@@ -219,10 +219,10 @@ void CPU::AddA (uint8_t value) {
 	SetC(oldA + value > 0xFF);
 }
 
-void CPU::Add (uint16_t& x, uint16_t value) {
-	uint8_t oldX = x;
-	x += value;
-	SetZ(x == 0);
+void CPU::Add (uint16_t& target, uint16_t value) {
+	uint8_t oldX = target;
+	target += value;
+	SetZ(target == 0);
 	SetN(0);
 	SetH((oldX & 0xF) + (value & 0xF) > 0xF);
 	SetC(oldX + value > 0xFF);
@@ -254,6 +254,11 @@ void CPU::Swap (uint8_t& value) {
 	uint8_t hi = value & 0xF0;
 	uint8_t lo = value & 0x0F;
 	value = (hi >> 4) | (lo << 4);
+}
+
+void CPU::SetBit (uint8_t& target, uint8_t bit, bool value) {
+	uint8_t bitMask = 1 << bit;
+	target = (target & ~bitMask) | value << bit;
 }
 
 /* Instructions specific code */
@@ -431,6 +436,15 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0x7A] = &CPU::cb0x7A; opcodesCB[0x7B] = &CPU::cb0x7B;
 	opcodesCB[0x7C] = &CPU::cb0x7C; opcodesCB[0x7D] = &CPU::cb0x7D;
 	opcodesCB[0x7E] = &CPU::cb0x7E; opcodesCB[0x7F] = &CPU::cb0x7F;
+
+	opcodesCB[0x80] = &CPU::cb0x80; opcodesCB[0x81] = &CPU::cb0x81;
+	opcodesCB[0x82] = &CPU::cb0x82; opcodesCB[0x83] = &CPU::cb0x83;
+	opcodesCB[0x84] = &CPU::cb0x84; opcodesCB[0x85] = &CPU::cb0x85;
+	opcodesCB[0x86] = &CPU::cb0x86; opcodesCB[0x87] = &CPU::cb0x87;
+	opcodesCB[0x88] = &CPU::cb0x88; opcodesCB[0x89] = &CPU::opNull;
+	opcodesCB[0x8A] = &CPU::opNull; opcodesCB[0x8B] = &CPU::opNull;
+	opcodesCB[0x8C] = &CPU::opNull; opcodesCB[0x8D] = &CPU::opNull;
+	opcodesCB[0x8E] = &CPU::opNull; opcodesCB[0x8F] = &CPU::opNull;
 
 }
 
@@ -1937,14 +1951,44 @@ void CPU::cb0x7F () {
 }
 // CB8. instructions
 // RES 0,B
+void CPU::cb0x80 () {
+	SetBit(BC.hi, 0, false);
+}
 // RES 0,C
+void CPU::cb0x81 () {
+	SetBit(BC.lo, 0, false);
+}
 // RES 0,D
+void CPU::cb0x82 () {
+	SetBit(DE.hi, 0, false);
+}
 // RES 0,E
+void CPU::cb0x83 () {
+	SetBit(DE.lo, 0, false);
+}
 // RES 0,H
+void CPU::cb0x84 () {
+	SetBit(HL.hi, 0, false);
+}
 // RES 0,L
+void CPU::cb0x85 () {
+	SetBit(HL.lo, 0, false);
+}
 // RES 0,(HL)
+void CPU::cb0x86 () {
+	uint8_t target = mmu->ReadByte(HL);
+	SetBit(target, 0, false);
+	mmu->WriteByte(HL, target);
+	clockCycles = 16;
+}
 // RES 0,A
+void CPU::cb0x87 () {
+	SetBit(AF.hi, 0, false);
+}
 // RES 1,B
+void CPU::cb0x88 () {
+	SetBit(BC.hi, 1, false);
+}
 // RES 1,C
 // RES 1,D
 // RES 1,E
