@@ -17,6 +17,9 @@ $ ./build/gameboy.out roms/tetris.gb
 
 ## TODO
 -   [x] Port to SFML
+-   [ ] Port to CMAKE
+-   [ ] MBC1
+-   [ ] Test Blargh's tests
 -   [ ] Tetris Title Screen
 
 
