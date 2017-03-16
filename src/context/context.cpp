@@ -1,9 +1,9 @@
-#include "context.hpp"
+#include <cstdlib>
+#include <iostream>
 
 #include <SFML/Graphics.hpp>
 
-#include <iostream>
-#include <cstdlib>
+#include "context.hpp"
 #include "../debug.hpp"
 
 static sf::Font font;

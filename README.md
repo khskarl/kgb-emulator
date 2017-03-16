@@ -12,7 +12,7 @@ $ mkdir build && cd build && cmake .. && make && cd ..
 
 To run the program, type the name of the executable followed by the rom's location:
 ```
-$ ./build/gameboy.out roms/tetris.gb
+$ ./build/gameboy-emulator roms/tetris.gb
 ```
 
 ## TODO
