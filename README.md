@@ -7,7 +7,7 @@ A Game Boy emulator written in C++14 for learning purposes. It doesn't do anythi
 ## Usage example
 A makefile is present in the repository, to build go to the project's root directory using the terminal and type the following command:
 ```
-$ make
+$ mkdir build && cd build && cmake .. && make && cd ..
 ```
 
 To run the program, type the name of the executable followed by the rom's location:
@@ -17,6 +17,8 @@ $ ./build/gameboy.out roms/tetris.gb
 
 ## TODO
 -   [x] Port to SFML
+-   [ ] MBC1
+-   [ ] Test Blargh's tests
 -   [ ] Tetris Title Screen
 
 
