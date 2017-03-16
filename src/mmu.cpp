@@ -1,5 +1,5 @@
-#include <iostream>
 #include <cstring> // std::memcpy
+#include <iostream>
 
 #include "mmu.hpp"
 #include "cpu.hpp"
@@ -12,19 +12,21 @@ MMU::~MMU () {}
 void MMU::Initialize () {
 	WriteByte(LCDCTRL, 0x91);
 
-	for (uint8_t &v : bios) {	v = 0; }
-	for (uint8_t &v : rom)  { v = 0; }
-	for (uint8_t &v : eram) {	v = 0; }
-	for (uint8_t &v : wram) {	v = 0; }
-	for (uint8_t &v : zram) {	v = 0; }
-	for (uint8_t &v : vram) {	v = 0; }
-	for (uint8_t &v : oam)  { v = 0; }
-	for (uint8_t &v : io)   {	v = 0; }
+	const auto memzero = [](auto& array) {
+		std::memset(array, 0, sizeof(array) / sizeof(array[0]));
+	};
+
+	memzero(bios);
+	memzero(rom);
+	memzero(eram);
+	memzero(wram);
+	memzero(zram);
+	memzero(vram);
+	memzero(oam);
+	memzero(io);
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {
-	assert(address >= 0x0000 && address <= 0xFFFF);
-
 	return *GetMemoryRef(address);
 }
 
@@ -38,7 +40,6 @@ uint8_t MMU::ReadClockFrequency () {
 
 
 void MMU::WriteByte (uint16_t address, uint8_t value) {
-	assert(address >= 0x0000 && address <= 0xFFFF);
 
 	if (0x4000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address);
@@ -148,7 +149,7 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 		case 0xF000:
 		{
 			uint16_t lo = address & 0x0F00;
-			if (0x000 <= lo && lo <= 0xD00) {
+			if (lo <= 0xD00) {
 				return &wram[address & 0x1FFF];
 			}
 			else if (lo == 0xE00) {
