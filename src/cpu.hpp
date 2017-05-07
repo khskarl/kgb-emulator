@@ -93,6 +93,7 @@ private:
 
 	/* Common Instructions */
 	void RotateLeft (uint8_t& value); // RL
+	void ShiftLeft (uint8_t& value); // SLA
 	void Decrement (uint8_t&  value); // DEC
 	void Decrement (uint16_t& value); // DEC
 	void Decrement (reg16_t& value); // DEC

@@ -19,7 +19,7 @@ $ ./build/gameboy-emulator roms/tetris.gb
 -   [x] Port to SFML
 -   [ ] MBC1
 -   [ ] Test Blargh's tests
--   [ ] Tetris Title Screen
+-   [x] Tetris Title Screen
 
 
 ## Known bugs
