@@ -44,9 +44,9 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
-	if (PC == 0x27f8) {
-		isHalted = true;
-	}
+	// if (PC == 0x27f8) {
+	// 	isHalted = true;
+	// }
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
@@ -179,11 +179,7 @@ void CPU::Decrement (uint8_t& value) {
 }
 
 void CPU::Decrement (uint16_t& value) {
-	uint8_t oldBit4 = value & 0x8;
 	value -= 1;
-	SetZ(value == 0);
-	SetN(1);
-	SetH( (value & 0x8) ^ oldBit4 && oldBit4 != 0x8 );
 }
 
 void CPU::Decrement (reg16_t& value) {
