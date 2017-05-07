@@ -44,8 +44,17 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
-	// if (PC == 0x27f8) {
+	// if (0x69af) {
 	// 	isHalted = true;
+	// 	// Hi! I'm a badly executed memory dump, please don't mind me :D
+	// 	std::cout << "0xFF87: " << std::to_string(mmu->ReadByte(0xff87)) << "\n";
+	// 	std::cout << "0xFF86: " << std::to_string(mmu->ReadByte(0xff86)) << "\n";
+	// 	std::cout << "0xFF85: " << std::to_string(mmu->ReadByte(0xff85)) << "\n";
+	// 	std::cout << "0xFF84: " << std::to_string(mmu->ReadByte(0xff84)) << "\n";
+	// 	std::cout << "0xFF83: " << std::to_string(mmu->ReadByte(0xff83)) << "\n";
+	// 	std::cout << "0xFF82: " << std::to_string(mmu->ReadByte(0xff82)) << "\n";
+	// 	std::cout << "0xFF81: " << std::to_string(mmu->ReadByte(0xff81)) << "\n";
+	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 
 	uint8_t opcode = mmu->ReadByte(PC);

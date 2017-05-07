@@ -6,6 +6,9 @@
 #define CARTRIDGE_TYPE  0x147
 #define ROM_SIZE        0x148
 
+/* Joypad */
+#define JOYPAD 0xFF00
+
 /* Timer related Addresses */
 #define DIV  0xFF04
 #define TIMA 0xFF05

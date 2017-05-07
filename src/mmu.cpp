@@ -54,6 +54,10 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 		io[address & 0x7F] = 0;
 		return;
 	}
+	else if (address == JOYPAD) {
+		io[address & 0x7F] = ~value >> 1;
+		return;
+	}
 
 	*GetMemoryRef(address) = value;
 }
