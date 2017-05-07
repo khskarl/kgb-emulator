@@ -274,6 +274,12 @@ void CPU::SetBit (uint8_t& target, uint8_t bit, bool value) {
 	target = (target & ~bitMask) | value << bit;
 }
 
+void CPU::Bit(uint8_t value, uint8_t bit) {
+	SetZ((value & (0x01 << bit)) == 0);
+	SetH(1);
+	SetN(0);
+}
+
 /* Instructions specific code */
 void CPU::InitializeOpcodeTable () {
 	opcodes[0x00] = &CPU::op0x00; opcodes[0x01] = &CPU::op0x01;
@@ -1931,8 +1937,7 @@ void CPU::cb0x37 () {
 // CB5. instructions
 // BIT 2,B
 void CPU::cb0x50 () {
-	SetZ((BC.hi & 0x4) == 0);
-	SetN(0), SetH(1);
+	Bit(2, BC.hi);
 }
 // BIT 2,C
 // BIT 2,D
@@ -1943,8 +1948,7 @@ void CPU::cb0x50 () {
 // BIT 2,A
 // BIT 3,B
 void CPU::cb0x58 () {
-	SetZ((BC.hi & 0x8) == 0);
-	SetN(0), SetH(1);
+	Bit(3, BC.hi);
 }
 // BIT 3,C
 // BIT 3,D
@@ -1956,8 +1960,7 @@ void CPU::cb0x58 () {
 // CB6. instructions
 // BIT 4,B
 void CPU::cb0x60 () {
-	SetZ((BC.hi & 0x10) == 0);
-	SetN(0), SetH(1);
+	Bit(4, BC.hi);
 }
 // BIT 4,C
 // BIT 4,D
@@ -1968,8 +1971,7 @@ void CPU::cb0x60 () {
 // BIT 4,A
 // BIT 5,B
 void CPU::cb0x68 () {
-	SetZ((BC.hi & 0x20) == 0);
-	SetN(0), SetH(1);
+	Bit(5, BC.hi);
 }
 // BIT 5,C
 // BIT 5,D
@@ -1991,34 +1993,28 @@ void CPU::cb0x68 () {
 // BIT 7,C
 // BIT 7,D
 void CPU::cb0x7A () {
-	SetZ((DE.hi & 0x80) == 0);
-	SetN(0), SetH(1);
+	Bit(7, DE.hi);
 }
 // BIT 7,E
 void CPU::cb0x7B () {
-	SetZ((DE.lo & 0x80) == 0);
-	SetN(0), SetH(1);
+	Bit(7, DE.lo);
 }
 // BIT 7,H
 void CPU::cb0x7C () {
-	SetZ((HL.hi & 0x80) == 0);
-	SetN(0), SetH(1);
+	Bit(7, HL.hi);
 }
 // BIT 7,L
 void CPU::cb0x7D () {
-	SetZ((HL.lo & 0x80) == 0);
-	SetN(0), SetH(1);
+	Bit(7, HL.lo);
 }
 // BIT 7,(HL)
 void CPU::cb0x7E () {
-	SetZ((HL.lo & 0x80) == 0);
-	SetN(0), SetH(1);
+	Bit(7, mmu->ReadByte(HL));
 	clockCycles = 16;
 }
 // BIT 7,A
 void CPU::cb0x7F () {
-	SetZ((AF.hi & 0x80) == 0);
-	SetN(0), SetH(1);
+	Bit(7, AF.hi);
 }
 // CB8. instructions
 // RES 0,B
