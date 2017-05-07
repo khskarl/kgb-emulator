@@ -20,9 +20,13 @@ std::string Debug::GetGameboyText (GameBoy& gameboy) {
 	text += "DE: " + std::string(buffer) + "\n";
 	sprintf(buffer, "%04X", cpu.HL.word);
 	text += "HL: " + std::string(buffer) + "\n";
-
 	sprintf(buffer, "%04X", cpu.SP);
 	text += "SP: " + std::string(buffer) + "\n";
+	text += "\n";
+	text += "Z: " + std::string(cpu.GetZ() ? "1" : "0") + "\n";
+	text += "N: " + std::string(cpu.GetN() ? "1" : "0") + "\n";
+	text += "H: " + std::string(cpu.GetH() ? "1" : "0") + "\n";
+	text += "C: " + std::string(cpu.GetC() ? "1" : "0") + "\n";
 
 	return text;
 }

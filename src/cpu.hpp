@@ -5,7 +5,7 @@
 #include "mmu.hpp"
 #include "rom.hpp"
 
-/* This structure allows a simple way to access lo/hi bytes from a 16bit */
+/* This structure allows an intuitive way to access lo/hi bytes from a 16bit */
 /* Example
 	reg16_t HL = 0xFFAA;
 	uint8_t H = HL.hi;
@@ -71,16 +71,18 @@ public:
 	void RequestInterrupt (uint8_t id);
 	void ProcessInterrupts ();
 	void DoInterrupt (uint8_t id);
+
+	/* Flag helpers */
+	bool GetZ () const;
+	bool GetN () const;
+	bool GetH () const;
+	bool GetC () const;
 private:
 	/* Flag helpers */
 	void SetZ (bool value);
 	void SetN (bool value);
 	void SetH (bool value);
 	void SetC (bool value);
-	bool GetZ ();
-	bool GetN ();
-	bool GetH ();
-	bool GetC ();
 
 	/* Instruction helpers */
 	uint8_t  ReadByte ();

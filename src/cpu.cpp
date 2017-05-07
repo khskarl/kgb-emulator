@@ -44,9 +44,9 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
-	// if (PC == 0x2876) {
-	// 	isHalted = true;
-	// }
+	if (PC == 0x27f8) {
+		isHalted = true;
+	}
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
@@ -108,6 +108,22 @@ void CPU::DoInterrupt (uint8_t id) {
 	// isHalted = true;
 }
 
+bool CPU::GetZ () const {
+	return (AF.lo & 0x80);
+}
+
+bool CPU::GetN () const {
+	return (AF.lo & 0x40);
+}
+
+bool CPU::GetH () const {
+	return (AF.lo & 0x20);
+}
+
+bool CPU::GetC () const {
+	return (AF.lo & 0x10);
+}
+
 void CPU::SetZ (bool value) {
 	AF.lo = (AF.lo & ~0x80) | 0x80 * value;
 }
@@ -122,22 +138,6 @@ void CPU::SetH (bool value) {
 
 void CPU::SetC (bool value) {
 	AF.lo = (AF.lo & ~0x10) | 0x10 * value;
-}
-
-bool CPU::GetZ () {
-	return (AF.lo & 0x80);
-}
-
-bool CPU::GetN () {
-	return (AF.lo & 0x40);
-}
-
-bool CPU::GetH () {
-	return (AF.lo & 0x20);
-}
-
-bool CPU::GetC () {
-	return (AF.lo & 0x10);
 }
 
 uint8_t CPU::ReadByte () {
