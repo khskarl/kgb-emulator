@@ -113,7 +113,7 @@ void Context::SetDisplayBuffer (uint8_t* buffer) {
 //color format that SFML can understand.
 void Context::CopyDisplayBuffer (uint8_t* buffer) {
 	for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
-		int luminosity = (buffer[i / 4] + 1) * 64 - 1;
+		int luminosity = 255 - ((buffer[i / 4] + 1) * 64 - 1);
 		pixels[i] = luminosity;
 		pixels[i + 1] = luminosity;
 		pixels[i + 2] = luminosity;

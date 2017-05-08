@@ -21,7 +21,6 @@ $ ./build/gameboy-emulator roms/tetris.gb
 -   [ ] Test Blargh's tests
 -   [x] Tetris Title Screen
 
-
 ## Known bugs
 -   It doesn't work
 
