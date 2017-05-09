@@ -20,7 +20,7 @@ void GameBoy::LoadRom (Rom rom) {
 
 void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 	cpu.isHalted = isHalted;
-	
+
 	size_t cylesDone = 0;
 	while (cylesDone < cyclesThisUpdate) {
 		this->StepInstruction();

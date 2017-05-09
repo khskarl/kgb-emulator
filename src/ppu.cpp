@@ -170,12 +170,12 @@ void PPU::FeedRandomToDisplay () {
 	}
 }
 
-uint16_t PPU::GetTilesAddress () { // FIXME: Double check, may be inverted
+uint16_t PPU::GetTilesAddress () {
 	uint8_t lcdControl = mmu->ReadByte(LCDCTRL);
-	if ((lcdControl & 0x16) == 0x16) {
-		return 0x8800;
-	} else {
+	if ((lcdControl & 0x10) == 0x10) {
 		return 0x8000;
+	} else {
+		return 0x8800;
 	}
 }
 
