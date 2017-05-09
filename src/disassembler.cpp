@@ -406,7 +406,7 @@ std::string DisassembleCB(const uint8_t* code) {
 		case 0x16: return Format("RL", "(HL)", code[0], code[1]); break;
 		case 0x17: return Format("RL", "A", code[0], code[1]); break;
 		case 0x18: return Format("RR", "B", code[0], code[1]); break;
-		case 0x19: return Format("RR", "IC", code[0], code[1]); break;
+		case 0x19: return Format("RR", "C", code[0], code[1]); break;
 		case 0x1A: return Format("RR", "D", code[0], code[1]); break;
 		case 0x1B: return Format("RR", "E", code[0], code[1]); break;
 		case 0x1C: return Format("RR", "H", code[0], code[1]); break;

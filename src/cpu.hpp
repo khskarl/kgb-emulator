@@ -92,8 +92,10 @@ private:
 	uint16_t PopWord ();
 
 	/* Common Instructions */
-	void RotateLeft (uint8_t& value); // RL
-	void ShiftLeft (uint8_t& value); // SLA
+	void RotateLeft  (uint8_t& value); // RL
+	void RotateRight (uint8_t& value); // RR
+	void ShiftLeft   (uint8_t& value); // SLA
+	void ShiftRight  (uint8_t& value); // SRL
 	void Decrement (uint8_t&  value); // DEC
 	void Decrement (uint16_t& value); // DEC
 	void Decrement (reg16_t& value); // DEC
