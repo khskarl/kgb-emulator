@@ -57,7 +57,7 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 
-	if (PC == 0x0213) {
+	if (PC == 0xC363) {
 		isHalted = true;
 	}
 
@@ -65,10 +65,12 @@ void CPU::EmulateCycle () {
 
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
-	(this->*opcodes[opcode])(); // Wtf C++
 
-	// Most important line in this whole program
+	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
+	// PC step must ocurr before executing the instruction,
+	//so ReadByte() and ReadWord() will read the following bytes
 	PC += 1;
+	(this->*opcodes[opcode])(); // Wtf C++
 }
 
 void CPU::RequestInterrupt (uint8_t id) {
@@ -1615,6 +1617,8 @@ void CPU::op0xF2 () {
 // JP a16
 void CPU::op0xC3 () {
 	PC = ReadWord();
+	// uint16_t lol = ((PC & 0xFF00) >> 8) | ((PC & 0x00FF) << 8);
+	// std::cout << std::hex << lol << '\n';
 	clockCycles = 12;
 }
 // D3..: I don't exist

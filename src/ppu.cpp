@@ -189,13 +189,13 @@ uint16_t PPU::GetBackgroundTilesAddress () {
 }
 
 uint8_t PPU::NextScanline () {
-	uint8_t* pScanline = mmu->GetIORef(CURLINE);
+	uint8_t* pScanline = mmu->GetMemoryRef(CURLINE);
 	(*pScanline) += 1;
 	return *pScanline;
 }
 
 void PPU::ResetScanline () {
-	(*mmu->GetIORef(CURLINE)) = 0;
+	(*mmu->GetMemoryRef(CURLINE)) = 0;
 }
 
 void PPU::ResetScanlineCounter () {
