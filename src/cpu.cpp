@@ -57,14 +57,18 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 
+	if (PC == 0x0213) {
+		isHalted = true;
+	}
+
 	uint8_t opcode = mmu->ReadByte(PC);
 
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
-	PC += 1;
 	(this->*opcodes[opcode])(); // Wtf C++
 
-
+	// Most important line in this whole program
+	PC += 1;
 }
 
 void CPU::RequestInterrupt (uint8_t id) {
