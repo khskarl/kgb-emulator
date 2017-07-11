@@ -1,5 +1,5 @@
-# Game Boy Emulator
-A Game Boy emulator written in C++14 for learning purposes. It doesn't do anything interesting yet.
+# KGB emulator
+_Karll's Game Boy_ is a Game Boy emulator written in C++14 for learning emulation and modern C++. It doesn't do anything interesting yet.
 
 ## Dependencies
 -   SFML2
@@ -17,13 +17,17 @@ $ ./build/gameboy-emulator roms/tetris.gb
 
 ## TODO
 -   [x] Port to SFML
--   [ ] MBC1
--   [ ] Test Blargh's tests
 -   [x] Tetris Title Screen
+-   [ ] Input
+-   [ ] MBC1
+-   [ ] Play Tetris
+-   [ ] Pass Blargh's tests
+-   [ ] Pass Opus5
+-   [ ] Sound
+-   [ ] Play Metroid II
 
 ## Known bugs
 -   It doesn't work
-
 
 ## References & Game Boy documentation
 -   [DuoDreamer's GameBoy Memory map](http://gameboy.mongenel.com/dmg/asmmemmap.html)
