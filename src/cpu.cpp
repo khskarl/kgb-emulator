@@ -57,9 +57,9 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 
-	if (PC == 0xC363) {
-		isHalted = true;
-	}
+	// if (PC == 0xC363) {
+	// 	isHalted = true;
+	// }
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
@@ -67,6 +67,10 @@ void CPU::EmulateCycle () {
 	// std::cout << std::hex << opcode << '\n';
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
+	ExecuteInstruction(opcode);
+}
+
+void CPU::ExecuteInstruction(uint8_t opcode) {
 	// PC step must ocurr before executing the instruction,
 	//so ReadByte() and ReadWord() will read the following bytes
 	PC += 1;

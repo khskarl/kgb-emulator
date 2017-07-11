@@ -66,6 +66,7 @@ public:
 
 	void Initialize (MMU* _mmu, bool doBootrom);
 	void EmulateCycle ();
+	void ExecuteInstruction (uint8_t opcode);
 
 	/* Interrupt related functions */
 	void RequestInterrupt (uint8_t id);
