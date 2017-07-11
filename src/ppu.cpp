@@ -150,11 +150,8 @@ void PPU::DrawScanline (uint8_t line) {
 			tileLocation += tileID * 16;
 		else
 			tileLocation += (tileID + 128) * 16;
-		// if (tileIdLocation == 0x990F)
-		// 	tileLocation = 0x80C0;
-		uint16_t tile = mmu->ReadWord(tileLocation + (iScrolled % 8) * 2);
-		// std::cout << "[" << std::hex << tileLocation << "] " << tileID << " : " << tile  << "\n";
 
+		uint16_t tile = mmu->ReadWord(tileLocation + (iScrolled % 8) * 2);
 
 		if (tileID != 0)
 			displayBuffer[line * 160 + jPixel] = 3;
