@@ -1805,8 +1805,9 @@ void CPU::op0xFB () {
 }
 // CALL Z,a16
 void CPU::op0xCC () {
+	uint16_t address = ReadWord();
 	if (GetZ() == true) {
-		PC = ReadWord();
+		PC = address;
 		clockCycles = 24;
 	} else {
 		clockCycles = 12;
@@ -1814,8 +1815,9 @@ void CPU::op0xCC () {
 }
 // CALL C,a16
 void CPU::op0xDC () {
+	uint16_t address = ReadWord();
 	if (GetC() == true) {
-		PC = ReadWord();
+		PC = address;
 		clockCycles = 24;
 	} else {
 		clockCycles = 12;
