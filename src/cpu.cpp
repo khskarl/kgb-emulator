@@ -47,8 +47,8 @@ void CPU::EmulateCycle () {
 	// if (0x69af) {
 	// 	isHalted = true;
 	// 	// Hi! I'm a badly executed memory dump, please don't mind me :D
-	// 	std::cout << "0xFF87: " << std::to_string(mmu->ReadByte(0xff87)) << "\n";
 	// 	std::cout << "0xFF86: " << std::to_string(mmu->ReadByte(0xff86)) << "\n";
+	// 	std::cout << "0xFF87: " << std::to_string(mmu->ReadByte(0xff87)) << "\n";
 	// 	std::cout << "0xFF85: " << std::to_string(mmu->ReadByte(0xff85)) << "\n";
 	// 	std::cout << "0xFF84: " << std::to_string(mmu->ReadByte(0xff84)) << "\n";
 	// 	std::cout << "0xFF83: " << std::to_string(mmu->ReadByte(0xff83)) << "\n";
@@ -57,9 +57,9 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 
-	// if (PC == 0xC363) {
-	// 	isHalted = true;
-	// }
+	if (PC == 0xC370) {
+		isHalted = true;
+	}
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
@@ -1635,8 +1635,9 @@ void CPU::op0xF3 () {
 
 // CALL NZ,a16
 void CPU::op0xC4 () {
+	uint16_t address = ReadWord();
 	if (GetZ() == false) {
-		PC = ReadWord();
+		PC = address;
 		clockCycles = 24;
 	} else {
 		clockCycles = 12;
@@ -1644,8 +1645,9 @@ void CPU::op0xC4 () {
 }
 // CALL NC,a16
 void CPU::op0xD4 () {
+	uint16_t address = ReadWord();
 	if (GetC() == false) {
-		PC = ReadWord();
+		PC = address;
 		clockCycles = 24;
 	} else {
 		clockCycles = 12;
@@ -1669,7 +1671,7 @@ void CPU::op0xE5 () {
 	PushWord(HL);
 	clockCycles += 16;
 }
-// PUSH AF // FIXME: There is NO value in F because of our flags hack
+// PUSH AF
 void CPU::op0xF5 () {
 	PushWord(AF);
 	clockCycles += 16;
@@ -1690,7 +1692,7 @@ void CPU::op0xD6 () {
 void CPU::op0xE6 () {
 	AF.hi &= ReadByte();
 	SetZ(AF.hi == 0);
-	SetN(0), SetH(0), SetC(0);
+	SetN(0), SetH(1), SetC(0);
 
 	clockCycles += 8;
 }

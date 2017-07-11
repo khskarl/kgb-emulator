@@ -12,7 +12,7 @@ MMU::~MMU () {}
 void MMU::Initialize () {
 	WriteByte(LCDCTRL, 0x91);
 
-	const auto memzero = [](auto& array) {
+	const auto memzero = [] (auto& array) {
 		std::memset(array, 0, sizeof(array) / sizeof(array[0]));
 	};
 
@@ -24,6 +24,8 @@ void MMU::Initialize () {
 	memzero(vram);
 	memzero(oam);
 	memzero(io);
+
+	*GetMemoryRef(LCDCTRL) = 0x91;
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {
