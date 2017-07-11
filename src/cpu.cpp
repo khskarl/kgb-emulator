@@ -57,9 +57,9 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 
-	if (PC == 0xC370) {
-		isHalted = true;
-	}
+	// if (PC == 0xC0AA) {
+	// 	isHalted = true;
+	// }
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
@@ -180,6 +180,12 @@ uint16_t CPU::PopWord () {
 	SP += 2;
 	return mmu->ReadWord(SP - 2);
 }
+
+void CPU::Call (uint16_t address) {
+	PushWord(PC);
+	PC = address;
+}
+
 // FIXME: Double check C flag computation
 void CPU::RotateLeft (uint8_t& value) {
 	uint8_t oldBit7 = (value >> 7);
@@ -324,7 +330,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x18] = &CPU::op0x18; opcodes[0x19] = &CPU::op0x19;
 	opcodes[0x1A] = &CPU::op0x1A; opcodes[0x1B] = &CPU::op0x1B;
 	opcodes[0x1C] = &CPU::op0x1C; opcodes[0x1D] = &CPU::op0x1D;
-	opcodes[0x1E] = &CPU::op0x1E; opcodes[0x1F] = &CPU::opNull;
+	opcodes[0x1E] = &CPU::op0x1E; opcodes[0x1F] = &CPU::op0x1F;
 
 	opcodes[0x20] = &CPU::op0x20; opcodes[0x21] = &CPU::op0x21;
 	opcodes[0x22] = &CPU::op0x22; opcodes[0x23] = &CPU::op0x23;
@@ -540,6 +546,7 @@ void CPU::InitializeOpcodeTable () {
 
 // NOP
 void CPU::op0x00 () {
+	// isHalted = true;
 	clockCycles = 4;
 }
 // STOP 0
@@ -885,6 +892,9 @@ void CPU::op0x0F () {
 	clockCycles = 4;
 }
 // RRA
+void CPU::op0x1F () {
+	RotateRight(AF.hi);
+}
 // CPL
 void CPU::op0x2F () {
 	AF.hi ^= 0xFF;
@@ -1637,7 +1647,7 @@ void CPU::op0xF3 () {
 void CPU::op0xC4 () {
 	uint16_t address = ReadWord();
 	if (GetZ() == false) {
-		PC = address;
+		Call(address);
 		clockCycles = 24;
 	} else {
 		clockCycles = 12;
@@ -1647,7 +1657,7 @@ void CPU::op0xC4 () {
 void CPU::op0xD4 () {
 	uint16_t address = ReadWord();
 	if (GetC() == false) {
-		PC = address;
+		Call(address);
 		clockCycles = 24;
 	} else {
 		clockCycles = 12;
@@ -1807,7 +1817,7 @@ void CPU::op0xFB () {
 void CPU::op0xCC () {
 	uint16_t address = ReadWord();
 	if (GetZ() == true) {
-		PC = address;
+		Call(address);
 		clockCycles = 24;
 	} else {
 		clockCycles = 12;
@@ -1817,7 +1827,7 @@ void CPU::op0xCC () {
 void CPU::op0xDC () {
 	uint16_t address = ReadWord();
 	if (GetC() == true) {
-		PC = address;
+		Call(address);
 		clockCycles = 24;
 	} else {
 		clockCycles = 12;
@@ -1827,8 +1837,8 @@ void CPU::op0xDC () {
 // FC..: I don't exist
 // CALL a16
 void CPU::op0xCD () {
-	PushWord(PC + 2);
-	PC = ReadWord();
+	uint16_t address = ReadWord();
+	Call(address);
 	clockCycles = 24;
 }
 // DD..: I don't exist

@@ -93,6 +93,7 @@ private:
 	uint16_t PopWord ();
 
 	/* Common Instructions */
+	void Call (uint16_t address); // CALL
 	void RotateLeft  (uint8_t& value); // RL
 	void RotateRight (uint8_t& value); // RR
 	void ShiftLeft   (uint8_t& value); // SLA
