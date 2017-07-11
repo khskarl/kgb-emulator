@@ -57,9 +57,9 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 
-	// if (PC == 0xC0AA) {
-	// 	isHalted = true;
-	// }
+	if (PC == 0xC0AD || PC == 0xC0B0) {
+		isHalted = true;
+	}
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
@@ -182,8 +182,10 @@ uint16_t CPU::PopWord () {
 }
 
 void CPU::Call (uint16_t address) {
+	uint16_t oldPC = PC;
 	PushWord(PC);
 	PC = address;
+	// std::cout << std::hex << "Calling   from '" << oldPC << "' to '" << PC << "'\n";
 }
 
 // FIXME: Double check C flag computation
@@ -1749,8 +1751,11 @@ void CPU::op0xC8 () {
 
 // RET
 void CPU::op0xC9 () {
+	uint16_t oldPC = PC - 1;
 	PC = PopWord();
+
 	clockCycles = 8;
+	// std::cout << std::hex << "Returning from '" << oldPC << "' to '" << PC << "'\n";
 }
 // RETI
 void CPU::op0xD9 () {
