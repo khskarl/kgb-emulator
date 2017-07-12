@@ -6,15 +6,17 @@
 
 namespace Context {
 
-bool SetupContext (int scale);
+bool SetupContext (const int scale);
 void DestroyContext ();
 void HandleEvents ();
 
 void RenderDebugText ();
 void RenderDisplay ();
 
-void SetDisplayBuffer (uint8_t* buffer);
-void CopyDisplayBuffer (uint8_t* buffer);
+void SetJoypadBuffer (bool* const joypadBuffer);
+
+void SetDisplayBuffer (uint8_t* const buffer);
+void CopyDisplayBuffer (uint8_t* const buffer);
 
 void SetTitle (std::string title);
 bool IsOpen ();

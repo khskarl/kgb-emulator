@@ -57,9 +57,9 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 
-	if (PC == 0xC0AD || PC == 0xC0B0) {
-		isHalted = true;
-	}
+	// if (PC == 0xC0AD || PC == 0xC0B0) {
+	// 	isHalted = true;
+	// }
 
 	uint8_t opcode = mmu->ReadByte(PC);
 

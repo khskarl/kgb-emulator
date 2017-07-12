@@ -19,6 +19,9 @@ private:
 
 	bool isHalted = true;
 
+	bool joypad[8] = {0, 0, 0, 0,
+										0, 0, 0, 0};
+
 public:
 	GameBoy ();
 	~GameBoy ();
@@ -34,6 +37,7 @@ public:
 	void ResetClockFrequency ();
 	bool IsClockEnabled ();
 
+	bool*    GetJoypadBuffer ();
 	uint8_t* GetDisplayBuffer ();
 	CPU* GetCPU ();
 	MMU* GetMMU ();

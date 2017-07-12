@@ -30,8 +30,9 @@ void run_emulator(const std::string& filepath) {
 	gameBoy.LoadRom(rom);
 
 	Context::SetupContext(4);
-	Context::SetTitle("MyGameBoy");
+	Context::SetTitle("KGB Emulator");
 	Context::SetDisplayBuffer(gameBoy.GetDisplayBuffer());
+	Context::SetJoypadBuffer(gameBoy.GetJoypadBuffer());
 
 	Timer timer;
 	while (Context::IsOpen()) {

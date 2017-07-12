@@ -2,7 +2,6 @@
 #include "bios.hpp"
 #include "gameboy.hpp"
 
-
 GameBoy::GameBoy () {}
 GameBoy::~GameBoy () {}
 
@@ -85,6 +84,9 @@ bool GameBoy::IsClockEnabled () {
 	return (mmu.ReadByte(TMC) & 0x4) == 0x4 ? true : false;
 }
 
+bool* GameBoy::GetJoypadBuffer() {
+	return joypad;
+}
 
 uint8_t* GameBoy::GetDisplayBuffer () {
 	return ppu.GetDisplayBuffer();

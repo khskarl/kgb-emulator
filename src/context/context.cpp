@@ -18,16 +18,17 @@ static float speedInput = 1.0f;
 
 // Placeholder
 uint8_t pixels[160 * 144 * 4];
+bool* joypad = nullptr;
 
 // Placeholder
 bool prevShouldHalt = false;
 bool prevShouldStep = false;
 
-bool Context::SetupContext (int scale = 1) {
+bool Context::SetupContext (const int scale = 1) {
 	font.loadFromFile("../resources/fonts/OpenSans-Bold.ttf");
 	debugText.setFont(font);
 	debugText.setColor(sf::Color::Magenta);
-	debugText.setCharacterSize(20);
+	debugText.setCharacterSize(15);
 	debugText.setString("Debug :D");
 
 	window.create(sf::VideoMode(160 * scale, 144 * scale), "Hello :)");
@@ -81,9 +82,33 @@ void Context::HandleEvents () {
 			}
 		}
 	}
+
+	joypad[0] = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
+	joypad[1] = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
+	joypad[2] = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
+	joypad[3] = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+	joypad[4] = sf::Keyboard::isKeyPressed(sf::Keyboard::H);
+	joypad[5] = sf::Keyboard::isKeyPressed(sf::Keyboard::G);
+	joypad[6] = sf::Keyboard::isKeyPressed(sf::Keyboard::B);
+	joypad[7] = sf::Keyboard::isKeyPressed(sf::Keyboard::N);
 }
 
 void Context::RenderDebugText () {
+	debugText.setPosition(0, 0);
+	window.draw(debugText);
+
+	std::string inputDebugString =
+		"Right: "  + std::string(joypad[0] ? "1" : "0") + "\n" +
+		"Left: "   + std::string(joypad[1] ? "1" : "0") + "\n" +
+		"Up: "     + std::string(joypad[2] ? "1" : "0") + "\n" +
+		"Down: "   + std::string(joypad[3] ? "1" : "0") + "\n" +
+		"A: "      + std::string(joypad[4] ? "1" : "0") + "\n" +
+		"B: "      + std::string(joypad[5] ? "1" : "0") + "\n" +
+		"Select: " + std::string(joypad[6] ? "1" : "0") + "\n" +
+		"Start: "  + std::string(joypad[7] ? "1" : "0");
+
+	debugText.setString(inputDebugString);
+	debugText.setPosition(100, 0);
 	window.draw(debugText);
 }
 
@@ -98,12 +123,16 @@ void Context::RenderDisplay () {
 	window.display();
 }
 
+void Context::SetJoypadBuffer (bool* const buffer) {
+	assert(buffer != nullptr);
+	joypad = buffer;
+}
 
 // TODO: Use opengl texture binding and GL_R8UI color format to use the VRAM di-
 //rectly as a pixel buffer.
 // http://fr.sfml-dev.org/forums/index.php?topic=17847.0
 // http://www.sfml-dev.org/documentation/2.4.1/classsf_1_1Texture.php
-void Context::SetDisplayBuffer (uint8_t* buffer) {
+void Context::SetDisplayBuffer (uint8_t* const buffer) {
 	assert(buffer != nullptr);
 	displayBuffer = buffer;
 }
@@ -111,7 +140,7 @@ void Context::SetDisplayBuffer (uint8_t* buffer) {
 // HACK: Temporary solution
 // Currently, Instead of accessing the VRAM memory directly, we convert it's contents to a
 //color format that SFML can understand.
-void Context::CopyDisplayBuffer (uint8_t* buffer) {
+void Context::CopyDisplayBuffer (uint8_t* const buffer) {
 	for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
 		int luminosity = 255 - ((buffer[i / 4] + 1) * 64 - 1);
 		pixels[i] = luminosity;
