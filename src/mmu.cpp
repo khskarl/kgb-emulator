@@ -65,13 +65,13 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 }
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
-	uint8_t* memory = GetMemoryRef(address);
+	uint8_t* memoryRef = GetMemoryRef(address);
 
 	if (0x4000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address);
 		return;
 	}
-	// Reset scanline if we try to write to it
+	// Reset current scanline if we try to write to it
 	else if (address == CURLINE) {
 		io[address & 0x7F] = 0;
 		return;
@@ -81,8 +81,8 @@ void MMU::WriteWord (uint16_t address, uint16_t value) {
 		return;
 	}
 
-	memory[0] =  value & 0x00FF;
-	memory[1] = (value & 0xFF00) >> 8;
+	memoryRef[0] =  value & 0x00FF;
+	memoryRef[1] = (value & 0xFF00) >> 8;
 }
 
 void MMU::WriteBios (const uint8_t* buffer) {
@@ -90,7 +90,7 @@ void MMU::WriteBios (const uint8_t* buffer) {
 	std::memcpy(bios, buffer, 0x100);
 }
 
-// TODO: Rename it to "WriteRom"
+// TODO: Refactor it to "WriteRom"
 void MMU::WriteBufferToRom (const uint8_t* buffer, size_t bufferSize) {
 	assert(buffer != nullptr);
 	assert(bufferSize > 0);
@@ -179,6 +179,6 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 	}
 }
 
-void MMU::HandleRomBankSwitch(uint16_t /*address*/) {
-	assert("Unimplemented bank switch!" && 0);
+void MMU::HandleRomBankSwitch(uint16_t address) {
+	assert("<HandleRomBankSwitch> Unimplemented bank switch!" && 0);
 }

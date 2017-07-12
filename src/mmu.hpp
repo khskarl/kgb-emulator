@@ -12,7 +12,7 @@ class MMU {
 private:
 	uint8_t bios[0x100];
 	uint8_t rom[0x4000];
-	uint8_t romBanks[96][0x4000];
+	uint8_t romBanks[96][0x4000]; 
 	uint8_t vram[0x2000];
 	uint8_t eram[0x2000];
 	uint8_t wram[0x1000];
