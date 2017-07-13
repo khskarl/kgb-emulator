@@ -59,7 +59,9 @@ void run_emulator(const std::string& filepath) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(16 - elapsedTime));
 		elapsedTime = timer.GetTimeInMiliseconds();
 
-		Context::SetTitle(std::to_string(cyclesThisUpdate) + " Hz | " + std::to_string(elapsedTime) + " ms");
+		Context::SetTitle("KGB Emulator | " +
+		                  std::to_string(cyclesThisUpdate) + " Hz | " +
+		                  std::to_string(elapsedTime) + " ms");
 	}
 
 	Context::DestroyContext();

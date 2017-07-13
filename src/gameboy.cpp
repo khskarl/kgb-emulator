@@ -7,7 +7,7 @@ GameBoy::~GameBoy () {}
 
 void GameBoy::Initialize () {
 	cpu.Initialize(&mmu, false);
-	mmu.Initialize();
+	mmu.Initialize(this);
 	ppu.Initialize(&cpu, &mmu);
 	mmu.WriteBios(kGameboyDMGBios);
 	timerCounter = 1024;
@@ -17,19 +17,34 @@ void GameBoy::LoadRom (Rom rom) {
 	mmu.WriteBufferToRom(rom.GetData(), rom.GetSize());
 }
 
+void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
+	uint8_t* joypadRegister = mmu.GetMemoryRef(JOYPAD);
+	uint8_t  prevJoypadRegister = *joypadRegister;
+	// *joypadRegister |= 0x0F;
+
+	size_t offset = 0;
+	for (size_t i = 0; i < 4; i++) {
+		// *joypadRegister &= ((~joypadBuffer[i + offset]) << i);
+	}
+
+	if (*joypadRegister != prevJoypadRegister) {
+		cpu.RequestInterrupt(4);
+	}
+}
+
 void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 	cpu.isHalted = isHalted;
+	UpdateJoypadMemory(joypad);
 
 	size_t cylesDone = 0;
 	while (cylesDone < cyclesThisUpdate) {
 		this->StepInstruction();
 
-		uint16_t numCycles = cpu.clockCycles;
-		this->StepTimers(numCycles);
-		ppu.StepUpdate(numCycles);
+		this->StepTimers(cpu.clockCycles);
+		ppu.StepUpdate(cpu.clockCycles);
 		cpu.ProcessInterrupts();
 
-		cylesDone += numCycles;
+		cylesDone += cpu.clockCycles;
 
 		if (cpu.isHalted) {
 			isHalted = true;
@@ -43,7 +58,7 @@ void GameBoy::StepInstruction () {
 	cpu.EmulateCycle();
 }
 
-void GameBoy::StepTimers (uint32_t cycles) {
+void GameBoy::StepTimers (const uint32_t cycles) {
 	uint8_t* div = mmu.GetMemoryRef(DIV);
 	if ((*div) + cycles >= 255) {
 		(*div) = 0;
@@ -84,7 +99,7 @@ bool GameBoy::IsClockEnabled () {
 	return (mmu.ReadByte(TMC) & 0x4) == 0x4 ? true : false;
 }
 
-bool* GameBoy::GetJoypadBuffer() {
+uint8_t* GameBoy::GetJoypadBuffer() {
 	return joypad;
 }
 
@@ -104,8 +119,9 @@ bool GameBoy::GetHalt () {
 	return isHalted;
 }
 
-void GameBoy::SetHalt (bool state) {
+void GameBoy::SetHalt (const bool state) {
 	this->isHalted = state;
+	cpu.isHalted = state;
 }
 
 void GameBoy::ToggleHalt () {

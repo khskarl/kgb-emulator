@@ -6,13 +6,16 @@
 
 #include "common_memory_addresses.hpp"
 
+class GameBoy;
 class CPU;
 
 class MMU {
 private:
+	GameBoy* gameboy = nullptr;
+
 	uint8_t bios[0x100];
 	uint8_t rom[0x4000];
-	uint8_t romBanks[96][0x4000]; 
+	uint8_t romBanks[96][0x4000];
 	uint8_t vram[0x2000];
 	uint8_t eram[0x2000];
 	uint8_t wram[0x1000];
@@ -25,13 +28,14 @@ private:
 	uint8_t unused[0x60];
 
 	void HandleRomBankSwitch (uint16_t address);
+
 public:
 	bool isInBios = true;
 
 	MMU ();
 	~MMU ();
 
-	void Initialize();
+	void Initialize(GameBoy* const gameboy);
 
 	/* General memory access functions */
 	uint8_t  ReadByte  (uint16_t address);

@@ -19,31 +19,32 @@ private:
 
 	bool isHalted = true;
 
-	bool joypad[8] = {0, 0, 0, 0,
-										0, 0, 0, 0};
+	uint8_t joypad[8] = {0, 0, 0, 0,
+	                     0, 0, 0, 0};
 
 public:
 	GameBoy ();
 	~GameBoy ();
 
 	void Initialize ();
-
 	void LoadRom  (Rom rom);
+
+	void UpdateJoypadMemory(uint8_t* const joypadBuffer);
 
 	void StepEmulation (const uint32_t cyclesThisUpdate = 69905);
 	void StepInstruction ();
-	void StepTimers (uint32_t cycles);
+	void StepTimers (const uint32_t cycles);
 
 	void ResetClockFrequency ();
 	bool IsClockEnabled ();
 
-	bool*    GetJoypadBuffer ();
+	uint8_t* GetJoypadBuffer ();
 	uint8_t* GetDisplayBuffer ();
 	CPU* GetCPU ();
 	MMU* GetMMU ();
 
 	bool GetHalt ();
-	void SetHalt (bool state);
+	void SetHalt (const bool state);
 	void ToggleHalt ();
 };
 

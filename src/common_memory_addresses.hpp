@@ -2,9 +2,9 @@
 #define COMMON_MEMORY_ADDRESSES
 
 /* Cartridge Header */
-#define GAME_TITLE      0x134
-#define CARTRIDGE_TYPE  0x147
-#define ROM_SIZE        0x148
+#define GAME_TITLE      0x0134
+#define CARTRIDGE_TYPE  0x0147
+#define ROM_SIZE        0x0148
 
 /* Joypad */
 #define JOYPAD 0xFF00

@@ -1,6 +1,7 @@
 #include <cstring> // std::memcpy
 #include <iostream>
 
+#include "gameboy.hpp"
 #include "mmu.hpp"
 #include "cpu.hpp"
 
@@ -9,7 +10,9 @@
 MMU::MMU () {}
 MMU::~MMU () {}
 
-void MMU::Initialize () {
+void MMU::Initialize (GameBoy* const argGameboy) {
+	gameboy = argGameboy;
+
 	WriteByte(LCDCTRL, 0x91);
 
 	const auto memzero = [] (auto& array) {
@@ -25,7 +28,9 @@ void MMU::Initialize () {
 	memzero(oam);
 	memzero(io);
 
-	*GetMemoryRef(LCDCTRL) = 0x91;
+	GetMemoryRef(JOYPAD)[0]  = 0xFF;
+	GetMemoryRef(JOYPAD)[1]  = 0xFF;
+	*GetMemoryRef(LCDCTRL)   = 0x91;
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {
@@ -42,6 +47,22 @@ uint8_t MMU::ReadClockFrequency () {
 
 
 void MMU::WriteByte (uint16_t address, uint8_t value) {
+	if (address == 0xFF00) {
+		std::cout << "Write FF00: " << std::hex << (int) value << "\n";
+		uint8_t joypadRegister = *GetMemoryRef(JOYPAD);
+		std::string p0 = joypadRegister & 0b0001 ? "1" : "0";
+		std::string p1 = joypadRegister & 0b0010 ? "1" : "0";
+		std::string p2 = joypadRegister & 0b0100 ? "1" : "0";
+		std::string p3 = joypadRegister & 0b1000 ? "1" : "0";
+		std::string directions = joypadRegister & 0b10000 ? "1" : "0";
+		std::string buttons = joypadRegister & 0b100000 ? "1" : "0";
+
+		std::cout << "Curr FF00: " << std::hex << (int) joypadRegister << "\n";
+		std::cout << "Buttons:    " + buttons + "\n";
+		std::cout << "Directions: " + directions + "\n";
+		std::cout << "| P3: " + p3 + " | P2: " + p2 + " | P1: " + p1 + " | P0: " + p0 + "\n";
+		gameboy->SetHalt(true);
+	}
 
 	if (0x4000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address);
@@ -57,7 +78,7 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 		return;
 	}
 	else if (address == JOYPAD) {
-		io[address & 0x7F] = ~value >> 1;
+		io[address & 0x7F] = value | (io[address & 0x7F] & 0xCF);
 		return;
 	}
 

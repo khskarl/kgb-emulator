@@ -13,7 +13,7 @@ void HandleEvents ();
 void RenderDebugText ();
 void RenderDisplay ();
 
-void SetJoypadBuffer (bool* const joypadBuffer);
+void SetJoypadBuffer (uint8_t* const joypadBuffer);
 
 void SetDisplayBuffer (uint8_t* const buffer);
 void CopyDisplayBuffer (uint8_t* const buffer);

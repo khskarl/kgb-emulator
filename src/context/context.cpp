@@ -17,8 +17,8 @@ static uint8_t* displayBuffer = nullptr;
 static float speedInput = 1.0f;
 
 // Placeholder
-uint8_t pixels[160 * 144 * 4];
-bool* joypad = nullptr;
+uint8_t  pixels[160 * 144 * 4];
+uint8_t* joypad = nullptr;
 
 // Placeholder
 bool prevShouldHalt = false;
@@ -31,7 +31,7 @@ bool Context::SetupContext (const int scale = 1) {
 	debugText.setCharacterSize(15);
 	debugText.setString("Debug :D");
 
-	window.create(sf::VideoMode(160 * scale, 144 * scale), "Hello :)");
+	window.create(sf::VideoMode(160 * scale, 144 * scale), "Hi, I'm a secret message :D");
 
 	displayTexture.create(160, 144);
 	displayTexture.setSmooth(false);
@@ -123,7 +123,7 @@ void Context::RenderDisplay () {
 	window.display();
 }
 
-void Context::SetJoypadBuffer (bool* const buffer) {
+void Context::SetJoypadBuffer (uint8_t* const buffer) {
 	assert(buffer != nullptr);
 	joypad = buffer;
 }

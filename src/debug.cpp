@@ -32,6 +32,8 @@ std::string Debug::GetGameboyText (GameBoy& gameboy) {
 
 	text += "\n";
 
+	sprintf(buffer, "%02X", (*mmu->GetMemoryRef(0xFF00)));
+	text += "FF00:" + std::string(buffer) + "\n";
 	text += "FF44:" + std::to_string((*mmu->GetMemoryRef(0xFF44)));
 
 	return text;

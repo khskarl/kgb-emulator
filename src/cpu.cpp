@@ -93,7 +93,6 @@ void CPU::ProcessInterrupts () {
 	if (requestRegister == 0)
 		return;
 
-
 	const uint8_t enabledRegister = mmu->ReadByte(IE);
 	for (size_t id = 0; id < 5; id++) {
 		const bool isInterruptRequested = requestRegister & (0x10 >> (4 - id));
@@ -1577,12 +1576,15 @@ void CPU::op0xC0 () {
 // RET NC
 // LDH (a8),A
 void CPU::op0xE0 () {
-	mmu->WriteByte(ReadByte() + 0xFF00, AF.hi);
+	mmu->WriteByte(0xFF00 + ReadByte(), AF.hi);
 	clockCycles = 12;
 }
 // LDH A,(a8)
 void CPU::op0xF0 () {
-	AF.hi = mmu->ReadByte(ReadByte() + 0xFF00);
+	uint16_t address = 0xFF00 + ReadByte();
+	uint8_t value = mmu->ReadByte(address);
+	std::cout << "LDH A " << std::hex << (int) value << " from " << address << "\n";
+	AF.hi = value;
 	clockCycles = 12;
 }
 
