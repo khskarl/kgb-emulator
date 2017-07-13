@@ -63,7 +63,7 @@ void CPU::EmulateCycle () {
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
-	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
@@ -181,7 +181,7 @@ uint16_t CPU::PopWord () {
 }
 
 void CPU::Call (uint16_t address) {
-	uint16_t oldPC = PC;
+	// uint16_t oldPC = PC;
 	PushWord(PC);
 	PC = address;
 	// std::cout << std::hex << "Calling   from '" << oldPC << "' to '" << PC << "'\n";
@@ -1581,10 +1581,7 @@ void CPU::op0xE0 () {
 }
 // LDH A,(a8)
 void CPU::op0xF0 () {
-	uint16_t address = 0xFF00 + ReadByte();
-	uint8_t value = mmu->ReadByte(address);
-	std::cout << "LDH A " << std::hex << (int) value << " from " << address << "\n";
-	AF.hi = value;
+	AF.hi = mmu->ReadByte(0xFF00 + ReadByte());;
 	clockCycles = 12;
 }
 
@@ -1753,7 +1750,7 @@ void CPU::op0xC8 () {
 
 // RET
 void CPU::op0xC9 () {
-	uint16_t oldPC = PC - 1;
+	// uint16_t oldPC = PC - 1;
 	PC = PopWord();
 
 	clockCycles = 8;
