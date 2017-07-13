@@ -63,7 +63,7 @@ void CPU::EmulateCycle () {
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
-	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
@@ -300,6 +300,8 @@ void CPU::Swap (uint8_t& value) {
 	uint8_t hi = value & 0xF0;
 	uint8_t lo = value & 0x0F;
 	value = (hi >> 4) | (lo << 4);
+	SetZ(value == 0);
+	SetN(0), SetH(0), SetC(0);
 }
 
 void CPU::SetBit (uint8_t& target, uint8_t bit, bool value) {

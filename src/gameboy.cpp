@@ -20,54 +20,51 @@ void GameBoy::LoadRom (Rom rom) {
 void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
 	uint8_t* joypadRegister = mmu.GetMemoryRef(JOYPAD);
 	uint8_t  prevJoypadRegister = *joypadRegister;
+
+	uint8_t isDirectionsSelected = ~(*joypadRegister & 0b010000);
+	uint8_t isButtonsSelected    = ~(*joypadRegister & 0b100000);
+
 	*joypadRegister |= 0x0F;
 
-	size_t offset = 4;
-	for (size_t i = 0; i < 4; i++) {
-		*joypadRegister &= (~(joypadBuffer[i + offset] << i));
+	if (isDirectionsSelected) {
+		for (size_t i = 0; i < 4; i++) {
+			*joypadRegister &= (~(joypadBuffer[i] << i));
+		}
+	}
+
+	if (isButtonsSelected) {
+		for (size_t i = 0; i < 4; i++) {
+			*joypadRegister &= (~(joypadBuffer[i + 4] << i));
+		}
 	}
 
 	if (*joypadRegister != prevJoypadRegister) {
-		cpu.RequestInterrupt(4);
+		// cpu.RequestInterrupt(4);
 	}
 }
 
 void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 	cpu.isHalted = isHalted;
-	{
-		std::cout << "[BEFORE]\n";
-		uint8_t joypadRegister = *mmu.GetMemoryRef(JOYPAD);
-		std::string p0 = joypadRegister & 0b0001 ? "1" : "0";
-		std::string p1 = joypadRegister & 0b0010 ? "1" : "0";
-		std::string p2 = joypadRegister & 0b0100 ? "1" : "0";
-		std::string p3 = joypadRegister & 0b1000 ? "1" : "0";
-		std::string directions = joypadRegister & 0b10000 ? "1" : "0";
-		std::string buttons = joypadRegister & 0b100000 ? "1" : "0";
 
-		std::cout << "Curr FF00: " << std::hex << (int) joypadRegister << "\n";
-		std::cout << "Buttons:    " + buttons + "\n";
-		std::cout << "Directions: " + directions + "\n";
-		std::cout << "| P3: " + p3 + " | P2: " + p2 + " | P1: " + p1 + " | P0: " + p0 + "\n";
-
-	}
-	UpdateJoypadMemory(joypad);
-
-		std::cout << "[AFTER]\n";
-	uint8_t joypadRegister = *mmu.GetMemoryRef(JOYPAD);
-	std::string p0 = joypadRegister & 0b0001 ? "1" : "0";
-	std::string p1 = joypadRegister & 0b0010 ? "1" : "0";
-	std::string p2 = joypadRegister & 0b0100 ? "1" : "0";
-	std::string p3 = joypadRegister & 0b1000 ? "1" : "0";
-	std::string directions = joypadRegister & 0b10000 ? "1" : "0";
-	std::string buttons = joypadRegister & 0b100000 ? "1" : "0";
-
-	std::cout << "Curr FF00: " << std::hex << (int) joypadRegister << "\n";
-	std::cout << "Buttons:    " + buttons + "\n";
-	std::cout << "Directions: " + directions + "\n";
-	std::cout << "| P3: " + p3 + " | P2: " + p2 + " | P1: " + p1 + " | P0: " + p0 + "\n";
+	// uint8_t joypadRegister = *mmu.GetMemoryRef(JOYPAD);
+	// std::string p0 = joypadRegister & 0b0001 ? "1" : "0";
+	// std::string p1 = joypadRegister & 0b0010 ? "1" : "0";
+	// std::string p2 = joypadRegister & 0b0100 ? "1" : "0";
+	// std::string p3 = joypadRegister & 0b1000 ? "1" : "0";
+	// std::string directions = joypadRegister & 0b10000 ? "1" : "0";
+	// std::string buttons = joypadRegister & 0b100000 ? "1" : "0";
+	//
+	// std::cout << "Curr FF00: " << std::hex << (int) joypadRegister << "\n";
+	// std::cout << "Buttons:    " + buttons + "\n";
+	// std::cout << "Directions: " + directions + "\n";
+	// std::cout << "| P3: " + p3 + " | P2: " + p2 + " | P1: " + p1 + " | P0: " + p0 + "\n";
 
 	size_t cylesDone = 0;
 	while (cylesDone < cyclesThisUpdate) {
+		// By calling this inside this loop, we ensure it's getting the selected pa-
+		//rt of the game pad.
+		UpdateJoypadMemory(joypad);
+
 		this->StepInstruction();
 
 		this->StepTimers(cpu.clockCycles);
