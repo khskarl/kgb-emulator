@@ -94,8 +94,10 @@ private:
 
 	/* Common Instructions */
 	void Call (uint16_t address); // CALL
-	void RotateLeft  (uint8_t& value); // RL
-	void RotateRight (uint8_t& value); // RR
+	void RotateLeft       (uint8_t& value); // RL
+	void RotateLeftCarry  (uint8_t& value); // RLC
+	void RotateRight      (uint8_t& value); // RR
+	void RotateRightCarry (uint8_t& value); // RRC
 	void ShiftLeft   (uint8_t& value); // SLA
 	void ShiftRight  (uint8_t& value); // SRL
 	void Decrement (uint8_t&  value); // DEC
@@ -104,9 +106,13 @@ private:
 	void Increment (uint8_t&  value); // INC
 	void Increment (uint16_t& value); // INC
 	void Increment (reg16_t& value); // INC
+	void AddCarryA (uint8_t value); // ADC
 	void AddA      (uint8_t value); // ADD
+	void Add       (uint8_t& target, uint8_t value); // ADD
 	void Add       (uint16_t& target, uint16_t value); // ADD
-	void SubtractA (uint8_t value); // SUB
+	void SubtractCarryA (uint8_t value); // SBC
+	void SubtractA      (uint8_t value); // SUB A
+	void Subtract       (uint8_t& target, uint8_t value); // SUB
 	void CompareA  (uint8_t value); // CP
 	void OrA       (uint8_t value); // OR
 	void Swap (uint8_t& value); // SWAP
