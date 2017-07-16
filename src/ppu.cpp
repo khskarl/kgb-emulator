@@ -108,7 +108,7 @@ uint8_t* PPU::GetDisplayBuffer () {
 	return &displayBuffer[0];
 }
 
-uint8_t ComputeBitColorID (uint16_t line, uint8_t numBit) {
+uint8_t CalculateBitColorID (uint16_t line, uint8_t numBit) {
 	return (line & (0x8000 >> numBit)) >> (14 - numBit) |
 	       (line & (0x80   >> numBit)) >> (7  - numBit);
 }
@@ -156,7 +156,8 @@ void PPU::DrawScanline (uint8_t line) {
 		if (tileID != 0)
 			displayBuffer[line * 160 + jPixel] = 3;
 
-		displayBuffer[line * 160 + jPixel] = ComputeBitColorID(tile, jScrolled % 8);
+		uint8_t currentBitColor = CalculateBitColorID(tile, jScrolled % 8);
+		displayBuffer[line * 160 + jPixel] = GetShadeFromBGP(currentBitColor);
 	}
 }
 
@@ -183,6 +184,13 @@ uint16_t PPU::GetBackgroundTilesAddress () {
 	} else {
 		return 0x9800;
 	}
+}
+
+uint8_t PPU::GetShadeFromBGP(uint8_t colorID) {
+	uint8_t backgroundPalette = mmu->ReadByte(BGP);
+	uint8_t offset = 2 * colorID;
+	uint8_t mask = 0b11 << offset;
+	return (backgroundPalette & mask) >> offset;
 }
 
 uint8_t PPU::NextScanline () {

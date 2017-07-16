@@ -21,6 +21,7 @@ private:
 
 	uint16_t GetTilesAddress ();
 	uint16_t GetBackgroundTilesAddress ();
+	uint8_t GetShadeFromBGP (uint8_t colorID);
 
 	uint8_t NextScanline ();
 	void ResetScanline ();

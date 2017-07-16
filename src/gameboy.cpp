@@ -6,7 +6,7 @@ GameBoy::GameBoy () {}
 GameBoy::~GameBoy () {}
 
 void GameBoy::Initialize () {
-	cpu.Initialize(&mmu, false);
+	cpu.Initialize(&mmu, true);
 	mmu.Initialize(this);
 	ppu.Initialize(&cpu, &mmu);
 	mmu.WriteBios(kGameboyDMGBios);
