@@ -9,7 +9,7 @@
 /* Joypad */
 #define JOYPAD 0xFF00
 
-/* Timer related Addresses */
+/* Timers Addresses */
 #define DIV  0xFF04
 #define TIMA 0xFF05
 #define TMA  0xFF06
@@ -22,6 +22,12 @@
 #define SCROLLX 0xFF43
 #define CURLINE 0xFF44
 #define CMPLINE 0xFF45
+
+/* Others */
+#define DMA  0xFF46
+#define BGP  0xFF47
+#define OBP0 0xFF48
+#define OBP1 0xFF49
 
 /* Interrupt related */
 #define IF 0xFF0F
