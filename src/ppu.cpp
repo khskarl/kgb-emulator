@@ -123,7 +123,7 @@ void PPU::DrawBackground (uint8_t line) {
 	uint8_t scrollY = mmu->ReadByte(SCROLLY);
 	uint8_t scrollX = mmu->ReadByte(SCROLLX);
 	uint16_t bgTilesMapAddress = GetBackgroundTilesAddress();
-	uint16_t tilesAddress = GetTilesAddress();
+	uint16_t tilesAddress = GetBackgroundPatternsAddress();
 
 	uint8_t iScrolled = scrollY + line;
 	uint8_t iTile = (iScrolled) / 8;
@@ -132,38 +132,73 @@ void PPU::DrawBackground (uint8_t line) {
 		uint8_t jScrolled = scrollX + jPixel;
 		uint8_t jTile = (jScrolled) / 8;
 
-		uint16_t tileIdAddress = bgTilesMapAddress + iTile * 32 + jTile;
-		uint8_t  rawTileID = mmu->ReadByte(tileIdAddress);
+		uint16_t tilePatternIDAddress = bgTilesMapAddress + iTile * 32 + jTile;
+		uint8_t  rawPatternID = mmu->ReadByte(tilePatternIDAddress);
 
-		uint8_t  tileID;
-		uint16_t tileLocation;
+		uint8_t  patternID;
+		uint16_t patternLocation;
 		if (tilesAddress == 0x8000) {
-			tileID = rawTileID;
-			tileLocation = tilesAddress + tileID * 16;
+			patternID = rawPatternID;
+			patternLocation = tilesAddress + patternID * 16;
 		} else {
-			tileID = reinterpret_cast<int8_t&>(rawTileID);
-			tileLocation = tilesAddress + (tileID + 128) * 16;
+			patternID = reinterpret_cast<int8_t&>(rawPatternID);
+			patternLocation = tilesAddress + (patternID + 128) * 16;
 		}
 
-		uint16_t tileData = mmu->ReadWord(tileLocation + (iScrolled % 8) * 2);
+		uint16_t patternData = mmu->ReadWord(patternLocation + (iScrolled % 8) * 2);
 
-		uint8_t currentBitColor = CalculatePixelColorID(tileData, jScrolled % 8);
+		uint8_t currentBitColor = CalculatePixelColorID(patternData, jScrolled % 8);
 		displayBuffer[line * 160 + jPixel] = GetShadeFromBGP(currentBitColor);
 	}
 }
 
 void PPU::DrawSprites (uint8_t line) {
+	uint8_t* oam = mmu->GetMemoryRef(OAM);
 
+	for (size_t spriteIndex = 0; spriteIndex < 40; spriteIndex += 1) {
+		uint8_t* spriteAttributes = &oam[spriteIndex * 4];
+		uint8_t positionY = spriteAttributes[0];
+		uint8_t positionX = spriteAttributes[1];
+		uint8_t patternID = spriteAttributes[2];
+		uint8_t flags     = spriteAttributes[3];
+
+		// If the current scanline being drawn isn't intersecting with sprite, skip
+		if (line < positionY || line >= positionY + 16) {
+			continue;
+		}
+
+		uint8_t usesPalette0 = (flags & 0b10000) >> 4 == 0;
+		// std::cout << "HAHA\n";
+		// std::cout << std::hex << (int)patternID << "\n"; 
+		uint16_t patternData = mmu->ReadByte(0x8000 + patternID * 16);
+
+		for (size_t iPatternPixel = 0; iPatternPixel < 8; iPatternPixel += 1) {
+			// FIXME: Something is stupid here
+			uint8_t patternPixelColor = CalculatePixelColorID(patternData, iPatternPixel);
+
+			uint8_t shade;
+			if (usesPalette0) {
+				shade = GetShadeFromOBP0(patternPixelColor);
+			} else {
+				shade = GetShadeFromOBP1(patternPixelColor);
+			}
+
+			if (shade != 0) {
+				displayBuffer[line * 160 + positionX + iPatternPixel] = shade;
+			}
+		}
+
+
+	}
 }
 
 void PPU::FeedRandomToDisplay () {
 	for (size_t i = 0; i < 160 * 144; i += 1) {
-		int luminosity = rand() % 4;
-		displayBuffer[i] = luminosity;
+		displayBuffer[i] = rand() % 4;
 	}
 }
 
-uint16_t PPU::GetTilesAddress () {
+uint16_t PPU::GetBackgroundPatternsAddress () {
 	uint8_t lcdControl = mmu->ReadByte(LCDCTRL);
 	if ((lcdControl & 0x10) == 0x10) {
 		return 0x8000;
@@ -181,11 +216,25 @@ uint16_t PPU::GetBackgroundTilesAddress () {
 	}
 }
 
-uint8_t PPU::GetShadeFromBGP(uint8_t colorID) {
+uint8_t PPU::GetShadeFromBGP (uint8_t colorID) {
 	uint8_t backgroundPalette = mmu->ReadByte(BGP);
 	uint8_t offset = 2 * colorID;
 	uint8_t mask = 0b11 << offset;
 	return (backgroundPalette & mask) >> offset;
+}
+
+uint8_t PPU::GetShadeFromOBP0 (uint8_t colorID) {
+	uint8_t palette = mmu->ReadByte(OBP0);
+	uint8_t offset = 2 * colorID;
+	uint8_t mask = 0b11 << offset;
+	return (palette & mask) >> offset;
+}
+
+uint8_t PPU::GetShadeFromOBP1 (uint8_t colorID) {
+	uint8_t palette = mmu->ReadByte(OBP1);
+	uint8_t offset = 2 * colorID;
+	uint8_t mask = 0b11 << offset;
+	return (palette & mask) >> offset;
 }
 
 uint8_t PPU::NextScanline () {

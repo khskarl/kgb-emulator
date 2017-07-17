@@ -6,6 +6,9 @@
 #define CARTRIDGE_TYPE  0x0147
 #define ROM_SIZE        0x0148
 
+/* Object Attribute Memory (or sprite attribute table) */
+#define OAM 0xFE00
+
 /* Joypad */
 #define JOYPAD 0xFF00
 

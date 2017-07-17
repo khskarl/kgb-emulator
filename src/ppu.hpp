@@ -15,15 +15,17 @@ private:
 
 	void SetDisplayStatus ();
 
-	void DrawScanline (uint8_t line);
+	void DrawScanline   (uint8_t line);
 	void DrawBackground (uint8_t line);
-	void DrawSprites (uint8_t line);
+	void DrawSprites    (uint8_t line);
 
 	void FeedRandomToDisplay ();
 
-	uint16_t GetTilesAddress ();
+	uint16_t GetBackgroundPatternsAddress ();
 	uint16_t GetBackgroundTilesAddress ();
-	uint8_t GetShadeFromBGP (uint8_t colorID);
+	uint8_t GetShadeFromBGP  (uint8_t colorID);
+	uint8_t GetShadeFromOBP0 (uint8_t colorID);
+	uint8_t GetShadeFromOBP1 (uint8_t colorID);
 
 	uint8_t NextScanline ();
 	void ResetScanline ();
