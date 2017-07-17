@@ -135,13 +135,12 @@ void PPU::DrawBackground (uint8_t line) {
 		uint16_t tilePatternIDAddress = bgTilesMapAddress + iTile * 32 + jTile;
 		uint8_t  rawPatternID = mmu->ReadByte(tilePatternIDAddress);
 
-		uint8_t  patternID;
 		uint16_t patternLocation;
 		if (patternsAddress == 0x8000) {
-			patternID = rawPatternID;
+			uint8_t patternID = rawPatternID;
 			patternLocation = patternsAddress + patternID * 16;
 		} else {
-			patternID = reinterpret_cast<int8_t&>(rawPatternID);
+			int8_t patternID = reinterpret_cast<int8_t&>(rawPatternID);
 			patternLocation = patternsAddress + (patternID + 128) * 16;
 		}
 
