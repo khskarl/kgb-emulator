@@ -108,12 +108,18 @@ uint8_t* PPU::GetDisplayBuffer () {
 	return &displayBuffer[0];
 }
 
-uint8_t CalculateBitColorID (uint16_t line, uint8_t numBit) {
+uint8_t CalculatePixelColorID (uint16_t line, uint8_t numBit) {
 	return (line & (0x8000 >> numBit)) >> (14 - numBit) |
 	       (line & (0x80   >> numBit)) >> (7  - numBit);
 }
 
 void PPU::DrawScanline (uint8_t line) {
+	DrawBackground(line);
+	DrawSprites(line);
+}
+
+
+void PPU::DrawBackground (uint8_t line) {
 	uint8_t scrollY = mmu->ReadByte(SCROLLY);
 	uint8_t scrollX = mmu->ReadByte(SCROLLX);
 	uint16_t bgTilesMapAddress = GetBackgroundTilesAddress();
@@ -126,39 +132,28 @@ void PPU::DrawScanline (uint8_t line) {
 		uint8_t jScrolled = scrollX + jPixel;
 		uint8_t jTile = (jScrolled) / 8;
 
-		// FIXME: Getting wrong tiles
 		uint16_t tileIdAddress = bgTilesMapAddress + iTile * 32 + jTile;
-		uint8_t untreatedByte = mmu->ReadByte(tileIdAddress);
+		uint8_t  rawTileID = mmu->ReadByte(tileIdAddress);
 
-		int16_t tileID;
-		if (tilesAddress == 0x8000)
-			tileID = untreatedByte;
-		else
-			tileID = reinterpret_cast<int8_t&>(untreatedByte);
+		uint8_t  tileID;
+		uint16_t tileLocation;
+		if (tilesAddress == 0x8000) {
+			tileID = rawTileID;
+			tileLocation = tilesAddress + tileID * 16;
+		} else {
+			tileID = reinterpret_cast<int8_t&>(rawTileID);
+			tileLocation = tilesAddress + (tileID + 128) * 16;
+		}
 
-		// std::cout << "i: " << std::hex << (int) iTile << '\n';
-		// std::cout << "j: " << std::hex << (int) jTile << '\n';
-		// std::cout << "tileIdAddress: " << std::hex << (int) tileIdAddress << '\n';
-		// std::cout << "tileId:        " << std::hex << (int) tileID << '\n';
-		// assert(tileIdAddress != 0x9910);
-		// if (tileIdAddress == 0x9910) {
-		// 	while (1) {}
-		// }
+		uint16_t tileData = mmu->ReadWord(tileLocation + (iScrolled % 8) * 2);
 
-		uint16_t tileLocation = tilesAddress;
-		if (tilesAddress == 0x8000)
-			tileLocation += tileID * 16;
-		else
-			tileLocation += (tileID + 128) * 16;
-
-		uint16_t tile = mmu->ReadWord(tileLocation + (iScrolled % 8) * 2);
-
-		if (tileID != 0)
-			displayBuffer[line * 160 + jPixel] = 3;
-
-		uint8_t currentBitColor = CalculateBitColorID(tile, jScrolled % 8);
+		uint8_t currentBitColor = CalculatePixelColorID(tileData, jScrolled % 8);
 		displayBuffer[line * 160 + jPixel] = GetShadeFromBGP(currentBitColor);
 	}
+}
+
+void PPU::DrawSprites (uint8_t line) {
+
 }
 
 void PPU::FeedRandomToDisplay () {

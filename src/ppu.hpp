@@ -16,6 +16,8 @@ private:
 	void SetDisplayStatus ();
 
 	void DrawScanline (uint8_t line);
+	void DrawBackground (uint8_t line);
+	void DrawSprites (uint8_t line);
 
 	void FeedRandomToDisplay ();
 
