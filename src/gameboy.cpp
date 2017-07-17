@@ -45,6 +45,8 @@ void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
 
 void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 	cpu.isHalted = isHalted;
+	// uint16_t pattern  = mmu.ReadWord(0x8580);
+	// std::cout << "0x8580: " << std::hex << pattern << "\n";
 
 	// uint8_t joypadRegister = *mmu.GetMemoryRef(JOYPAD);
 	// std::string p0 = joypadRegister & 0b0001 ? "1" : "0";

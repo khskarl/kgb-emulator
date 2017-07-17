@@ -64,13 +64,17 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 		io[address & 0x7F] = value | (io[address & 0x7F] & 0xCF);
 		return;
 	}
+	else if (address == DMA) {
+		StartDmaTransfer(value * 0x100);
+		// std::cout << "Starting DMA at " << std::hex << value * 0x100 << "\n";
+		// gameboy->SetHalt(true);
+		return;
+	}
 
 	*GetMemoryRef(address) = value;
 }
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
-	uint8_t* memoryRef = GetMemoryRef(address);
-
 	if (0x4000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address);
 		return;
@@ -85,6 +89,7 @@ void MMU::WriteWord (uint16_t address, uint16_t value) {
 		return;
 	}
 
+	uint8_t* memoryRef = GetMemoryRef(address);
 	memoryRef[0] =  value & 0x00FF;
 	memoryRef[1] = (value & 0xFF00) >> 8;
 }
@@ -180,6 +185,12 @@ uint8_t* MMU::GetMemoryRef (uint16_t address) {
 		return 0;
 		break;
 
+	}
+}
+
+void MMU::StartDmaTransfer (uint16_t startingAddress) {
+	for (size_t i = 0; i < 160; i++) {
+		*GetMemoryRef(0xFE00 + i) = *GetMemoryRef(startingAddress + i);
 	}
 }
 

@@ -46,12 +46,17 @@ public:
 	/* Specific memory access functions */
 	uint8_t  ReadClockFrequency ();
 
-	void WriteBios (const uint8_t* buffer);
+	/* Write memory access */
+	void WriteBios        (const uint8_t* buffer);
 	void WriteBufferToRom (const uint8_t* buffer, size_t bufferSize);
 
+	/* Memory References */
 	uint8_t* GetRomRef    (uint16_t address);
 	uint8_t* GetIORef     (uint16_t address);
 	uint8_t* GetMemoryRef (uint16_t address);
+
+	/* Others */
+	void StartDmaTransfer (uint16_t startingAddress);
 };
 
 #endif

@@ -123,7 +123,7 @@ void PPU::DrawBackground (uint8_t line) {
 	uint8_t scrollY = mmu->ReadByte(SCROLLY);
 	uint8_t scrollX = mmu->ReadByte(SCROLLX);
 	uint16_t bgTilesMapAddress = GetBackgroundTilesAddress();
-	uint16_t tilesAddress = GetBackgroundPatternsAddress();
+	uint16_t patternsAddress = GetBackgroundPatternsAddress();
 
 	uint8_t iScrolled = scrollY + line;
 	uint8_t iTile = (iScrolled) / 8;
@@ -137,12 +137,12 @@ void PPU::DrawBackground (uint8_t line) {
 
 		uint8_t  patternID;
 		uint16_t patternLocation;
-		if (tilesAddress == 0x8000) {
+		if (patternsAddress == 0x8000) {
 			patternID = rawPatternID;
-			patternLocation = tilesAddress + patternID * 16;
+			patternLocation = patternsAddress + patternID * 16;
 		} else {
 			patternID = reinterpret_cast<int8_t&>(rawPatternID);
-			patternLocation = tilesAddress + (patternID + 128) * 16;
+			patternLocation = patternsAddress + (patternID + 128) * 16;
 		}
 
 		uint16_t patternData = mmu->ReadWord(patternLocation + (iScrolled % 8) * 2);
@@ -157,23 +157,21 @@ void PPU::DrawSprites (uint8_t line) {
 
 	for (size_t spriteIndex = 0; spriteIndex < 40; spriteIndex += 1) {
 		uint8_t* spriteAttributes = &oam[spriteIndex * 4];
-		uint8_t positionY = spriteAttributes[0];
-		uint8_t positionX = spriteAttributes[1];
+		uint8_t positionY = spriteAttributes[0] - 16;
+		uint8_t positionX = spriteAttributes[1] - 8;
 		uint8_t patternID = spriteAttributes[2];
 		uint8_t flags     = spriteAttributes[3];
 
 		// If the current scanline being drawn isn't intersecting with sprite, skip
-		if (line < positionY || line >= positionY + 16) {
+		if (line < positionY || line >= positionY + 8) {
 			continue;
 		}
 
 		uint8_t usesPalette0 = (flags & 0b10000) >> 4 == 0;
-		// std::cout << "HAHA\n";
-		// std::cout << std::hex << (int)patternID << "\n"; 
-		uint16_t patternData = mmu->ReadByte(0x8000 + patternID * 16);
+		uint8_t currentSpriteLine = line % positionY;
+		uint16_t patternData = mmu->ReadByte(0x8000 + patternID * 16 + currentSpriteLine * 2);
 
 		for (size_t iPatternPixel = 0; iPatternPixel < 8; iPatternPixel += 1) {
-			// FIXME: Something is stupid here
 			uint8_t patternPixelColor = CalculatePixelColorID(patternData, iPatternPixel);
 
 			uint8_t shade;
@@ -187,8 +185,6 @@ void PPU::DrawSprites (uint8_t line) {
 				displayBuffer[line * 160 + positionX + iPatternPixel] = shade;
 			}
 		}
-
-
 	}
 }
 
