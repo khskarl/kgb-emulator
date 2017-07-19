@@ -21,13 +21,17 @@ void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
 	uint8_t* joypadRegister = mmu.GetMemoryRef(JOYPAD);
 	uint8_t  prevJoypadRegister = *joypadRegister;
 
-	uint8_t isDirectionsSelected = ~(*joypadRegister & 0b010000);
-	uint8_t isButtonsSelected    = ~(*joypadRegister & 0b100000);
+	uint8_t isDirectionsSelected = !(*joypadRegister & 0b010000);
+	uint8_t isButtonsSelected    = !(*joypadRegister & 0b100000);
 
-	*joypadRegister |= 0x0F;
+	// *joypadRegister |= 0x0F;
 
 	if (isDirectionsSelected) {
 		for (size_t i = 0; i < 4; i++) {
+			uint16_t isPressed = joypadBuffer[i];
+			uint16_t offsetted = isPressed << i;
+			uint16_t inverted = ~offsetted;
+			// std::cout << std::hex << isPressed << "| offseted " << offsetted << " = ~" << inverted << "\n";
 			*joypadRegister &= (~(joypadBuffer[i] << i));
 		}
 	}
@@ -38,7 +42,7 @@ void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
 		}
 	}
 
-	if (*joypadRegister != prevJoypadRegister) {
+	if (*joypadRegister < prevJoypadRegister) {
 		// cpu.RequestInterrupt(4);
 	}
 }

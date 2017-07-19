@@ -44,6 +44,9 @@ void CPU::EmulateCycle () {
 		areInterruptsEnabled = true;
 	}
 
+
+	// std::cout << std::hex << (int) mmu->ReadByte(0xFFB1) << "\n";
+
 	// if (0x69af) {
 	// 	isHalted = true;
 	// 	// Hi! I'm a badly executed memory dump, please don't mind me :D
@@ -56,8 +59,8 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF81: " << std::to_string(mmu->ReadByte(0xff81)) << "\n";
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
-
-	// if (PC == 0xC0AD || PC == 0xC0B0) {
+	//
+	// if (PC == 0x528 || PC == 0xC0B0) {
 	// 	isHalted = true;
 	// }
 
@@ -338,8 +341,8 @@ void CPU::SetBit (uint8_t& target, uint8_t bit, bool value) {
 	target = (target & ~bitMask) | value << bit;
 }
 
-void CPU::Bit(uint8_t value, uint8_t bit) {
-	SetZ((value & (0x01 << bit)) == 0);
+void CPU::Bit(uint8_t bit, uint8_t value) {
+	SetZ((value & (1 << bit)) == 0);
 	SetH(1);
 	SetN(0);
 }

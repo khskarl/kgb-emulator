@@ -47,6 +47,11 @@ uint8_t MMU::ReadClockFrequency () {
 
 
 void MMU::WriteByte (uint16_t address, uint8_t value) {
+	if (0xFB00 == address) {
+		std::cout << std::hex << (int) value << "\n";
+		gameboy->SetHalt(true);
+	}
+
 	if (0x4000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address);
 		return;
@@ -75,6 +80,10 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 }
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
+	if (0xFB00 == address) {
+		std::cout << std::hex << (int) value << "\n";
+		gameboy->SetHalt(true);
+	}
 	if (0x4000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address);
 		return;
