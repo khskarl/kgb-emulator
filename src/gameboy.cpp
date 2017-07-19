@@ -24,7 +24,7 @@ void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
 	uint8_t isDirectionsSelected = !(*joypadRegister & 0b010000);
 	uint8_t isButtonsSelected    = !(*joypadRegister & 0b100000);
 
-	// *joypadRegister |= 0x0F;
+	*joypadRegister |= 0x0F;
 
 	if (isDirectionsSelected) {
 		for (size_t i = 0; i < 4; i++) {
@@ -51,7 +51,7 @@ void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 	cpu.isHalted = isHalted;
 	// uint16_t pattern  = mmu.ReadWord(0x8580);
 	// std::cout << "0x8580: " << std::hex << pattern << "\n";
-
+	//
 	// uint8_t joypadRegister = *mmu.GetMemoryRef(JOYPAD);
 	// std::string p0 = joypadRegister & 0b0001 ? "1" : "0";
 	// std::string p1 = joypadRegister & 0b0010 ? "1" : "0";
