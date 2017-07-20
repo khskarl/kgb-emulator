@@ -65,9 +65,7 @@ void CPU::EmulateCycle () {
 	// }
 
 	uint8_t opcode = mmu->ReadByte(PC);
-
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
-	// std::cout << std::hex << opcode << '\n';
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
 	ExecuteInstruction(opcode);
@@ -336,9 +334,14 @@ void CPU::Swap (uint8_t& value) {
 	SetN(0), SetH(0), SetC(0);
 }
 
-void CPU::SetBit (uint8_t& target, uint8_t bit, bool value) {
+void CPU::SetBit (uint8_t& target, uint8_t bit) {
 	uint8_t bitMask = 1 << bit;
-	target = (target & ~bitMask) | value << bit;
+	target = (target & ~bitMask) | 1 << bit;
+}
+
+void CPU::ResetBit (uint8_t& target, uint8_t bit) {
+	uint8_t bitMask = 1 << bit;
+	target = (target & ~bitMask) | 0 << bit;
 }
 
 void CPU::Bit(uint8_t bit, uint8_t value) {
@@ -532,10 +535,10 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0x3C] = &CPU::opNull; opcodesCB[0x3D] = &CPU::opNull;
 	opcodesCB[0x3E] = &CPU::opNull; opcodesCB[0x3F] = &CPU::cb0x3F;
 
-	opcodesCB[0x40] = &CPU::opNull; opcodesCB[0x41] = &CPU::opNull;
-	opcodesCB[0x42] = &CPU::opNull; opcodesCB[0x43] = &CPU::opNull;
-	opcodesCB[0x44] = &CPU::opNull; opcodesCB[0x45] = &CPU::opNull;
-	opcodesCB[0x46] = &CPU::opNull; opcodesCB[0x47] = &CPU::cb0x47;
+	opcodesCB[0x40] = &CPU::cb0x40; opcodesCB[0x41] = &CPU::cb0x41;
+	opcodesCB[0x42] = &CPU::cb0x42; opcodesCB[0x43] = &CPU::cb0x43;
+	opcodesCB[0x44] = &CPU::cb0x44; opcodesCB[0x45] = &CPU::cb0x45;
+	opcodesCB[0x46] = &CPU::cb0x46; opcodesCB[0x47] = &CPU::cb0x47;
 	opcodesCB[0x48] = &CPU::cb0x48; opcodesCB[0x49] = &CPU::opNull;
 	opcodesCB[0x4A] = &CPU::opNull; opcodesCB[0x4B] = &CPU::opNull;
 	opcodesCB[0x4C] = &CPU::opNull; opcodesCB[0x4D] = &CPU::opNull;
@@ -602,7 +605,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0xB8] = &CPU::opNull; opcodesCB[0xB9] = &CPU::opNull;
 	opcodesCB[0xBA] = &CPU::opNull; opcodesCB[0xBB] = &CPU::opNull;
 	opcodesCB[0xBC] = &CPU::opNull; opcodesCB[0xBD] = &CPU::opNull;
-	opcodesCB[0xBE] = &CPU::opNull; opcodesCB[0xBF] = &CPU::opNull;
+	opcodesCB[0xBE] = &CPU::cb0xBE; opcodesCB[0xBF] = &CPU::opNull;
 
 	opcodesCB[0xC0] = &CPU::opNull; opcodesCB[0xC1] = &CPU::opNull;
 	opcodesCB[0xC2] = &CPU::opNull; opcodesCB[0xC3] = &CPU::opNull;
@@ -638,7 +641,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0xF8] = &CPU::opNull; opcodesCB[0xF9] = &CPU::opNull;
 	opcodesCB[0xFA] = &CPU::opNull; opcodesCB[0xFB] = &CPU::opNull;
 	opcodesCB[0xFC] = &CPU::opNull; opcodesCB[0xFD] = &CPU::opNull;
-	opcodesCB[0xFE] = &CPU::opNull; opcodesCB[0xFF] = &CPU::opNull;
+	opcodesCB[0xFE] = &CPU::cb0xFE; opcodesCB[0xFF] = &CPU::cb0xFF;
 
 }
 
@@ -1826,11 +1829,8 @@ void CPU::op0xD8 () {
 
 // RET
 void CPU::op0xC9 () {
-	// uint16_t oldPC = PC - 1;
 	PC = PopWord();
-
 	clockCycles = 8;
-	// std::cout << std::hex << "Returning from '" << oldPC << "' to '" << PC << "'\n";
 }
 // RETI
 void CPU::op0xD9 () {
@@ -2085,12 +2085,34 @@ void CPU::cb0x3F () {
 }
 // CB4.
 // BIT 0,B
+void CPU::cb0x40 () {
+	Bit(0, BC.hi);
+}
 // BIT 0,C
+void CPU::cb0x41 () {
+	Bit(0, BC.lo);
+}
 // BIT 0,D
+void CPU::cb0x42 () {
+	Bit(0, DE.hi);
+}
 // BIT 0,E
+void CPU::cb0x43 () {
+	Bit(0, DE.lo);
+}
 // BIT 0,H
+void CPU::cb0x44 () {
+	Bit(0, HL.hi);
+}
 // BIT 0,L
+void CPU::cb0x45 () {
+	Bit(0, HL.lo);
+}
 // BIT 0,(HL)
+void CPU::cb0x46 () {
+	Bit(0, mmu->ReadByte(HL));
+	clockCycles = 16;
+}
 // BIT 0,A
 void CPU::cb0x47 () {
 	Bit(0, AF.hi);
@@ -2308,42 +2330,42 @@ void CPU::cb0x7F () {
 // CB8. instructions
 // RES 0,B
 void CPU::cb0x80 () {
-	SetBit(BC.hi, 0, false);
+	ResetBit(BC.hi, 0);
 }
 // RES 0,C
 void CPU::cb0x81 () {
-	SetBit(BC.lo, 0, false);
+	ResetBit(BC.lo, 0);
 }
 // RES 0,D
 void CPU::cb0x82 () {
-	SetBit(DE.hi, 0, false);
+	ResetBit(DE.hi, 0);
 }
 // RES 0,E
 void CPU::cb0x83 () {
-	SetBit(DE.lo, 0, false);
+	ResetBit(DE.lo, 0);
 }
 // RES 0,H
 void CPU::cb0x84 () {
-	SetBit(HL.hi, 0, false);
+	ResetBit(HL.hi, 0);
 }
 // RES 0,L
 void CPU::cb0x85 () {
-	SetBit(HL.lo, 0, false);
+	ResetBit(HL.lo, 0);
 }
 // RES 0,(HL)
 void CPU::cb0x86 () {
 	uint8_t target = mmu->ReadByte(HL);
-	SetBit(target, 0, false);
+	ResetBit(target, 0);
 	mmu->WriteByte(HL, target);
 	clockCycles = 16;
 }
 // RES 0,A
 void CPU::cb0x87 () {
-	SetBit(AF.hi, 0, false);
+	ResetBit(AF.hi, 0);
 }
 // RES 1,B
 void CPU::cb0x88 () {
-	SetBit(BC.hi, 1, false);
+	ResetBit(BC.hi, 1);
 }
 // RES 1,C
 // RES 1,D
@@ -2402,6 +2424,12 @@ void CPU::cb0x88 () {
 // RES 7,H
 // RES 7,L
 // RES 7,(HL)
+void CPU::cb0xBE () {
+	uint8_t target = mmu->ReadByte(HL);
+	ResetBit(target, 7);
+	mmu->WriteByte(HL, target);
+	clockCycles = 16;
+}
 // RES 7,A
 // CBC. instructions
 // SET 0,B
@@ -2470,7 +2498,16 @@ void CPU::cb0x88 () {
 // SET 7,H
 // SET 7,L
 // SET 7,(HL)
+void CPU::cb0xFE () {
+	uint8_t target = mmu->ReadByte(HL);
+	SetBit(target, 7);
+	mmu->WriteByte(HL, target);
+	clockCycles = 16;
+}
 // SET 7,A
+void CPU::cb0xFF () {
+	SetBit(AF.hi, 7);
+}
 
 /* Not implemented instructions call this function */
 void CPU::opNull () {

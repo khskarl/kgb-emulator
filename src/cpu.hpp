@@ -118,7 +118,8 @@ private:
 	void Swap (uint8_t& value); // SWAP
 
 	/* Common CB Instructions */
-	void SetBit (uint8_t& target, uint8_t bit, bool value);
+	void SetBit   (uint8_t& target, uint8_t bit);
+	void ResetBit (uint8_t& target, uint8_t bit);
 	void Bit(uint8_t bit, uint8_t value);
 
 	/* Instruction tables */
