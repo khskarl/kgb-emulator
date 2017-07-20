@@ -171,10 +171,11 @@ void PPU::DrawSprites (uint8_t line) {
 			positionY = 1;
 		}
 		uint8_t currentSpriteLine = line % positionY;
-		uint16_t patternData = mmu->ReadByte(0x8000 + patternID * 16 + currentSpriteLine * 2);
+		uint16_t patternData = mmu->ReadWord(0x8000 + patternID * 16 + currentSpriteLine * 2);
 
 		for (size_t iPatternPixel = 0; iPatternPixel < 8; iPatternPixel += 1) {
 			uint8_t patternPixelColor = CalculatePixelColorID(patternData, iPatternPixel);
+
 
 			uint8_t shade;
 			if (usesPalette0) {
