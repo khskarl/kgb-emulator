@@ -182,10 +182,8 @@ uint16_t CPU::PopWord () {
 }
 
 void CPU::Call (uint16_t address) {
-	// uint16_t oldPC = PC;
 	PushWord(PC);
 	PC = address;
-	// std::cout << std::hex << "Calling   from '" << oldPC << "' to '" << PC << "'\n";
 }
 
 // FIXME: Double check C flag computation
@@ -373,7 +371,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x20] = &CPU::op0x20; opcodes[0x21] = &CPU::op0x21;
 	opcodes[0x22] = &CPU::op0x22; opcodes[0x23] = &CPU::op0x23;
 	opcodes[0x24] = &CPU::op0x24; opcodes[0x25] = &CPU::op0x25;
-	opcodes[0x26] = &CPU::op0x26; opcodes[0x27] = &CPU::opNull;
+	opcodes[0x26] = &CPU::op0x26; opcodes[0x27] = &CPU::op0x27;
 	opcodes[0x28] = &CPU::op0x28; opcodes[0x29] = &CPU::op0x29;
 	opcodes[0x2A] = &CPU::op0x2A; opcodes[0x2B] = &CPU::op0x2B;
 	opcodes[0x2C] = &CPU::op0x2C; opcodes[0x2D] = &CPU::op0x2D;
@@ -382,11 +380,11 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x30] = &CPU::op0x30; opcodes[0x31] = &CPU::op0x31;
 	opcodes[0x32] = &CPU::op0x32; opcodes[0x33] = &CPU::op0x33;
 	opcodes[0x34] = &CPU::op0x34; opcodes[0x35] = &CPU::op0x35;
-	opcodes[0x36] = &CPU::op0x36; opcodes[0x37] = &CPU::opNull;
+	opcodes[0x36] = &CPU::op0x36; opcodes[0x37] = &CPU::op0x37;
 	opcodes[0x38] = &CPU::op0x38; opcodes[0x39] = &CPU::op0x39;
 	opcodes[0x3A] = &CPU::op0x3A; opcodes[0x3B] = &CPU::op0x3B;
 	opcodes[0x3C] = &CPU::op0x3C; opcodes[0x3D] = &CPU::op0x3D;
-	opcodes[0x3E] = &CPU::op0x3E; opcodes[0x3F] = &CPU::opNull;
+	opcodes[0x3E] = &CPU::op0x3E; opcodes[0x3F] = &CPU::op0x3F;
 
 	opcodes[0x40] = &CPU::op0x40; opcodes[0x41] = &CPU::op0x41;
 	opcodes[0x42] = &CPU::op0x42; opcodes[0x43] = &CPU::op0x43;
@@ -428,19 +426,19 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x82] = &CPU::op0x82; opcodes[0x83] = &CPU::op0x83;
 	opcodes[0x84] = &CPU::op0x84; opcodes[0x85] = &CPU::op0x85;
 	opcodes[0x86] = &CPU::op0x86; opcodes[0x87] = &CPU::op0x87;
-	opcodes[0x88] = &CPU::opNull; opcodes[0x89] = &CPU::op0x89;
-	opcodes[0x8A] = &CPU::opNull; opcodes[0x8B] = &CPU::opNull;
-	opcodes[0x8C] = &CPU::opNull; opcodes[0x8D] = &CPU::opNull;
-	opcodes[0x8E] = &CPU::opNull; opcodes[0x8F] = &CPU::opNull;
+	opcodes[0x88] = &CPU::op0x88; opcodes[0x89] = &CPU::op0x89;
+	opcodes[0x8A] = &CPU::op0x8A; opcodes[0x8B] = &CPU::op0x8B;
+	opcodes[0x8C] = &CPU::op0x8C; opcodes[0x8D] = &CPU::op0x8D;
+	opcodes[0x8E] = &CPU::opNull; opcodes[0x8F] = &CPU::op0x8F;
 
 	opcodes[0x90] = &CPU::op0x90; opcodes[0x91] = &CPU::op0x91;
 	opcodes[0x92] = &CPU::op0x92; opcodes[0x93] = &CPU::op0x93;
 	opcodes[0x94] = &CPU::op0x94; opcodes[0x95] = &CPU::op0x95;
 	opcodes[0x96] = &CPU::op0x96; opcodes[0x97] = &CPU::op0x97;
-	opcodes[0x98] = &CPU::opNull; opcodes[0x99] = &CPU::op0x99;
-	opcodes[0x9A] = &CPU::opNull; opcodes[0x9B] = &CPU::opNull;
-	opcodes[0x9C] = &CPU::opNull; opcodes[0x9D] = &CPU::opNull;
-	opcodes[0x9E] = &CPU::opNull; opcodes[0x9F] = &CPU::opNull;
+	opcodes[0x98] = &CPU::op0x98; opcodes[0x99] = &CPU::op0x99;
+	opcodes[0x9A] = &CPU::op0x9A; opcodes[0x9B] = &CPU::op0x9B;
+	opcodes[0x9C] = &CPU::op0x9C; opcodes[0x9D] = &CPU::op0x9D;
+	opcodes[0x9E] = &CPU::opNull; opcodes[0x9F] = &CPU::op0x9F;
 
 	opcodes[0xA0] = &CPU::op0xA0; opcodes[0xA1] = &CPU::op0xA1;
 	opcodes[0xA2] = &CPU::op0xA2; opcodes[0xA3] = &CPU::op0xA3;
@@ -499,40 +497,40 @@ void CPU::InitializeOpcodeTable () {
 	/* -------------------------------------- */
 	/* Initialize CB prefixed functions table */
 	/* -------------------------------------- */
-	opcodesCB[0x00] = &CPU::opNull; opcodesCB[0x01] = &CPU::opNull;
-	opcodesCB[0x02] = &CPU::opNull; opcodesCB[0x03] = &CPU::opNull;
-	opcodesCB[0x04] = &CPU::opNull; opcodesCB[0x05] = &CPU::opNull;
-	opcodesCB[0x06] = &CPU::opNull; opcodesCB[0x07] = &CPU::opNull;
-	opcodesCB[0x08] = &CPU::opNull; opcodesCB[0x09] = &CPU::opNull;
-	opcodesCB[0x0A] = &CPU::opNull; opcodesCB[0x0B] = &CPU::opNull;
-	opcodesCB[0x0C] = &CPU::opNull; opcodesCB[0x0D] = &CPU::opNull;
-	opcodesCB[0x0E] = &CPU::opNull; opcodesCB[0x0F] = &CPU::opNull;
+	opcodesCB[0x00] = &CPU::cb0x00; opcodesCB[0x01] = &CPU::cb0x01;
+	opcodesCB[0x02] = &CPU::cb0x02; opcodesCB[0x03] = &CPU::cb0x03;
+	opcodesCB[0x04] = &CPU::cb0x04; opcodesCB[0x05] = &CPU::cb0x05;
+	opcodesCB[0x06] = &CPU::opNull; opcodesCB[0x07] = &CPU::cb0x07;
+	opcodesCB[0x08] = &CPU::cb0x08; opcodesCB[0x09] = &CPU::cb0x09;
+	opcodesCB[0x0A] = &CPU::cb0x0A; opcodesCB[0x0B] = &CPU::cb0x0B;
+	opcodesCB[0x0C] = &CPU::cb0x0C; opcodesCB[0x0D] = &CPU::cb0x0D;
+	opcodesCB[0x0E] = &CPU::opNull; opcodesCB[0x0F] = &CPU::cb0x0F;
 
 	opcodesCB[0x10] = &CPU::cb0x10; opcodesCB[0x11] = &CPU::cb0x11;
 	opcodesCB[0x12] = &CPU::cb0x12; opcodesCB[0x13] = &CPU::cb0x13;
 	opcodesCB[0x14] = &CPU::cb0x14; opcodesCB[0x15] = &CPU::cb0x15;
-	opcodesCB[0x16] = &CPU::cb0x16; opcodesCB[0x17] = &CPU::opNull;
-	opcodesCB[0x18] = &CPU::opNull; opcodesCB[0x19] = &CPU::cb0x19;
-	opcodesCB[0x1A] = &CPU::cb0x1A; opcodesCB[0x1B] = &CPU::opNull;
-	opcodesCB[0x1C] = &CPU::opNull; opcodesCB[0x1D] = &CPU::opNull;
-	opcodesCB[0x1E] = &CPU::opNull; opcodesCB[0x1F] = &CPU::opNull;
+	opcodesCB[0x16] = &CPU::cb0x16; opcodesCB[0x17] = &CPU::cb0x17;
+	opcodesCB[0x18] = &CPU::cb0x18; opcodesCB[0x19] = &CPU::cb0x19;
+	opcodesCB[0x1A] = &CPU::cb0x1A; opcodesCB[0x1B] = &CPU::cb0x1B;
+	opcodesCB[0x1C] = &CPU::cb0x1C; opcodesCB[0x1D] = &CPU::cb0x1D;
+	opcodesCB[0x1E] = &CPU::opNull; opcodesCB[0x1F] = &CPU::cb0x1F;
 
-	opcodesCB[0x20] = &CPU::opNull; opcodesCB[0x21] = &CPU::opNull;
-	opcodesCB[0x22] = &CPU::opNull; opcodesCB[0x23] = &CPU::opNull;
-	opcodesCB[0x24] = &CPU::opNull; opcodesCB[0x25] = &CPU::opNull;
+	opcodesCB[0x20] = &CPU::cb0x20; opcodesCB[0x21] = &CPU::cb0x21;
+	opcodesCB[0x22] = &CPU::cb0x22; opcodesCB[0x23] = &CPU::cb0x23;
+	opcodesCB[0x24] = &CPU::cb0x24; opcodesCB[0x25] = &CPU::cb0x25;
 	opcodesCB[0x26] = &CPU::opNull; opcodesCB[0x27] = &CPU::cb0x27;
-	opcodesCB[0x28] = &CPU::opNull; opcodesCB[0x29] = &CPU::opNull;
-	opcodesCB[0x2A] = &CPU::opNull; opcodesCB[0x2B] = &CPU::opNull;
-	opcodesCB[0x2C] = &CPU::opNull; opcodesCB[0x2D] = &CPU::opNull;
-	opcodesCB[0x2E] = &CPU::opNull; opcodesCB[0x2F] = &CPU::opNull;
+	opcodesCB[0x28] = &CPU::cb0x28; opcodesCB[0x29] = &CPU::cb0x29;
+	opcodesCB[0x2A] = &CPU::cb0x2A; opcodesCB[0x2B] = &CPU::cb0x2B;
+	opcodesCB[0x2C] = &CPU::cb0x2C; opcodesCB[0x2D] = &CPU::cb0x2D;
+	opcodesCB[0x2E] = &CPU::opNull; opcodesCB[0x2F] = &CPU::cb0x2F;
 
-	opcodesCB[0x30] = &CPU::opNull; opcodesCB[0x31] = &CPU::opNull;
-	opcodesCB[0x32] = &CPU::opNull; opcodesCB[0x33] = &CPU::opNull;
-	opcodesCB[0x34] = &CPU::opNull; opcodesCB[0x35] = &CPU::opNull;
+	opcodesCB[0x30] = &CPU::cb0x30; opcodesCB[0x31] = &CPU::cb0x31;
+	opcodesCB[0x32] = &CPU::cb0x32; opcodesCB[0x33] = &CPU::cb0x33;
+	opcodesCB[0x34] = &CPU::cb0x34; opcodesCB[0x35] = &CPU::cb0x35;
 	opcodesCB[0x36] = &CPU::opNull; opcodesCB[0x37] = &CPU::cb0x37;
-	opcodesCB[0x38] = &CPU::cb0x38; opcodesCB[0x39] = &CPU::opNull;
-	opcodesCB[0x3A] = &CPU::opNull; opcodesCB[0x3B] = &CPU::opNull;
-	opcodesCB[0x3C] = &CPU::opNull; opcodesCB[0x3D] = &CPU::opNull;
+	opcodesCB[0x38] = &CPU::cb0x38; opcodesCB[0x39] = &CPU::cb0x39;
+	opcodesCB[0x3A] = &CPU::cb0x3A; opcodesCB[0x3B] = &CPU::cb0x3B;
+	opcodesCB[0x3C] = &CPU::cb0x3C; opcodesCB[0x3D] = &CPU::cb0x3D;
 	opcodesCB[0x3E] = &CPU::opNull; opcodesCB[0x3F] = &CPU::cb0x3F;
 
 	opcodesCB[0x40] = &CPU::cb0x40; opcodesCB[0x41] = &CPU::cb0x41;
@@ -620,7 +618,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0xD2] = &CPU::opNull; opcodesCB[0xD3] = &CPU::opNull;
 	opcodesCB[0xD4] = &CPU::opNull; opcodesCB[0xD5] = &CPU::opNull;
 	opcodesCB[0xD6] = &CPU::opNull; opcodesCB[0xD7] = &CPU::opNull;
-	opcodesCB[0xD8] = &CPU::opNull; opcodesCB[0xD9] = &CPU::opNull;
+	opcodesCB[0xD8] = &CPU::cb0xD8; opcodesCB[0xD9] = &CPU::opNull;
 	opcodesCB[0xDA] = &CPU::opNull; opcodesCB[0xDB] = &CPU::opNull;
 	opcodesCB[0xDC] = &CPU::opNull; opcodesCB[0xDD] = &CPU::opNull;
 	opcodesCB[0xDE] = &CPU::opNull; opcodesCB[0xDF] = &CPU::opNull;
@@ -638,7 +636,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0xF2] = &CPU::opNull; opcodesCB[0xF3] = &CPU::opNull;
 	opcodesCB[0xF4] = &CPU::opNull; opcodesCB[0xF5] = &CPU::opNull;
 	opcodesCB[0xF6] = &CPU::opNull; opcodesCB[0xF7] = &CPU::opNull;
-	opcodesCB[0xF8] = &CPU::opNull; opcodesCB[0xF9] = &CPU::opNull;
+	opcodesCB[0xF8] = &CPU::cb0xF8; opcodesCB[0xF9] = &CPU::opNull;
 	opcodesCB[0xFA] = &CPU::opNull; opcodesCB[0xFB] = &CPU::opNull;
 	opcodesCB[0xFC] = &CPU::opNull; opcodesCB[0xFD] = &CPU::opNull;
 	opcodesCB[0xFE] = &CPU::cb0xFE; opcodesCB[0xFF] = &CPU::cb0xFF;
@@ -822,8 +820,27 @@ void CPU::op0x17 () {
 	RotateLeft(AF.hi);
 	clockCycles = 4;
 }
-// DAA
+// DAA // FIXME: Maybe wrong
+void CPU::op0x27 () {
+	uint8_t oldA = AF.hi;
+	uint8_t upperNibble = (AF.hi & 0xF0) >> 4;
+	uint8_t lowerNibble = (AF.hi & 0x0F);
+	if (lowerNibble > 9 || GetH()) {
+		AF.hi += 0x6;
+	}
+	if (upperNibble > 9 || GetC()) {
+		AF.hi += 0x60;
+	}
+	SetZ(AF.hi == 0);
+	SetH(0);
+	SetC(oldA > AF.hi);
+	clockCycles = 4;
+}
 // SCF
+void CPU::op0x37 () {
+	SetN(0); SetH(0); SetC(1);
+	clockCycles = 4;
+}
 
 // LD (a16),SP
 void CPU::op0x08 () {
@@ -990,7 +1007,7 @@ void CPU::op0x3E () {
 
 // RRCA
 void CPU::op0x0F () {
-	opNull();
+	RotateRightCarry(AF.hi);
 	clockCycles = 4;
 }
 // RRA
@@ -1004,6 +1021,10 @@ void CPU::op0x2F () {
 	clockCycles = 4;
 }
 // CCF
+void CPU::op0x3F () {
+	SetN(0); SetH(0); SetC(!GetC());
+	clockCycles = 4;
+}
 
 /* 4. instructions */
 // LD B,B
@@ -1052,7 +1073,7 @@ void CPU::op0x48 () {
 	clockCycles = 4;
 }
 // LD C,C
-void CPU::op0x49 () { // Copying C to C? Is this Right?
+void CPU::op0x49 () {
 	BC.lo = BC.lo;
 	clockCycles = 4;
 }
@@ -1105,7 +1126,7 @@ void CPU::op0x52 () {
 }
 // LD D,E
 void CPU::op0x53 () {
-	DE.hi = HL.hi;
+	DE.hi = DE.lo;
 	clockCycles = 4;
 }
 // LD D,H
@@ -1197,7 +1218,7 @@ void CPU::op0x64 () {
 }
 // LD H,L
 void CPU::op0x65 () {
-	AF.lo = HL.lo;
+	HL.hi = HL.lo;
 	clockCycles = 4;
 }
 // LD H,(HL)
@@ -1324,7 +1345,7 @@ void CPU::op0x7D () {
 // LD A,(HL)
 void CPU::op0x7E () {
 	AF.hi = mmu->ReadByte(HL);
-	clockCycles = 4;
+	clockCycles = 8;
 }
 // LD A,A
 void CPU::op0x7F () {
@@ -1334,111 +1355,159 @@ void CPU::op0x7F () {
 
 /* 8. instructions */
 // ADD A,B
-void CPU::op0x80() {
+void CPU::op0x80 () {
 	AddA(BC.hi);
 	clockCycles = 4;
 }
 // ADD A,C
-void CPU::op0x81() {
+void CPU::op0x81 () {
 	AddA(BC.lo);
 	clockCycles = 4;
 }
 // ADD A,D
-void CPU::op0x82() {
+void CPU::op0x82 () {
 	AddA(DE.hi);
 	clockCycles = 4;
 }
 // ADD A,E
-void CPU::op0x83() {
+void CPU::op0x83 () {
 	AddA(DE.lo);
 	clockCycles = 4;
 }
 // ADD A,H
-void CPU::op0x84() {
+void CPU::op0x84 () {
 	AddA(HL.hi);
 	clockCycles = 4;
 }
 // ADD A,L
-void CPU::op0x85() {
+void CPU::op0x85 () {
 	AddA(HL.lo);
 	clockCycles = 4;
 }
 // ADD A,(HL)
-void CPU::op0x86() {
+void CPU::op0x86 () {
 	AddA(mmu->ReadByte(HL));
 	clockCycles = 8;
 }
 // ADD A,A
-void CPU::op0x87() {
+void CPU::op0x87 () {
 	AddA(AF.hi);
 	clockCycles = 4;
 }
 // ADC A,B
+void CPU::op0x88 () {
+	AddCarryA(BC.hi);
+	clockCycles = 4;
+}
 // ADC A,C
-void CPU::op0x89() {
+void CPU::op0x89 () {
 	AddCarryA(BC.lo);
 	clockCycles = 4;
 }
 // ADC A,D
+void CPU::op0x8A () {
+	AddCarryA(DE.hi);
+	clockCycles = 4;
+}
 // ADC A,E
+void CPU::op0x8B () {
+	AddCarryA(DE.lo);
+	clockCycles = 4;
+}
 // ADC A,H
+void CPU::op0x8C () {
+	AddCarryA(HL.hi);
+	clockCycles = 4;
+}
 // ADC A,L
+void CPU::op0x8D () {
+	AddCarryA(HL.lo);
+	clockCycles = 4;
+}
 // ADC A,(HL)
 // ADC A,A
+void CPU::op0x8F () {
+	AddCarryA(AF.hi);
+	clockCycles = 4;
+}
 
 /* 9. instructions */
 // SUB B
-void CPU::op0x90() {
+void CPU::op0x90 () {
 	SubtractA(BC.hi);
 	clockCycles = 4;
 }
 // SUB C
-void CPU::op0x91() {
+void CPU::op0x91 () {
 	SubtractA(BC.lo);
 	clockCycles = 4;
 }
 // SUB D
-void CPU::op0x92() {
+void CPU::op0x92 () {
 	SubtractA(DE.hi);
 	clockCycles = 4;
 }
 // SUB E
-void CPU::op0x93() {
+void CPU::op0x93 () {
 	SubtractA(DE.lo);
 	clockCycles = 4;
 }
 // SUB H
-void CPU::op0x94() {
+void CPU::op0x94 () {
 	SubtractA(HL.hi);
 	clockCycles = 4;
 }
 // SUB L
-void CPU::op0x95() {
+void CPU::op0x95 () {
 	SubtractA(HL.lo);
 	clockCycles = 4;
 }
 // SUB (HL)
-void CPU::op0x96() {
+void CPU::op0x96 () {
 	SubtractA(mmu->ReadByte(HL));
 	clockCycles = 8;
 }
 // SUB A
-void CPU::op0x97() {
+void CPU::op0x97 () {
 	SubtractA(AF.hi);
 	clockCycles = 4;
 }
 // SBC A,B
+void CPU::op0x98 () {
+	SubtractCarryA(AF.hi);
+	clockCycles = 4;
+}
 // SBC A,C
-void CPU::op0x99() {
+void CPU::op0x99 () {
 	SubtractCarryA(BC.lo);
 	clockCycles = 4;
 }
 // SBC A,D
+void CPU::op0x9A () {
+	SubtractCarryA(DE.hi);
+	clockCycles = 4;
+}
 // SBC A,E
+void CPU::op0x9B () {
+	SubtractCarryA(DE.lo);
+	clockCycles = 4;
+}
 // SBC A,H
+void CPU::op0x9C () {
+	SubtractCarryA(HL.hi);
+	clockCycles = 4;
+}
 // SBC A,L
+void CPU::op0x9D () {
+	SubtractCarryA(HL.lo);
+	clockCycles = 4;
+}
 // SBC A,(HL)
 // SBC A,A
+void CPU::op0x9F () {
+	SubtractCarryA(AF.hi);
+	clockCycles = 4;
+}
 
 /* A. instructions */
 // AND B
@@ -1662,25 +1731,21 @@ void CPU::op0xF0 () {
 // POP BC
 void CPU::op0xC1 () {
 	BC = PopWord();
-
 	clockCycles = 12;
 }
 // POP DE
 void CPU::op0xD1 () {
 	DE = PopWord();
-
 	clockCycles = 12;
 }
 // POP HL
 void CPU::op0xE1 () {
 	HL = PopWord();
-
 	clockCycles = 12;
 }
 // POP AF
 void CPU::op0xF1 () {
 	AF = PopWord();
-
 	clockCycles = 12;
 }
 
@@ -1976,21 +2041,63 @@ void CPU::op0xFF () {
 }
 // CB0. instructions
 // RLC B
+void CPU::cb0x00 () {
+	RotateLeftCarry(BC.hi);
+}
 // RLC C
+void CPU::cb0x01 () {
+	RotateLeftCarry(BC.lo);
+}
 // RLC D
+void CPU::cb0x02 () {
+	RotateLeftCarry(DE.hi);
+}
 // RLC E
+void CPU::cb0x03 () {
+	RotateLeftCarry(DE.lo);
+}
 // RLC H
+void CPU::cb0x04 () {
+	RotateLeftCarry(HL.hi);
+}
 // RLC L
+void CPU::cb0x05 () {
+	RotateLeftCarry(HL.lo);
+}
 // RLC (HL)
 // RLC A
+void CPU::cb0x07 () {
+	RotateLeftCarry(AF.hi);
+}
 // RRC B
+void CPU::cb0x08 () {
+	RotateRightCarry(BC.hi);
+}
 // RRC C
+void CPU::cb0x09 () {
+	RotateRightCarry(BC.lo);
+}
 // RRC D
+void CPU::cb0x0A () {
+	RotateRightCarry(DE.hi);
+}
 // RRC E
+void CPU::cb0x0B () {
+	RotateRightCarry(DE.lo);
+}
 // RRC H
+void CPU::cb0x0C () {
+	RotateRightCarry(HL.hi);
+}
 // RRC L
+void CPU::cb0x0D () {
+	RotateRightCarry(HL.lo);
+}
 // RRC (HL)
 // RRC A
+void CPU::cb0x0F () {
+	RotateRightCarry(AF.hi);
+}
 // CB1. instructions
 // RL B
 void CPU::cb0x10() {
@@ -2023,7 +2130,13 @@ void CPU::cb0x16() {
 	mmu->WriteByte(HL, value);
 }
 // RL A
+void CPU::cb0x17 () {
+	RotateLeft(AF.hi);
+}
 // RR B
+void CPU::cb0x18 () {
+	RotateRight(BC.hi);
+}
 // RR C
 void CPU::cb0x19 () {
 	RotateRight(BC.lo);
@@ -2033,37 +2146,106 @@ void CPU::cb0x1A () {
 	RotateRight(DE.hi);
 }
 // RR E
+void CPU::cb0x1B () {
+	RotateRight(DE.lo);
+}
 // RR H
+void CPU::cb0x1C () {
+	RotateRight(HL.hi);
+}
 // RR L
+void CPU::cb0x1D () {
+	RotateRight(HL.lo);
+}
 // RR (HL)
 // RR A
+void CPU::cb0x1F () {
+	RotateRight(AF.hi);
+}
 // CB2. instructions
 // SLA B
+void CPU::cb0x20 () {
+	ShiftLeft(BC.hi);
+}
 // SLA C
+void CPU::cb0x21 () {
+	ShiftLeft(BC.lo);
+}
 // SLA D
+void CPU::cb0x22 () {
+	ShiftLeft(DE.hi);
+}
 // SLA E
+void CPU::cb0x23 () {
+	ShiftLeft(DE.lo);
+}
 // SLA H
+void CPU::cb0x24 () {
+	ShiftLeft(HL.hi);
+}
 // SLA L
+void CPU::cb0x25 () {
+	ShiftLeft(HL.lo);
+}
 // SLA (HL)
 // SLA A
-void CPU::cb0x27() {
+void CPU::cb0x27 () {
 	ShiftLeft(AF.hi);
 }
 // SRA B
+void CPU::cb0x28 () {
+	ShiftLeft(BC.hi);
+}
 // SRA C
+void CPU::cb0x29 () {
+	ShiftLeft(BC.lo);
+}
 // SRA D
+void CPU::cb0x2A () {
+	ShiftLeft(DE.hi);
+}
 // SRA E
+void CPU::cb0x2B () {
+	ShiftLeft(DE.lo);
+}
 // SRA H
+void CPU::cb0x2C () {
+	ShiftLeft(HL.hi);
+}
 // SRA L
+void CPU::cb0x2D () {
+	ShiftLeft(HL.lo);
+}
 // SRA (HL)
 // SRA A
+void CPU::cb0x2F () {
+	ShiftLeft(AF.hi);
+}
 // CB3. instructions
 // SWAP B
+void CPU::cb0x30 () {
+	Swap(BC.hi);
+}
 // SWAP C
+void CPU::cb0x31 () {
+	Swap(BC.lo);
+}
 // SWAP D
+void CPU::cb0x32 () {
+	Swap(DE.hi);
+}
 // SWAP E
+void CPU::cb0x33 () {
+	Swap(DE.lo);
+}
 // SWAP H
+void CPU::cb0x34 () {
+	Swap(HL.hi);
+}
 // SWAP L
+void CPU::cb0x35 () {
+	Swap(HL.lo);
+}
 // SWAP (HL)
 // SWAP A
 void CPU::cb0x37 () {
@@ -2074,10 +2256,25 @@ void CPU::cb0x38 () {
 	ShiftRight(BC.hi);
 }
 // SRL C
+void CPU::cb0x39 () {
+	ShiftRight(BC.lo);
+}
 // SRL D
+void CPU::cb0x3A () {
+	ShiftRight(DE.hi);
+}
 // SRL E
+void CPU::cb0x3B () {
+	ShiftRight(DE.lo);
+}
 // SRL H
+void CPU::cb0x3C () {
+	ShiftRight(HL.hi);
+}
 // SRL L
+void CPU::cb0x3D () {
+	ShiftRight(HL.lo);
+}
 // SRL (HL)
 // SRL A
 void CPU::cb0x3F () {
@@ -2458,6 +2655,9 @@ void CPU::cb0xBE () {
 // SET 2,(HL)
 // SET 2,A
 // SET 3,B
+void CPU::cb0xD8 () {
+	SetBit(BC.hi, 3);
+}
 // SET 3,C
 // SET 3,D
 // SET 3,E
@@ -2492,6 +2692,9 @@ void CPU::cb0xBE () {
 // SET 6,(HL)
 // SET 6,A
 // SET 7,B
+void CPU::cb0xF8 () {
+	SetBit(BC.hi, 7);
+}
 // SET 7,C
 // SET 7,D
 // SET 7,E

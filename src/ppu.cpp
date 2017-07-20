@@ -167,6 +167,9 @@ void PPU::DrawSprites (uint8_t line) {
 		}
 
 		uint8_t usesPalette0 = (flags & 0b10000) >> 4 == 0;
+		if (positionY == 0) {
+			positionY = 1;
+		}
 		uint8_t currentSpriteLine = line % positionY;
 		uint16_t patternData = mmu->ReadByte(0x8000 + patternID * 16 + currentSpriteLine * 2);
 

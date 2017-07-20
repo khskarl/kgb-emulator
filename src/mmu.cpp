@@ -71,9 +71,7 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 		return;
 	}
 	else if (address == SB) {
-		// std::cout << "SB: " << std::hex << value << " (" << (int) value << ")\n";
-		// gameboy->SetHalt(true);
-		return;
+		// std::cout << std::hex << value;
 	}
 
 	*GetMemoryRef(address) = value;
