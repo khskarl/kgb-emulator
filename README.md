@@ -18,11 +18,11 @@ $ ./build/gameboy-emulator roms/tetris.gb
 ## TODO
 -   [x] Port to SFML
 -   [x] Tetris Title Screen
--   [ ] Input
--   [ ] MBC1
+-   [x] Input
+-   [ ] Pass Blargh's cpu_instr tests
 -   [ ] Play Tetris
--   [ ] Pass Blargh's tests
--   [ ] Pass Opus5
+-   [ ] Get Opus5 working
+-   [ ] MBC1
 -   [ ] Sound
 -   [ ] Play Metroid II
 
