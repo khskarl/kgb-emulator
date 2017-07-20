@@ -92,7 +92,7 @@ void GameBoy::StepTimers (const uint32_t cycles) {
 	if ((*div) + cycles >= 255) {
 		(*div) = 0;
 	} else {
-		(*div) = cycles;
+		(*div) += cycles;
 	}
 
 	if (IsClockEnabled() == false)

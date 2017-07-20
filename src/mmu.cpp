@@ -53,16 +53,13 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 	}
 	// Reset scanline if we try to write to it
 	else if (address == CURLINE) {
-		io[address & 0x7F] = 0;
-		return;
+		value = 0;
 	}
 	else if (address == DIV) {
-		io[address & 0x7F] = 0;
-		return;
+		value = 0;
 	}
 	else if (address == JOYPAD) {
-		io[address & 0x7F] = value | (io[address & 0x7F] & 0xCF);
-		return;
+		value = value | (io[address & 0x7F] & 0xCF);
 	}
 	else if (address == DMA) {
 		StartDmaTransfer(value * 0x100);
@@ -78,21 +75,17 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 }
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
-	if (0xFB00 == address) {
-		std::cout << std::hex << (int) value << "\n";
-		gameboy->SetHalt(true);
-	}
 	if (0x4000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address);
 		return;
 	}
 	// Reset current scanline if we try to write to it
 	else if (address == CURLINE) {
-		io[address & 0x7F] = 0;
+		value = 0;
 		return;
 	}
 	else if (address == DIV) {
-		io[address & 0x7F] = 0;
+		value = 0;
 		return;
 	}
 
