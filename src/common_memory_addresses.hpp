@@ -12,6 +12,9 @@
 /* Joypad */
 #define JOYPAD 0xFF00
 
+/* Serial */
+#define SB 0xFF01
+
 /* Timers Addresses */
 #define DIV  0xFF04
 #define TIMA 0xFF05

@@ -66,7 +66,7 @@ void CPU::EmulateCycle () {
 
 	uint8_t opcode = mmu->ReadByte(PC);
 
-	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 	// std::cout << std::hex << opcode << '\n';
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
@@ -464,13 +464,13 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xC8] = &CPU::op0xC8; opcodes[0xC9] = &CPU::op0xC9;
 	opcodes[0xCA] = &CPU::op0xCA; opcodes[0xCB] = &CPU::op0xCB;
 	opcodes[0xCC] = &CPU::op0xCC; opcodes[0xCD] = &CPU::op0xCD;
-	opcodes[0xCE] = &CPU::opNull; opcodes[0xCF] = &CPU::op0xCF;
+	opcodes[0xCE] = &CPU::op0xCE; opcodes[0xCF] = &CPU::op0xCF;
 
-	opcodes[0xD0] = &CPU::opNull; opcodes[0xD1] = &CPU::op0xD1;
+	opcodes[0xD0] = &CPU::op0xD0; opcodes[0xD1] = &CPU::op0xD1;
 	opcodes[0xD2] = &CPU::opNull; opcodes[0xD3] = &CPU::opNull;
 	opcodes[0xD4] = &CPU::op0xD4; opcodes[0xD5] = &CPU::op0xD5;
 	opcodes[0xD6] = &CPU::op0xD6; opcodes[0xD7] = &CPU::op0xD7;
-	opcodes[0xD8] = &CPU::opNull; opcodes[0xD9] = &CPU::op0xD9;
+	opcodes[0xD8] = &CPU::op0xD8; opcodes[0xD9] = &CPU::op0xD9;
 	opcodes[0xDA] = &CPU::op0xDA; opcodes[0xDB] = &CPU::opNull;
 	opcodes[0xDC] = &CPU::op0xDC; opcodes[0xDD] = &CPU::opNull;
 	opcodes[0xDE] = &CPU::op0xDE; opcodes[0xDF] = &CPU::op0xDF;
@@ -668,7 +668,7 @@ void CPU::op0x30 () {
 	uint8_t value = ReadByte();
 
 	if (GetC() == 0) {
-		PC += value;
+		PC += reinterpret_cast<int8_t&>(value);
 		clockCycles = 12;
 	}
 	else
@@ -1640,6 +1640,11 @@ void CPU::op0xC0 () {
 	clockCycles = 8;
 }
 // RET NC
+void CPU::op0xD0 () {
+	if (GetC() == 0)
+		PC = PopWord();
+	clockCycles = 8;
+}
 // LDH (a8),A
 void CPU::op0xE0 () {
 	mmu->WriteByte(0xFF00 + ReadByte(), AF.hi);
@@ -1811,6 +1816,11 @@ void CPU::op0xC8 () {
 	clockCycles = 8;
 }
 // RET C
+void CPU::op0xD8 () {
+	if (GetC() != 0)
+		PC = PopWord();
+	clockCycles = 8;
+}
 // ADD SP,r8
 // LD HL,SP+r8
 
@@ -1916,6 +1926,10 @@ void CPU::op0xCD () {
 // FD..: I don't exist
 
 // ADC A,d8
+void CPU::op0xCE () {
+	AddCarryA(ReadByte());
+	clockCycles = 8;
+}
 // SBC A,d8
 void CPU::op0xDE () {
 	SubtractCarryA(ReadByte());
