@@ -65,7 +65,7 @@ void CPU::EmulateCycle () {
 	// }
 
 	uint8_t opcode = mmu->ReadByte(PC);
-	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
 	ExecuteInstruction(opcode);
@@ -429,7 +429,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x88] = &CPU::op0x88; opcodes[0x89] = &CPU::op0x89;
 	opcodes[0x8A] = &CPU::op0x8A; opcodes[0x8B] = &CPU::op0x8B;
 	opcodes[0x8C] = &CPU::op0x8C; opcodes[0x8D] = &CPU::op0x8D;
-	opcodes[0x8E] = &CPU::opNull; opcodes[0x8F] = &CPU::op0x8F;
+	opcodes[0x8E] = &CPU::op0x8E; opcodes[0x8F] = &CPU::op0x8F;
 
 	opcodes[0x90] = &CPU::op0x90; opcodes[0x91] = &CPU::op0x91;
 	opcodes[0x92] = &CPU::op0x92; opcodes[0x93] = &CPU::op0x93;
@@ -585,7 +585,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0x98] = &CPU::opNull; opcodesCB[0x99] = &CPU::opNull;
 	opcodesCB[0x9A] = &CPU::opNull; opcodesCB[0x9B] = &CPU::opNull;
 	opcodesCB[0x9C] = &CPU::opNull; opcodesCB[0x9D] = &CPU::opNull;
-	opcodesCB[0x9E] = &CPU::opNull; opcodesCB[0x9F] = &CPU::opNull;
+	opcodesCB[0x9E] = &CPU::cb0x9E; opcodesCB[0x9F] = &CPU::opNull;
 
 	opcodesCB[0xA0] = &CPU::opNull; opcodesCB[0xA1] = &CPU::opNull;
 	opcodesCB[0xA2] = &CPU::opNull; opcodesCB[0xA3] = &CPU::opNull;
@@ -614,14 +614,14 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0xCC] = &CPU::opNull; opcodesCB[0xCD] = &CPU::opNull;
 	opcodesCB[0xCE] = &CPU::opNull; opcodesCB[0xCF] = &CPU::opNull;
 
-	opcodesCB[0xD0] = &CPU::opNull; opcodesCB[0xD1] = &CPU::opNull;
+	opcodesCB[0xD0] = &CPU::cb0xD0; opcodesCB[0xD1] = &CPU::opNull;
 	opcodesCB[0xD2] = &CPU::opNull; opcodesCB[0xD3] = &CPU::opNull;
 	opcodesCB[0xD4] = &CPU::opNull; opcodesCB[0xD5] = &CPU::opNull;
 	opcodesCB[0xD6] = &CPU::opNull; opcodesCB[0xD7] = &CPU::opNull;
 	opcodesCB[0xD8] = &CPU::cb0xD8; opcodesCB[0xD9] = &CPU::opNull;
 	opcodesCB[0xDA] = &CPU::opNull; opcodesCB[0xDB] = &CPU::opNull;
 	opcodesCB[0xDC] = &CPU::opNull; opcodesCB[0xDD] = &CPU::opNull;
-	opcodesCB[0xDE] = &CPU::opNull; opcodesCB[0xDF] = &CPU::opNull;
+	opcodesCB[0xDE] = &CPU::cb0xDE; opcodesCB[0xDF] = &CPU::opNull;
 
 	opcodesCB[0xE0] = &CPU::opNull; opcodesCB[0xE1] = &CPU::opNull;
 	opcodesCB[0xE2] = &CPU::opNull; opcodesCB[0xE3] = &CPU::opNull;
@@ -632,7 +632,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0xEC] = &CPU::opNull; opcodesCB[0xED] = &CPU::opNull;
 	opcodesCB[0xEE] = &CPU::opNull; opcodesCB[0xEF] = &CPU::opNull;
 
-	opcodesCB[0xF0] = &CPU::opNull; opcodesCB[0xF1] = &CPU::opNull;
+	opcodesCB[0xF0] = &CPU::cb0xF0; opcodesCB[0xF1] = &CPU::opNull;
 	opcodesCB[0xF2] = &CPU::opNull; opcodesCB[0xF3] = &CPU::opNull;
 	opcodesCB[0xF4] = &CPU::opNull; opcodesCB[0xF5] = &CPU::opNull;
 	opcodesCB[0xF6] = &CPU::opNull; opcodesCB[0xF7] = &CPU::opNull;
@@ -1425,6 +1425,12 @@ void CPU::op0x8D () {
 	clockCycles = 4;
 }
 // ADC A,(HL)
+void CPU::op0x8E () {
+	uint8_t value = mmu->ReadByte(HL);
+	AddCarryA(value);
+	mmu->WriteByte(HL, value);
+	clockCycles = 8;
+}
 // ADC A,A
 void CPU::op0x8F () {
 	AddCarryA(AF.hi);
@@ -2587,6 +2593,12 @@ void CPU::cb0x88 () {
 // RES 3,H
 // RES 3,L
 // RES 3,(HL)
+void CPU::cb0x9E () {
+	uint8_t target = mmu->ReadByte(HL);
+	ResetBit(target, 3);
+	mmu->WriteByte(HL, target);
+	clockCycles = 16;
+}
 // RES 3,A
 // CBA. instructions
 // RES 4,B
@@ -2647,6 +2659,9 @@ void CPU::cb0xBE () {
 // SET 1,A
 // CBD. instructions
 // SET 2,B
+void CPU::cb0xD0 () {
+	SetBit(BC.hi, 2);
+}
 // SET 2,C
 // SET 2,D
 // SET 2,E
@@ -2664,6 +2679,12 @@ void CPU::cb0xD8 () {
 // SET 3,H
 // SET 3,L
 // SET 3,(HL)
+void CPU::cb0xDE () {
+	uint8_t target = mmu->ReadByte(HL);
+	SetBit(target, 3);
+	mmu->WriteByte(HL, target);
+	clockCycles = 16;
+}
 // SET 3,A
 // CBE. instructions
 // SET 4,B
@@ -2684,6 +2705,9 @@ void CPU::cb0xD8 () {
 // SET 5,A
 // CBF. instructions
 // SET 6,B
+void CPU::cb0xF0 () {
+	SetBit(BC.hi, 6);
+}
 // SET 6,C
 // SET 6,D
 // SET 6,E
