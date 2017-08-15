@@ -2,7 +2,8 @@
 #include <iostream>
 
 #include <SFML/Graphics.hpp>
-
+// #include <SFML/Vector3.hpp>
+// #include <Vector3.hpp>
 #include "context.hpp"
 #include "../debug.hpp"
 
@@ -142,10 +143,15 @@ void Context::SetDisplayBuffer (uint8_t* const buffer) {
 //color format that SFML can understand.
 void Context::CopyDisplayBuffer (uint8_t* const buffer) {
 	for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
-		int luminosity = 255 - ((buffer[i / 4] + 1) * 64 - 1);
-		pixels[i] = luminosity;
-		pixels[i + 1] = luminosity;
-		pixels[i + 2] = luminosity;
+		sf::Vector3<uint8_t> shades[] = {
+			sf::Vector3<uint8_t>(155, 188, 15),
+			sf::Vector3<uint8_t>(139, 172, 15),
+			sf::Vector3<uint8_t>( 48,  98, 48),
+			sf::Vector3<uint8_t>( 15,  56, 15),
+		};
+		pixels[i]     = shades[buffer[i / 4]].x;
+		pixels[i + 1] = shades[buffer[i / 4]].y;
+		pixels[i + 2] = shades[buffer[i / 4]].z;
 		pixels[i + 3] = 255;
 	}
 }
