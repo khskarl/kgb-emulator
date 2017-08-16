@@ -16,15 +16,24 @@ const int defaultCycles = 69905;
 float speed = 1.0f;
 
 
+void RomInfoWindow (bool* p_open, Rom& rom) {
+	const char* name          = rom.GetName().c_str();
+	const char* size          = std::to_string(rom.GetSize()).c_str();
+	const char* num_rom_banks = std::to_string(rom.GetNumRomBanks()).c_str();
+	const char* type          = rom.GetType().c_str();
+
+	ImGui::Begin("Rom Info", p_open);
+		ImGui::Text("Name:      %s", rom.GetName().c_str());
+		ImGui::Text("Size:      %i", rom.GetSize());
+		ImGui::Text("#RomBanks: %i", rom.GetNumRomBanks());
+		ImGui::Text("Type:      %s", rom.GetType().c_str());
+	ImGui::End();
+}
+
 void run_emulator(const std::string& filepath) {
 	Rom rom(filepath);
 
-	std::cout <<
-		"[ROM DATA]" << '\n' <<
-		"Name:      " << rom.GetName() << '\n' <<
-		"Size:      " << rom.GetSize() << " B\n" <<
-		"#RomBanks: " << (int) rom.GetNumRomBanks() << '\n' <<
-		"Type:      " << rom.GetType() << '\n';
+
 	// std::cout << DisassembleRom(rom) << '\n';
 
 	GameBoy gameBoy;
@@ -55,9 +64,8 @@ void run_emulator(const std::string& filepath) {
 
 		Context::SetDebugText(Debug::GetGameboyText(gameBoy));
 
-		ImGui::Begin("Hello, world!");
-		ImGui::Button("Look at this pretty button");
-		ImGui::End();
+		static bool show_rom_info = true;
+		RomInfoWindow(&show_rom_info, rom);
 
 		Context::RenderDisplay();
 
