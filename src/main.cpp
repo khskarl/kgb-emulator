@@ -3,6 +3,8 @@
 #include <chrono>
 #include <thread>
 
+#include <imgui/imgui.h>
+
 #include "context/context.hpp"
 #include "gameboy.hpp"
 #include "disassembler.hpp"
@@ -52,6 +54,11 @@ void run_emulator(const std::string& filepath) {
 			gameBoy.StepEmulation(cyclesThisUpdate);
 
 		Context::SetDebugText(Debug::GetGameboyText(gameBoy));
+
+		ImGui::Begin("Hello, world!");
+		ImGui::Button("Look at this pretty button");
+		ImGui::End();
+
 		Context::RenderDisplay();
 
 		int elapsedTime = timer.GetTimeInMiliseconds();

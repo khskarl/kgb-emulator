@@ -2,8 +2,9 @@
 #include <iostream>
 
 #include <SFML/Graphics.hpp>
-// #include <SFML/Vector3.hpp>
-// #include <Vector3.hpp>
+#include <imgui/imgui.h>
+#include <imgui/imgui-SFML.h>
+
 #include "context.hpp"
 #include "../debug.hpp"
 
@@ -46,6 +47,8 @@ bool Context::SetupContext (const int scale = 1) {
 
 	displaySprite.setScale(scaleX, scaleY);
 
+	window.setFramerateLimit(60);
+	ImGui::SFML::Init(window);
 	return true;
 }
 
@@ -56,7 +59,10 @@ void Context::DestroyContext () {
 
 void Context::HandleEvents () {
 	sf::Event event;
+	sf::Clock deltaClock;
 	while (window.pollEvent(event)) {
+		ImGui::SFML::ProcessEvent(event);
+
 		if (event.type == sf::Event::Closed)
 			window.close();
 		else if (event.type == sf::Event::KeyPressed) {
@@ -83,6 +89,8 @@ void Context::HandleEvents () {
 			}
 		}
 	}
+
+	ImGui::SFML::Update(window, deltaClock.restart());
 
 	joypad[0] = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
 	joypad[1] = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
@@ -121,6 +129,7 @@ void Context::RenderDisplay () {
 	window.draw(displaySprite);
 	RenderDebugText();
 
+	ImGui::SFML::Render(window);
 	window.display();
 }
 

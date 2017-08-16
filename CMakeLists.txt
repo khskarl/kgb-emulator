@@ -11,7 +11,7 @@ option(USAN OFF)
 option(ENABLE_LTO OFF)
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wshadow\
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -Wshadow\
 	-Wstrict-aliasing")
 
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -Werror -fstrict-aliasing \
@@ -35,15 +35,13 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
 	if(ENABLE_LTO)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")
-		set(LINK_FLAGS "${LINK_FLAGS} -flto") 
+		set(LINK_FLAGS "${LINK_FLAGS} -flto")
 	endif()
 
 	set(CMAKE_EXE_LINKER_FLAGS "${LINK_FLAGS}")
 	set(CMAKE_SHARED_LINKER_FLAGS "${LINK_FLAGS}")
 	set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${LINK_FLAGS}")
 	set(CMAKE_STATIC_LIBRARY_LINK_CXX_FLAGS "${LINK_FLAGS}")
-
-
 # "Debug" full debug information, no optimization, asserts enabled
 elseif (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	if (${ASAN})
@@ -57,13 +55,13 @@ endif()
 
 # gbx src directory
 set(SRC_DIR "./src")
+set(3RD_DIR "./3rdparty")
 # include src directory
-include_directories("${SRC_DIR}")
+include_directories("${SRC_DIR}" "${3RD_DIR}")
 
 
 # build
-file(GLOB SRC_FILES "${SRC_DIR}/*.cpp" "${SRC_DIR}/context/*.cpp")
+file(GLOB SRC_FILES "${SRC_DIR}/*.cpp" "${SRC_DIR}/context/*.cpp" "${3RD_DIR}/imgui/*.cpp")
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
-target_link_libraries(${PROJECT_NAME} -lsfml-system -lsfml-window -lsfml-graphics)
-
+target_link_libraries(${PROJECT_NAME} -lsfml-system -lsfml-window -lsfml-graphics -lGL)
