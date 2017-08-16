@@ -43,6 +43,7 @@ union reg16_t {
 };
 
 class CPU {
+friend class Debug;
 private:
 	MMU* mmu;
 

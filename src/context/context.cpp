@@ -102,32 +102,12 @@ void Context::HandleEvents () {
 	joypad[7] = sf::Keyboard::isKeyPressed(sf::Keyboard::N);
 }
 
-void Context::RenderDebugText () {
-	debugText.setPosition(0, 0);
-	window.draw(debugText);
-
-	std::string inputDebugString =
-		"Right: "  + std::string(joypad[0] ? "1" : "0") + "\n" +
-		"Left: "   + std::string(joypad[1] ? "1" : "0") + "\n" +
-		"Up: "     + std::string(joypad[2] ? "1" : "0") + "\n" +
-		"Down: "   + std::string(joypad[3] ? "1" : "0") + "\n" +
-		"A: "      + std::string(joypad[4] ? "1" : "0") + "\n" +
-		"B: "      + std::string(joypad[5] ? "1" : "0") + "\n" +
-		"Select: " + std::string(joypad[6] ? "1" : "0") + "\n" +
-		"Start: "  + std::string(joypad[7] ? "1" : "0");
-
-	debugText.setString(inputDebugString);
-	debugText.setPosition(100, 0);
-	window.draw(debugText);
-}
-
 void Context::RenderDisplay () {
 	window.clear();
 
 	CopyDisplayBuffer(displayBuffer);
 	displayTexture.update(pixels);
 	window.draw(displaySprite);
-	RenderDebugText();
 
 	ImGui::SFML::Render(window);
 	window.display();
@@ -152,7 +132,7 @@ void Context::SetDisplayBuffer (uint8_t* const buffer) {
 //color format that SFML can understand.
 void Context::CopyDisplayBuffer (uint8_t* const buffer) {
 	for (size_t i = 0; i < 160 * 144 * 4; i += 4) {
-		sf::Vector3<uint8_t> shades[] = {
+		const sf::Vector3<uint8_t> shades[] = {
 			sf::Vector3<uint8_t>(155, 188, 15),
 			sf::Vector3<uint8_t>(139, 172, 15),
 			sf::Vector3<uint8_t>( 48,  98, 48),

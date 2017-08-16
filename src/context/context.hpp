@@ -10,7 +10,6 @@ bool SetupContext (const int scale);
 void DestroyContext ();
 void HandleEvents ();
 
-void RenderDebugText ();
 void RenderDisplay ();
 
 void SetJoypadBuffer (uint8_t* const joypadBuffer);

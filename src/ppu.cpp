@@ -14,8 +14,7 @@ void PPU::Initialize(CPU* _cpu, MMU* _mmu) {
 	cpu = _cpu;
 	mmu = _mmu;
 
-	// FeedRandomToBackground ();
-	// FeedPatternToBackground ();
+	FeedRandomToDisplay ();
 }
 
 void PPU::SetDisplayStatus () {
