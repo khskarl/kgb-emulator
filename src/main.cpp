@@ -63,11 +63,20 @@ void run_emulator(const std::string& filepath) {
 		static bool show_rom_info = true;
 		static bool show_cpu_window = true;
 		static bool show_joypad_status = true;
+		static bool show_memory_viewer = true;
+		static bool show_disassembler = true;
 		if (show_rom_info)
 			RomInfoWindow(&show_rom_info, rom);
 		if (show_cpu_window)
 			Debug::ShowCpuWindow(&show_cpu_window, &gameBoy);
-		Debug::ShowJoypadWindow(&show_joypad_status, gameBoy.GetJoypadBuffer());
+		if (show_joypad_status)
+			Debug::ShowJoypadWindow(&show_joypad_status, gameBoy.GetJoypadBuffer());
+		if (show_memory_viewer)
+			Debug::ShowMemoryWindow(&show_memory_viewer, gameBoy.GetMMU());
+		if (show_disassembler)
+			Debug::ShowDisassemblerWindow(&show_disassembler);
+
+		// ImGui::ShowTestWindow();
 		// - End -------- //
 
 		Context::RenderDisplay();
