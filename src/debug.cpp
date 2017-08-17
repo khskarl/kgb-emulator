@@ -10,6 +10,7 @@ void Debug::ShowCpuWindow (bool* p_open, GameBoy* const gameboy) {
 	//                             ImGuiInputTextFlags_CharsUppercase;
 
 	CPU* cpu = gameboy->GetCPU();
+	ImGui::SetNextWindowPos(ImVec2(50,50), ImGuiSetCond_FirstUseEver);
 	// Begin Window
 	ImGui::Begin("CPU Status", p_open);
 
@@ -53,6 +54,7 @@ void Debug::ShowJoypadWindow (bool* p_open, uint8_t joypad_buffer[8]) {
 	bool select = joypad_buffer[6];
 	bool start  = joypad_buffer[7];
 
+	ImGui::SetNextWindowPos(ImVec2(400, 50), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Joypad Status", p_open);
 	ImGui::Checkbox("Up", &up); ImGui::SameLine(0);
 	ImGui::Checkbox("Down", &down); ImGui::SameLine(0);

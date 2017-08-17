@@ -16,6 +16,7 @@ const int defaultCycles = 69905;
 float speed = 1.0f;
 
 void RomInfoWindow (bool* p_open, Rom& rom) {
+	ImGui::SetNextWindowPos(ImVec2(50, 400), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Rom Info", p_open);
 		ImGui::Text("Name:      %s", rom.GetName().c_str());
 		ImGui::Text("Size:      %i", rom.GetSize());
