@@ -66,6 +66,18 @@ void Debug::ShowJoypadWindow (bool* p_open, uint8_t joypad_buffer[8]) {
 
 }
 
+void Debug::ShowMemoryWindow (bool* p_open, MMU* const mmu) {
+	ImGui::Begin("Memory Viewer", p_open);
+
+	ImGui::End();
+}
+
+void Debug::ShowDisassemblerWindow (bool* p_open) {
+	ImGui::Begin("Disassembler", p_open);
+
+	ImGui::End();
+}
+
 // std::string Debug::GetGameboyText (GameBoy& gameboy) {
 // 	const CPU& cpu = *gameboy.GetCPU();
 // 	MMU* mmu = gameboy.GetMMU();
