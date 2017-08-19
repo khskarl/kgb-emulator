@@ -59,11 +59,23 @@ void run_emulator(const std::string& filepath) {
 		// -------------- //
 		// Begin Gui code //
 		// -------------- //
-		static bool show_rom_info = true;
-		static bool show_cpu_window = true;
-		static bool show_joypad_status = true;
-		static bool show_memory_viewer = true;
-		static bool show_disassembler = true;
+		static bool show_rom_info      = false;
+		static bool show_cpu_window    = true;
+		static bool show_joypad_status = false;
+		static bool show_memory_viewer = false;
+		static bool show_disassembler  = true;
+
+		ImGui::BeginMainMenuBar();
+		if (ImGui::BeginMenu("Debug")){
+			ImGui::MenuItem("CPU",          "c", &show_cpu_window);
+			ImGui::MenuItem("Disassembler", "d", &show_disassembler);
+			ImGui::MenuItem("Joypad",       "h", &show_joypad_status);
+			ImGui::MenuItem("Memory",       "m", &show_memory_viewer);
+			ImGui::MenuItem("Rom Info",     "r", &show_rom_info);
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+
 		if (show_rom_info)
 			RomInfoWindow(&show_rom_info, rom);
 		if (show_cpu_window)
