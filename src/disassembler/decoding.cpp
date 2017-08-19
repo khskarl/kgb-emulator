@@ -5,7 +5,7 @@
 
 #include <imgui/imgui.h>
 
-#include "disassembler.hpp"
+#include "decoding.hpp"
 /*
 	Reference:
 	http://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html

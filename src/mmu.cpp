@@ -24,7 +24,7 @@ void MMU::Initialize (GameBoy* const argGameboy) {
 
 	GetMemoryRef(JOYPAD)[0]  = 0xFF;
 	GetMemoryRef(JOYPAD)[1]  = 0xFF;
-	*GetMemoryRef(LCDCTRL)   = 0x91;
+	GetMemoryRef(LCDCTRL)[0] = 0x91;
 }
 
 uint8_t MMU::ReadByte (uint16_t address) {
@@ -93,12 +93,10 @@ void MMU::WriteBios (const uint8_t* buffer) {
 	std::memcpy(m_bios, buffer, 0x100);
 }
 
-// TODO: Refactor it to "WriteRom"
-void MMU::WriteBufferToRom (const uint8_t* buffer, size_t bufferSize) {
+void MMU::WriteRom (const uint8_t* buffer, size_t bufferSize) {
 	assert(buffer != nullptr);
 	assert(bufferSize > 0 && bufferSize <= 0x8001);
 	std::memcpy(m_memory, buffer, bufferSize);
-	// std::memcpy(romBanks[0], buffer + 0x4000, 0x4000);
 }
 
 uint8_t* MMU::GetMemoryRef (uint16_t address) {
@@ -120,7 +118,7 @@ void MMU::StartDmaTransfer (uint16_t startingAddress) {
 }
 
 void MMU::HandleRomBankSwitch(uint16_t address) {
-	assert("<HandleRomBankSwitch> Unimplemented bank switch!" && 0);
+	assert("Unimplemented bank switch!" && __FILE__ && __LINE__ && 0);
 }
 
 void MMU::DeactivateBios () {

@@ -37,8 +37,8 @@ public:
 	uint8_t  ReadClockFrequency ();
 
 	/* Write memory access */
-	void WriteBios        (const uint8_t* buffer);
-	void WriteBufferToRom (const uint8_t* buffer, size_t bufferSize);
+	void WriteBios (const uint8_t* buffer);
+	void WriteRom  (const uint8_t* buffer, size_t bufferSize);
 
 	/* Memory References */
 	uint8_t* GetMemoryRef (uint16_t address);

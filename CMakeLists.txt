@@ -61,7 +61,7 @@ include_directories("${SRC_DIR}" "${3RD_DIR}")
 
 
 # build
-file(GLOB SRC_FILES "${SRC_DIR}/*.cpp" "${SRC_DIR}/context/*.cpp" "${3RD_DIR}/imgui/*.cpp")
+file(GLOB SRC_FILES "${SRC_DIR}/*.cpp" "${SRC_DIR}/disassembler/*.cpp" "${SRC_DIR}/context/*.cpp" "${3RD_DIR}/imgui/*.cpp")
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 target_link_libraries(${PROJECT_NAME} -lsfml-system -lsfml-window -lsfml-graphics -lGL)

@@ -4,7 +4,7 @@
 #include "mmu.hpp"
 
 #include "debug.hpp"
-#include "disassembler.hpp"
+#include "disassembler/decoding.hpp"
 
 CPU::CPU () {}
 CPU::~CPU () {}

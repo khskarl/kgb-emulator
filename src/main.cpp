@@ -7,7 +7,7 @@
 
 #include "context/context.hpp"
 #include "gameboy.hpp"
-#include "disassembler.hpp"
+#include "disassembler/decoding.hpp"
 #include "rom.hpp"
 #include "timer.hpp"
 #include "debug.hpp"
