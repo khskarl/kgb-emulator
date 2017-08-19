@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <vector>
+
+#include <imgui/imgui.h>
 
 #include "disassembler.hpp"
 /*
@@ -49,21 +52,21 @@ std::string Format (const char* mnemonic, const char* args, uint8_t op, uint8_t 
 	return std::string(buffer);
 }
 
-std::string DisassembleRom(const Rom& rom) {
+std::vector<std::string> DisassembleRom(const Rom& rom) {
 	const uint8_t* code = rom.GetData();
 
 	char buffer[64];
 	pc = 0x100;
-	std::string disassembledRom = "";
+	std::vector<std::string> disassembly = {};
 	while (pc < rom.GetSize()) {
 		sprintf(buffer, "%04x ", pc);
 		std::string address(buffer);
 
 		std::string line = address + DisassembleOpcode(code + pc);
-		disassembledRom += line + '\n';
+		disassembly.push_back(line);
 	}
 
-	return disassembledRom;
+	return disassembly;
 }
 
 std::string DisassembleCB(const uint8_t* code);
@@ -71,7 +74,7 @@ std::string DisassembleCB(const uint8_t* code);
 std::string DisassembleOpcode(const uint8_t* code) {
 	switch (code[0]) {
 		case 0x00: return Format("NOP",  "",  code[0]); break;
-		case 0x10: return Format("STOP",	 "0", code[0]); break;
+		case 0x10: return Format("STOP", "0", code[0]); break;
 		case 0x20: return Format("JR", "NZ,$%02x", code[0], code[1]); break;
 		case 0x30: return Format("JR", "NC,$%02x", code[0], code[1]); break;
 

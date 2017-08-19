@@ -29,7 +29,7 @@ void run_emulator(const std::string& filepath) {
 	Rom rom(filepath);
 
 
-	// std::cout << DisassembleRom(rom) << '\n';
+	auto disassembly = DisassembleRom(rom);
 
 	GameBoy gameBoy;
 	gameBoy.Initialize();
@@ -74,7 +74,7 @@ void run_emulator(const std::string& filepath) {
 		if (show_memory_viewer)
 			Debug::ShowMemoryWindow(&show_memory_viewer, gameBoy.GetMMU());
 		if (show_disassembler)
-			Debug::ShowDisassemblerWindow(&show_disassembler);
+			Debug::ShowDisassemblerWindow(&show_disassembler, disassembly);
 
 		// ImGui::ShowTestWindow();
 		// - End -------- //
