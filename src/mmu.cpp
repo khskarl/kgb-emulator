@@ -11,7 +11,7 @@ MMU::MMU () {}
 MMU::~MMU () {}
 
 void MMU::Initialize (GameBoy* const argGameboy) {
-	gameboy = argGameboy;
+	p_gameboy = argGameboy;
 
 	WriteByte(LCDCTRL, 0x91);
 
@@ -19,14 +19,8 @@ void MMU::Initialize (GameBoy* const argGameboy) {
 		std::memset(array, 0, sizeof(array) / sizeof(array[0]));
 	};
 
-	memzero(bios);
-	memzero(rom);
-	memzero(eram);
-	memzero(wram);
-	memzero(zram);
-	memzero(vram);
-	memzero(oam);
-	memzero(io);
+	memzero(m_memory);
+	memzero(m_bios);
 
 	GetMemoryRef(JOYPAD)[0]  = 0xFF;
 	GetMemoryRef(JOYPAD)[1]  = 0xFF;
@@ -59,7 +53,7 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 		value = 0;
 	}
 	else if (address == JOYPAD) {
-		value = value | (io[address & 0x7F] & 0xCF);
+		value = value | (m_memory[address] & 0xCF);
 	}
 	else if (address == DMA) {
 		StartDmaTransfer(value * 0x100);
@@ -96,96 +90,27 @@ void MMU::WriteWord (uint16_t address, uint16_t value) {
 
 void MMU::WriteBios (const uint8_t* buffer) {
 	assert(buffer != nullptr);
-	std::memcpy(bios, buffer, 0x100);
+	std::memcpy(m_bios, buffer, 0x100);
 }
 
 // TODO: Refactor it to "WriteRom"
 void MMU::WriteBufferToRom (const uint8_t* buffer, size_t bufferSize) {
 	assert(buffer != nullptr);
-	assert(bufferSize > 0);
-	std::memcpy(rom, buffer, 0x4000);
-	std::memcpy(romBanks[0], buffer + 0x4000, 0x4000);
-}
-
-uint8_t* MMU::GetRomRef (uint16_t address) {
-	return &rom[address];
-}
-
-uint8_t* MMU::GetIORef (uint16_t address) {
-	return &io[address & 0x7F];
+	assert(bufferSize > 0 && bufferSize <= 0x8001);
+	std::memcpy(m_memory, buffer, bufferSize);
+	// std::memcpy(romBanks[0], buffer + 0x4000, 0x4000);
 }
 
 uint8_t* MMU::GetMemoryRef (uint16_t address) {
-
-	switch (address & 0xF000) {
-		/* BIOS / ROM0 */
-		case 0x0000:
-		if (isInBios && address <= 0xFF)
-			return &bios[address];
-		else
-			return &rom[address];
-		break;
-
-		/* ROM0 */
-		case 0x1000:
-		case 0x2000:
-		case 0x3000:
-		return &rom[address];
-		break;
-
-		/* ROM1 (unbanked) (16k) */
-		case 0x4000:
-		case 0x5000:
-		case 0x6000:
-		case 0x7000:
-		return &romBanks[0][address & 0x3FFF];
-		break;
-
-		/* VRAM (8k) */
-		case 0x8000:
-		case 0x9000:
-		return &vram[address & 0x1FFF];
-
-		/* External RAM (8k) */
-		case 0xA000:
-		case 0xB000:
-		return &eram[address & 0x1FFF];
-
-		/* Working RAM (8k) */
-		case 0xC000:
-		case 0xD000:
-		return &wram[address & 0x1FFF];
-
-		/* Working RAM shadow */
-		case 0xE000:
-		return &wram[address & 0x1FFF];
-
-		/* Working RAM shadow, I/O, Zero-page RAM */
-		case 0xF000:
-		{
-			uint16_t lo = address & 0x0F00;
-			if (lo <= 0xD00) {
-				return &wram[address & 0x1FFF];
-			}
-			else if (lo == 0xE00) {
-				if (address < 0xFEA0)
-					return &oam[address & 0xFF];
-				else
-					return &unused[address & 0x7F];
-			}
-			else if (lo == 0xF00) {
-				if (address >= 0xFF80)
-					return &zram[address & 0x7F];
-				else
-					return &io[address & 0x7F];
-			}
-		}
-		default:
-			assert("ReadByte is trying to access an invalid address" && 0);
-		return 0;
-		break;
-
-	}
+	/* Handle BIOS / ROM0 access below 0x100 */
+	if (m_isInBios && address < 0x100)
+		return &m_bios[address];
+	else if (address < 0x100)
+		return &m_memory[address];
+	else if (address >= 0x100)
+		return &m_memory[address];
+	else
+		assert("ReadByte is trying to access an invalid address" && 0);
 }
 
 void MMU::StartDmaTransfer (uint16_t startingAddress) {
@@ -196,4 +121,8 @@ void MMU::StartDmaTransfer (uint16_t startingAddress) {
 
 void MMU::HandleRomBankSwitch(uint16_t address) {
 	assert("<HandleRomBankSwitch> Unimplemented bank switch!" && 0);
+}
+
+void MMU::DeactivateBios () {
+	m_isInBios = false;
 }

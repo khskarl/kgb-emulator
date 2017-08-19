@@ -11,31 +11,21 @@ class CPU;
 
 class MMU {
 private:
-	GameBoy* gameboy = nullptr;
+	GameBoy* p_gameboy = nullptr;
 
-	uint8_t bios[0x100];
-	uint8_t rom[0x4000];
-	uint8_t romBanks[96][0x4000];
-	uint8_t vram[0x2000];
-	uint8_t eram[0x2000];
-	uint8_t wram[0x1000];
-	uint8_t zram[0x1000];
-
-	uint8_t oam[0x2000];
-
-	uint8_t io[0x80];
-
-	uint8_t unused[0x60];
+	uint8_t m_bios[0x100];
+	uint8_t m_memory[0xFFFF + 1]; // 64k
 
 	void HandleRomBankSwitch (uint16_t address);
 
 public:
-	bool isInBios = true;
+	bool m_isInBios = true;
 
 	MMU ();
 	~MMU ();
 
-	void Initialize(GameBoy* const gameboy);
+	void Initialize (GameBoy* const gameboy);
+	void DeactivateBios ();
 
 	/* General memory access functions */
 	uint8_t  ReadByte  (uint16_t address);
@@ -51,8 +41,6 @@ public:
 	void WriteBufferToRom (const uint8_t* buffer, size_t bufferSize);
 
 	/* Memory References */
-	uint8_t* GetRomRef    (uint16_t address);
-	uint8_t* GetIORef     (uint16_t address);
 	uint8_t* GetMemoryRef (uint16_t address);
 
 	/* Others */

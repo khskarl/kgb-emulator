@@ -40,7 +40,7 @@ void CPU::Initialize (MMU* _mmu, bool doBootrom) {
 
 void CPU::EmulateCycle () {
 	if (PC == 0x100) {
-		mmu->isInBios = false;
+		mmu->DeactivateBios();
 		areInterruptsEnabled = true;
 	}
 

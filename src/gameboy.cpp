@@ -14,6 +14,7 @@ void GameBoy::Initialize () {
 }
 
 void GameBoy::LoadRom (Rom rom) {
+	std::cout << rom.GetSize() << "\n";
 	mmu.WriteBufferToRom(rom.GetData(), rom.GetSize());
 }
 
