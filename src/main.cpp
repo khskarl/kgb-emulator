@@ -28,7 +28,6 @@ void RomInfoWindow (bool* p_open, Rom& rom) {
 void run_emulator(const std::string& filepath) {
 	Rom rom(filepath);
 
-
 	auto disassembly = DisassembleRom(rom);
 
 	GameBoy gameBoy;

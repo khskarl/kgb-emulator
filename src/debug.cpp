@@ -86,11 +86,13 @@ bool ListBox(const char* label, int* currIndex, std::vector<std::string>& values
 {
 	if (values.empty()) { return false; }
 	return ImGui::ListBox(label, currIndex, StringVectorGetter,
-		static_cast<void*>(&values), values.size());
+		static_cast<void*>(&values), values.size(), 20);
 }
 
 void Debug::ShowDisassemblerWindow (bool* p_open, std::vector<std::string>& disassembly) {
 	ImGui::SetNextWindowPos(ImVec2(120, 200), ImGuiSetCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(250, 250), ImGuiSetCond_FirstUseEver);
+
 	ImGui::Begin("Disassembler", p_open);
 	ImGui::PushItemWidth(-1);
 	ImGui::Text("Lists:");
