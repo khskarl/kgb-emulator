@@ -287,6 +287,7 @@ void CPU::AddA (uint8_t value) {
 	Add(AF.hi, value);
 }
 
+// FIXME
 void CPU::Add (uint8_t& target, uint8_t value) {
 	uint8_t oldValue = target;
 	target += value;
@@ -830,7 +831,7 @@ void CPU::op0x17 () {
 	RotateLeft(AF.hi);
 	clockCycles = 4;
 }
-// DAA // FIXME: Maybe wrong
+// DAA // FIXME Tetris Type B score not working
 void CPU::op0x27 () {
 	uint8_t oldA = AF.hi;
 	uint8_t upperNibble = (AF.hi & 0xF0) >> 4;
