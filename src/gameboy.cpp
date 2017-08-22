@@ -89,10 +89,11 @@ void GameBoy::StepInstruction () {
 
 void GameBoy::StepTimers (const uint32_t cycles) {
 	uint8_t* div = mmu.GetMemoryRef(DIV);
-	if ((*div) + cycles >= 255) {
+	uint8_t increment = cycles / 16;
+	if ((*div) + increment > 255) {
 		(*div) = 0;
 	} else {
-		(*div) += cycles;
+		(*div) += increment;
 	}
 
 	if (IsClockEnabled() == false)

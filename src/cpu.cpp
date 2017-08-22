@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdio.h>
 
 #include "cpu.hpp"
 #include "mmu.hpp"
@@ -60,12 +61,14 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 	//
-	if (PC == 0xC32C) {
-		isHalted = true;
+	if (PC < 0xC360 || PC > 0xC36C)
+	printf("PC: %04x AF: %04x BC: %04x DE: %04x HL: %04x\n", PC, AF.word, BC.word, DE.word, HL.word);
+	if (PC == 0xC7D2 || PC == 0xc06a) {
+		// isHalted = true;
 	}
 
 	uint8_t opcode = mmu->ReadByte(PC);
-	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
 	ExecuteInstruction(opcode);
@@ -230,6 +233,14 @@ void CPU::ShiftRight (uint8_t& value) {
 	SetZ(value == 0);
 	SetN(0), SetH(0);
 	SetC(oldBit7);
+}
+
+void CPU::ShiftRightL (uint8_t& value) {
+	uint8_t oldBit0 = (0x1 & value);
+	value = (value >> 1);
+	SetZ(value == 0);
+	SetN(0), SetH(0);
+	SetC(oldBit0);
 }
 
 void CPU::Decrement (uint8_t& value) {
@@ -1996,12 +2007,12 @@ void CPU::op0xCD () {
 // ED..: I don't exist
 // FD..: I don't exist
 
-// ADC A,d8
+// ADC A,d8 FIXME
 void CPU::op0xCE () {
 	AddCarryA(ReadByte());
 	clockCycles = 8;
 }
-// SBC A,d8
+// SBC A,d8 FIXME
 void CPU::op0xDE () {
 	SubtractCarryA(ReadByte());
 	clockCycles = 8;
@@ -2259,32 +2270,32 @@ void CPU::cb0x37 () {
 }
 // SRL B
 void CPU::cb0x38 () {
-	ShiftRight(BC.hi);
+	ShiftRightL(BC.hi);
 }
 // SRL C
 void CPU::cb0x39 () {
-	ShiftRight(BC.lo);
+	ShiftRightL(BC.lo);
 }
 // SRL D
 void CPU::cb0x3A () {
-	ShiftRight(DE.hi);
+	ShiftRightL(DE.hi);
 }
 // SRL E
 void CPU::cb0x3B () {
-	ShiftRight(DE.lo);
+	ShiftRightL(DE.lo);
 }
 // SRL H
 void CPU::cb0x3C () {
-	ShiftRight(HL.hi);
+	ShiftRightL(HL.hi);
 }
 // SRL L
 void CPU::cb0x3D () {
-	ShiftRight(HL.lo);
+	ShiftRightL(HL.lo);
 }
 // SRL (HL)
 // SRL A
 void CPU::cb0x3F () {
-	ShiftRight(AF.hi);
+	ShiftRightL(AF.hi);
 }
 // CB4.
 // BIT 0,B

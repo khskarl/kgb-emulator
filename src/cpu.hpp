@@ -100,7 +100,8 @@ private:
 	void RotateRight      (uint8_t& value); // RR
 	void RotateRightCarry (uint8_t& value); // RRC
 	void ShiftLeft   (uint8_t& value); // SLA
-	void ShiftRight  (uint8_t& value); // SRL
+	void ShiftRight  (uint8_t& value); //
+	void ShiftRightL (uint8_t& value); // SRL
 	void Decrement (uint8_t&  value); // DEC
 	void Decrement (uint16_t& value); // DEC
 	void Decrement (reg16_t& value); // DEC

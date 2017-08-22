@@ -12,7 +12,7 @@
 #include "timer.hpp"
 #include "debug.hpp"
 
-const int defaultCycles = 69905;
+const int defaultCyclesPerFrame = 69905;
 float speed = 1.0f;
 
 void RomInfoWindow (bool* p_open, Rom& rom) {
@@ -50,11 +50,11 @@ void run_emulator(const std::string& filepath) {
 			gameBoy.ToggleHalt();
 
 		speed = Context::GetSpeedInput();
-		int cyclesThisUpdate = defaultCycles * speed;
+		const int cyclesThisFrame = defaultCyclesPerFrame * speed;
 		if (gameBoy.GetHalt() && Context::ShouldStep() == true)
 			gameBoy.StepInstruction();
 		else if (gameBoy.GetHalt() == false && Context::ShouldStep() == false)
-			gameBoy.StepEmulation(cyclesThisUpdate);
+			gameBoy.StepEmulation(cyclesThisFrame);
 
 		// -------------- //
 		// Begin Gui code //
@@ -98,7 +98,7 @@ void run_emulator(const std::string& filepath) {
 		elapsedTime = timer.GetTimeInMiliseconds();
 
 		Context::SetTitle("KGB Emulator | " +
-		                  std::to_string(cyclesThisUpdate) + " Hz | " +
+		                  std::to_string(cyclesThisFrame) + " Hz | " +
 		                  std::to_string(elapsedTime) + " ms");
 	}
 

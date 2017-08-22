@@ -76,11 +76,9 @@ void MMU::WriteWord (uint16_t address, uint16_t value) {
 	// Reset current scanline if we try to write to it
 	else if (address == CURLINE) {
 		value = 0;
-		return;
 	}
 	else if (address == DIV) {
 		value = 0;
-		return;
 	}
 
 	uint8_t* memoryRef = GetMemoryRef(address);
