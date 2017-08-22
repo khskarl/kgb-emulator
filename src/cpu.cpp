@@ -831,20 +831,34 @@ void CPU::op0x17 () {
 	RotateLeft(AF.hi);
 	clockCycles = 4;
 }
-// DAA // FIXME Tetris Type B score not working
+// DAA
 void CPU::op0x27 () {
-	uint8_t oldA = AF.hi;
-	uint8_t upperNibble = (AF.hi & 0xF0) >> 4;
-	uint8_t lowerNibble = (AF.hi & 0x0F);
-	if (lowerNibble > 9 || GetH()) {
-		AF.hi += 0x6;
+
+	uint16_t rawValue = AF.hi;
+	if (GetN()) {
+		if (GetH()) {
+			rawValue = (rawValue - 0x06) & 0xFF;
+		}
+		if (GetC()) {
+			rawValue -= 0x60;
+		}
 	}
-	if (upperNibble > 9 || GetC()) {
-		AF.hi += 0x60;
+	else {
+		uint8_t lowerNibble = (AF.hi & 0x0F);
+
+		if (lowerNibble > 9 || GetH()) {
+			rawValue += 0x06;
+		}
+		if (rawValue > 0x9f || GetC()) {
+			rawValue += 0x60;
+		}
 	}
+
+	AF.hi = static_cast<uint8_t>(rawValue);
+
 	SetZ(AF.hi == 0);
 	SetH(0);
-	SetC(oldA > AF.hi);
+	SetC(rawValue > 0xFF);
 	clockCycles = 4;
 }
 // SCF

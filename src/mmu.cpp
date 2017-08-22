@@ -65,11 +65,11 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 		// std::cout << std::hex << value;
 	}
 
-	if (address == 0xffe7 || address == 0xff9e) {
-		std::cout << std::hex << address << " : " << (int)*GetMemoryRef(address) << "\n";
-		std::cout << std::hex << address << "n: " << (int)value << "\n";
-		p_gameboy->SetHalt(true);
-	}
+	// if (address == 0xffe7 || address == 0xff9e) {
+	// 	std::cout << std::hex << address << " : " << (int)*GetMemoryRef(address) << "\n";
+	// 	std::cout << std::hex << address << "n: " << (int)value << "\n";
+	// 	p_gameboy->SetHalt(true);
+	// }
 
 	*GetMemoryRef(address) = value;
 }
