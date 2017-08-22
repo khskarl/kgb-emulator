@@ -298,12 +298,11 @@ void CPU::Add (uint8_t& target, uint8_t value) {
 }
 
 void CPU::Add (uint16_t& target, uint16_t value) {
-	uint16_t oldValue = target;
+	uint16_t prev_value = target;
 	target += value;
-	SetZ(target == 0);
 	SetN(0);
-	SetH((oldValue & 0xF) + (value & 0xF) > 0xF);
-	SetC(oldValue + value > 0xFF);
+	SetH((prev_value & 0xFFF) + (value & 0xFFF) > 0xFFF);
+	SetC(prev_value + value > 0xFFFF);
 }
 
 void CPU::SubtractCarryA (uint8_t value) {
@@ -902,17 +901,17 @@ void CPU::op0x38 () {
 		clockCycles = 8;
 }
 
-// ADD HL,BC
+// ADD HL,BC FIXME
 void CPU::op0x09 () {
 	Add(HL.word, BC);
 	clockCycles = 8;
 }
-// ADD HL,DE
+// ADD HL,DE FIXME
 void CPU::op0x19 () {
 	Add(HL.word, DE);
 	clockCycles = 8;
 }
-// ADD HL,HL
+// ADD HL,HL FIXME
 void CPU::op0x29 () {
 	Add(HL.word, HL);
 	clockCycles = 8;
