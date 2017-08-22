@@ -60,9 +60,9 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 	//
-	// if (PC == 0x528 || PC == 0xC0B0) {
-	// 	isHalted = true;
-	// }
+	if (PC == 0xC32C) {
+		isHalted = true;
+	}
 
 	uint8_t opcode = mmu->ReadByte(PC);
 	std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
@@ -203,7 +203,7 @@ void CPU::RotateLeftCarry (uint8_t& value) {
 }
 void CPU::RotateRight (uint8_t& value) {
 	uint8_t oldBit0 = (value & 1);
-	value = (value >> 1) | (GetC() << 6);
+	value = (value >> 1) | (GetC() << 7);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
 	SetC(oldBit0);
@@ -314,7 +314,7 @@ void CPU::Subtract (uint8_t& target, uint8_t value) {
 void CPU::CompareA (uint8_t value) {
 	SetZ(AF.hi == value);
 	SetN(1);
-	SetH((AF.hi & 0xF) < (value & 0xF));
+	SetH((AF.hi & 0x0F) < (value & 0x0F));
 	SetC(AF.hi < value);
 }
 
@@ -646,11 +646,11 @@ void CPU::InitializeOpcodeTable () {
 
 // NOP
 void CPU::op0x00 () {
-	// isHalted = true;
 	clockCycles = 4;
 }
 // STOP 0
 void CPU::op0x10 () {
+	isHalted = true;
 	clockCycles = 4;
 }
 // JR NZ,r8
@@ -790,7 +790,6 @@ void CPU::op0x35 () {
 // LD B,d8
 void CPU::op0x06 () {
 	BC.hi = ReadByte();
-
 	clockCycles = 8;
 }
 // LD D,d8
@@ -1758,19 +1757,20 @@ void CPU::op0xF1 () {
 // JP NZ,a16
 void CPU::op0xC2 () {
 	uint16_t value = ReadWord();
-	if (GetZ() == 0)
+	if (GetZ() == 0) {
 		PC = value;
+	}
 	clockCycles = 12;
 }
 // JP NC,a16
 // LD (C),A
 void CPU::op0xE2 () {
-	mmu->WriteByte(BC.lo + 0xFF00, AF.hi);
+	mmu->WriteByte(0xFF00 + BC.lo, AF.hi);
 	clockCycles = 8;
 }
 // LD A,(C)
 void CPU::op0xF2 () {
-	AF.hi = mmu->ReadByte(BC.lo + 0xFF00);
+	AF.hi = mmu->ReadByte(0xFF00 + BC.lo);
 	clockCycles = 8;
 }
 
