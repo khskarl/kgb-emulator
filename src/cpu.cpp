@@ -205,11 +205,11 @@ void CPU::RotateLeft (uint8_t& value) {
 	SetC(oldBit7);
 }
 void CPU::RotateLeftCarry (uint8_t& value) {
-	const uint8_t oldBit7 = (value >> 7);
-	value = (value << 1);
+	const uint8_t prev_bit7 = (value >> 7);
+	value = (value << 1) | prev_bit7;
 	SetZ(value == 0);
 	SetN(0), SetH(0);
-	SetC(oldBit7);
+	SetC(prev_bit7);
 }
 void CPU::RotateRight (uint8_t& value) {
 	const uint8_t prev_bit0 = (value & 1);
@@ -227,7 +227,7 @@ void CPU::RotateRightA () {
 }
 void CPU::RotateRightCarry (uint8_t& value) {
 	uint8_t prev_bit0 = (value & 1);
-	value = (value >> 1);
+	value = (value >> 1) | (prev_bit0 << 7);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
 	SetC(prev_bit0);
@@ -333,7 +333,7 @@ void CPU::SubtractCarryA (uint8_t value) {
 	AF.hi = raw_result & 0xFF;
 	SetZ(AF.hi == 0);
 	SetN(1);
-	SetH((value & 0x0F) + GetC() > (prev_value & 0x0F) );
+	SetH((value & 0x0F) + GetC() > (prev_value & 0x0F));
 	SetC(value + GetC() > prev_value);
 }
 
@@ -850,12 +850,13 @@ void CPU::op0x36 () {
 // RLCA
 void CPU::op0x07 () {
 	RotateLeftCarry(AF.hi);
+	SetZ(0);
 	clockCycles = 4;
 }
 // RLA
-// FIXME: Maybe RLA isn't the same as RL A, check Flags on pastraiser
 void CPU::op0x17 () {
 	RotateLeft(AF.hi);
+	SetZ(0);
 	clockCycles = 4;
 }
 // DAA
@@ -1053,11 +1054,13 @@ void CPU::op0x3E () {
 // RRCA
 void CPU::op0x0F () {
 	RotateRightCarry(AF.hi);
+	SetZ(0);
 	clockCycles = 4;
 }
 // RRA
 void CPU::op0x1F () {
 	RotateRightA();
+	SetZ(0);
 	clockCycles = 4;
 }
 // CPL
@@ -1526,7 +1529,7 @@ void CPU::op0x97 () {
 }
 // SBC A,B
 void CPU::op0x98 () {
-	SubtractCarryA(AF.hi);
+	SubtractCarryA(BC.hi);
 	clockCycles = 4;
 }
 // SBC A,C
