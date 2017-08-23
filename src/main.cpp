@@ -7,7 +7,7 @@
 
 #include "context/context.hpp"
 #include "gameboy.hpp"
-#include "disassembler/decoding.hpp"
+#include "disassembler/disassembler.hpp"
 #include "rom.hpp"
 #include "timer.hpp"
 #include "debug.hpp"
@@ -28,11 +28,11 @@ void RomInfoWindow (bool* p_open, Rom& rom) {
 void run_emulator(const std::string& filepath) {
 	Rom rom(filepath);
 
-	auto disassembly = DisassembleRom(rom);
-
 	GameBoy gameBoy;
 	gameBoy.Initialize();
 	gameBoy.LoadRom(rom);
+
+	Disassembler disassembler(&gameBoy);
 
 	Context::SetupContext(4);
 	Context::SetTitle("KGB Emulator");
@@ -85,7 +85,7 @@ void run_emulator(const std::string& filepath) {
 		if (show_memory_viewer)
 			Debug::ShowMemoryWindow(&show_memory_viewer, gameBoy.GetMMU());
 		if (show_disassembler)
-			Debug::ShowDisassemblerWindow(&show_disassembler, disassembly);
+			disassembler.ShowDisassemblerWindow(&show_disassembler);
 
 		// ImGui::ShowTestWindow();
 		// - End -------- //

@@ -36,7 +36,6 @@ void Debug::ShowCpuWindow (bool* p_open, GameBoy* const gameboy) {
 	cpu->SetH(H);
 	cpu->SetC(C);
 
-
 	ImGui::Separator();
 	static bool show_cpu_editor = false;
 	ImGui::Button("Edit");
@@ -73,55 +72,3 @@ void Debug::ShowMemoryWindow (bool* p_open, MMU* const mmu) {
 
 	ImGui::End();
 }
-
-bool StringVectorGetter(void* vec, int idx, const char** out_text)
-{
-	auto& vector = *static_cast<std::vector<std::string>*>(vec);
-	if (idx < 0 || idx >= static_cast<int>(vector.size())) { return false; }
-		  *out_text = vector.at(idx).c_str();
-	return true;
-};
-
-bool ListBox(const char* label, int* currIndex, std::vector<std::string>& values)
-{
-	if (values.empty()) { return false; }
-	return ImGui::ListBox(label, currIndex, StringVectorGetter,
-		static_cast<void*>(&values), values.size(), 20);
-}
-
-void Debug::ShowDisassemblerWindow (bool* p_open, std::vector<std::string>& disassembly) {
-	ImGui::SetNextWindowPos(ImVec2(120, 200), ImGuiSetCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(250, 250), ImGuiSetCond_FirstUseEver);
-
-	ImGui::Begin("Disassembler", p_open);
-	ImGui::PushItemWidth(-1);
-	ImGui::Text("Lists:");
-	static int current_index = 0;
-	{
-			// if (i > 0) ImGui::SameLine();
-			ImGui::PushID(current_index);
-			ListBox("", &current_index, disassembly);
-			ImGui::PopID();
-	}
-	ImGui::PopItemWidth();
-	ImGui::End();
-}
-
-
-// std::string Debug::GetGameboyText (GameBoy& gameboy) {
-// 	const CPU& cpu = *gameboy.GetCPU();
-// 	MMU* mmu = gameboy.GetMMU();
-//
-// 	std::string text = "";
-// 	// text += "ScrollY: " + std::to_string(mmu->ReadByte(SCROLLY)) + "\n";
-// 	// text += "ScrollX: " + std::to_string(mmu->ReadByte(SCROLLX)) + "\n";
-// 	// text += "CurLine: " + std::to_string(mmu->ReadByte(CURLINE)) + "\n";
-//
-// 	char buffer[8];
-//
-// 	sprintf(buffer, "%02X", (*mmu->GetMemoryRef(0xFF00)));
-// 	text += "FF00:" + std::string(buffer) + "\n";
-// 	text += "FF44:" + std::to_string((*mmu->GetMemoryRef(0xFF44)));
-//
-// 	return text;
-// }

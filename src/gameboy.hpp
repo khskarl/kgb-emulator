@@ -6,7 +6,11 @@
 #include "ppu.hpp"
 #include "rom.hpp"
 
+class Disassembler;
+
 class GameBoy {
+friend class Disassembler;
+
 private:
 	CPU cpu;
 	MMU mmu;
