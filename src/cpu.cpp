@@ -29,6 +29,13 @@ void CPU::Initialize (MMU* _mmu, bool doBootrom) {
 		SP = 0xFFFE;
 		PC = 0x100;
 		SetZ(1); SetN(0); SetH(1); SetC(1);
+		// AF = 0;
+		// BC = 0;
+		// DE = 0;
+		// HL = 0;
+		// SP = 0x0;
+		// PC = 0x100;
+		// SetZ(0); SetN(0); SetH(0); SetC(0);
 	}
 
 	clockCycles = 0;
@@ -61,14 +68,14 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 	//
-	if (PC < 0xC360 || PC > 0xC36C)
-	printf("PC: %04x AF: %04x BC: %04x DE: %04x HL: %04x\n", PC, AF.word, BC.word, DE.word, HL.word);
-	if (PC == 0xC7D2 || PC == 0xc06a) {
-		// isHalted = true;
-	}
 
 	uint8_t opcode = mmu->ReadByte(PC);
 	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	// if (PC < 0xc35c || PC > 0xc36c)
+	printf("OP: %02x PC: %04x AF: %04x BC: %04x DE: %04x HL: %04x\n", opcode, PC, AF.word, BC.word, DE.word, HL.word);
+	if (PC == 0xC7D2) {
+		isHalted = true;
+	}
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
 	ExecuteInstruction(opcode);
@@ -198,25 +205,32 @@ void CPU::RotateLeft (uint8_t& value) {
 	SetC(oldBit7);
 }
 void CPU::RotateLeftCarry (uint8_t& value) {
-	uint8_t oldBit7 = (value >> 7);
+	const uint8_t oldBit7 = (value >> 7);
 	value = (value << 1);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
 	SetC(oldBit7);
 }
 void CPU::RotateRight (uint8_t& value) {
-	uint8_t oldBit0 = (value & 1);
+	const uint8_t prev_bit0 = (value & 1);
 	value = (value >> 1) | (GetC() << 7);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
-	SetC(oldBit0);
+	SetC(prev_bit0);
+}
+void CPU::RotateRightA () {
+	const uint8_t prev_bit0 = (AF.hi & 1);
+	AF.hi = (AF.hi >> 1) | (GetC() << 7);
+	SetZ(0);
+	SetN(0), SetH(0);
+	SetC(prev_bit0);
 }
 void CPU::RotateRightCarry (uint8_t& value) {
-	uint8_t oldBit0 = (value & 1);
+	uint8_t prev_bit0 = (value & 1);
 	value = (value >> 1);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
-	SetC(oldBit0);
+	SetC(prev_bit0);
 }
 
 void CPU::ShiftLeft (uint8_t& value) {
@@ -280,7 +294,14 @@ void CPU::Increment (reg16_t& value) {
 }
 
 void CPU::AddCarryA (uint8_t value) {
-	AddA(value + GetC());
+	uint8_t  prev_value = AF.hi;
+	uint16_t raw_result = AF.hi + value + GetC();
+
+	AF.hi = raw_result & 0xFF;
+	SetZ(AF.hi == 0);
+	SetN(0);
+	SetH((prev_value & 0x0F) + (value & 0x0F) + GetC() > 0x0F);
+	SetC(prev_value + value + GetC() > 0xFF);
 }
 
 void CPU::AddA (uint8_t value) {
@@ -306,7 +327,14 @@ void CPU::Add (uint16_t& target, uint16_t value) {
 }
 
 void CPU::SubtractCarryA (uint8_t value) {
-	SubtractA(value + GetC());
+	uint8_t  prev_value = AF.hi;
+	uint16_t raw_result = AF.hi - value - GetC();
+
+	AF.hi = raw_result & 0xFF;
+	SetZ(AF.hi == 0);
+	SetN(1);
+	SetH((value & 0x0F) + GetC() > (prev_value & 0x0F) );
+	SetC(value + GetC() > prev_value);
 }
 
 void CPU::SubtractA (uint8_t value) {
@@ -314,12 +342,12 @@ void CPU::SubtractA (uint8_t value) {
 }
 
 void CPU::Subtract (uint8_t& target, uint8_t value) {
-	uint8_t oldTarget = target;
+	uint8_t prev_value = target;
 	target -= value;
 	SetZ(target == 0);
 	SetN(1);
-	SetH((oldTarget & 0xF) < (target & 0xF));
-	SetC(oldTarget < target);
+	SetH((prev_value & 0xF) < (target & 0xF));
+	SetC(prev_value < target);
 }
 
 void CPU::CompareA (uint8_t value) {
@@ -832,32 +860,25 @@ void CPU::op0x17 () {
 }
 // DAA
 void CPU::op0x27 () {
+	const bool was_subtraction = GetN();
+	uint8_t correction = 0;
 
-	uint16_t rawValue = AF.hi;
-	if (GetN()) {
-		if (GetH()) {
-			rawValue = (rawValue - 0x06) & 0xFF;
-		}
-		if (GetC()) {
-			rawValue -= 0x60;
-		}
-	}
-	else {
-		uint8_t lowerNibble = (AF.hi & 0x0F);
-
-		if (lowerNibble > 9 || GetH()) {
-			rawValue += 0x06;
-		}
-		if (rawValue > 0x9f || GetC()) {
-			rawValue += 0x60;
-		}
+	if ((AF.hi > 0x99 && !was_subtraction) || GetC()) {
+		correction += 0x60;
+		SetC(1);
 	}
 
-	AF.hi = static_cast<uint8_t>(rawValue);
+	if (((AF.hi & 0x0F) > 0x09 && !was_subtraction) || GetH()) {
+		correction += 0x06;
+	}
+
+	if (was_subtraction)
+		AF.hi -= correction;
+	else
+		AF.hi += correction;
 
 	SetZ(AF.hi == 0);
 	SetH(0);
-	SetC(rawValue > 0xFF);
 	clockCycles = 4;
 }
 // SCF
@@ -901,17 +922,17 @@ void CPU::op0x38 () {
 		clockCycles = 8;
 }
 
-// ADD HL,BC
+// ADD HL,BC FIXME
 void CPU::op0x09 () {
 	Add(HL.word, BC);
 	clockCycles = 8;
 }
-// ADD HL,DE
+// ADD HL,DE FIXME
 void CPU::op0x19 () {
 	Add(HL.word, DE);
 	clockCycles = 8;
 }
-// ADD HL,HL
+// ADD HL,HL FIXME
 void CPU::op0x29 () {
 	Add(HL.word, HL);
 	clockCycles = 8;
@@ -1036,7 +1057,8 @@ void CPU::op0x0F () {
 }
 // RRA
 void CPU::op0x1F () {
-	RotateRight(AF.hi);
+	RotateRightA();
+	clockCycles = 4;
 }
 // CPL
 void CPU::op0x2F () {
@@ -1775,7 +1797,7 @@ void CPU::op0xE1 () {
 }
 // POP AF
 void CPU::op0xF1 () {
-	AF = PopWord();
+	AF = PopWord() & 0xFFF0; // F register's 0-3 bits aren't writeable
 	clockCycles = 12;
 }
 
