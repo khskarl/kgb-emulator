@@ -242,11 +242,20 @@ void CPU::ShiftLeft (uint8_t& value) {
 }
 
 void CPU::ShiftRight (uint8_t& value) {
-	uint8_t oldBit7 = (value >> 7);
+	uint8_t prev_bit0 = (value & 0x1);
 	value = (value >> 1);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
-	SetC(oldBit7);
+	SetC(prev_bit0);
+}
+
+void CPU::ShiftRightA (uint8_t& value) {
+	uint8_t prev_bit0 = (value & 0x01);
+	uint8_t prev_bit7 = (value & 0x80);
+	value = (value >> 1) | prev_bit7;
+	SetZ(value == 0);
+	SetN(0), SetH(0);
+	SetC(prev_bit0);
 }
 
 void CPU::ShiftRightL (uint8_t& value) {
@@ -2250,32 +2259,32 @@ void CPU::cb0x27 () {
 }
 // SRA B
 void CPU::cb0x28 () {
-	ShiftLeft(BC.hi);
+	ShiftRightA(BC.hi);
 }
 // SRA C
 void CPU::cb0x29 () {
-	ShiftLeft(BC.lo);
+	ShiftRightA(BC.lo);
 }
 // SRA D
 void CPU::cb0x2A () {
-	ShiftLeft(DE.hi);
+	ShiftRightA(DE.hi);
 }
 // SRA E
 void CPU::cb0x2B () {
-	ShiftLeft(DE.lo);
+	ShiftRightA(DE.lo);
 }
 // SRA H
 void CPU::cb0x2C () {
-	ShiftLeft(HL.hi);
+	ShiftRightA(HL.hi);
 }
 // SRA L
 void CPU::cb0x2D () {
-	ShiftLeft(HL.lo);
+	ShiftRightA(HL.lo);
 }
 // SRA (HL)
 // SRA A
 void CPU::cb0x2F () {
-	ShiftLeft(AF.hi);
+	ShiftRightA(AF.hi);
 }
 // CB3. instructions
 // SWAP B
