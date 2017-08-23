@@ -191,6 +191,11 @@ uint16_t CPU::PopWord () {
 	return mmu->ReadWord(SP - 2);
 }
 
+void CPU::EnableInterrupts () {
+	areInterruptsEnabled = true;
+	mmu->WriteByte(IE, 1);
+}
+
 void CPU::Call (uint16_t address) {
 	PushWord(PC);
 	PC = address;
@@ -537,7 +542,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xF2] = &CPU::op0xF2; opcodes[0xF3] = &CPU::op0xF3;
 	opcodes[0xF4] = &CPU::opNull; opcodes[0xF5] = &CPU::op0xF5;
 	opcodes[0xF6] = &CPU::op0xF6; opcodes[0xF7] = &CPU::op0xF7;
-	opcodes[0xF8] = &CPU::opNull; opcodes[0xF9] = &CPU::op0xF9;
+	opcodes[0xF8] = &CPU::op0xF8; opcodes[0xF9] = &CPU::op0xF9;
 	opcodes[0xFA] = &CPU::op0xFA; opcodes[0xFB] = &CPU::op0xFB;
 	opcodes[0xFC] = &CPU::opNull; opcodes[0xFD] = &CPU::opNull;
 	opcodes[0xFE] = &CPU::op0xFE; opcodes[0xFF] = &CPU::op0xFF;
@@ -1956,6 +1961,10 @@ void CPU::op0xD8 () {
 }
 // ADD SP,r8
 // LD HL,SP+r8
+void CPU::op0xF8 () {
+	HL = SP + ReadByte();
+	clockCycles = 12;
+}
 
 // RET
 void CPU::op0xC9 () {
@@ -2020,7 +2029,7 @@ void CPU::op0xCB () {
 // EB..: I don't exist
 // EI
 void CPU::op0xFB () {
-	areInterruptsEnabled = true;
+	EnableInterrupts();
 	clockCycles = 4;
 }
 // CALL Z,a16

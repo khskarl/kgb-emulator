@@ -93,6 +93,8 @@ private:
 	void     PushWord (uint16_t value);
 	uint16_t PopWord ();
 
+	void EnableInterrupts ();
+
 	/* Common Instructions */
 	void Call (uint16_t address); // CALL
 	void RotateLeft       (uint8_t& value); // RL
