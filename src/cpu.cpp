@@ -61,14 +61,14 @@ void CPU::EmulateCycle () {
 	// 	std::cout << "0xFF80: " << std::to_string(mmu->ReadByte(0xff80)) << "\n";
 	// }
 	//
-	if (PC < 0xC360 || PC > 0xC36C)
-	printf("PC: %04x AF: %04x BC: %04x DE: %04x HL: %04x\n", PC, AF.word, BC.word, DE.word, HL.word);
-	if (PC == 0xC7D2 || PC == 0xc06a) {
-		// isHalted = true;
-	}
 
 	uint8_t opcode = mmu->ReadByte(PC);
 	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
+	if (PC < 0xc6be || PC > 0xc6ce)
+	printf("OP: %02x PC: %04x AF: %04x BC: %04x DE: %04x HL: %04x\n", opcode, PC, AF.word, BC.word, DE.word, HL.word);
+	if (PC == 0xCB35) {
+		isHalted = true;
+	}
 
 	// [MOST IMPORTANT LINE IN THIS WHOLE PROGRAM]
 	ExecuteInstruction(opcode);
@@ -198,25 +198,32 @@ void CPU::RotateLeft (uint8_t& value) {
 	SetC(oldBit7);
 }
 void CPU::RotateLeftCarry (uint8_t& value) {
-	uint8_t oldBit7 = (value >> 7);
+	const uint8_t oldBit7 = (value >> 7);
 	value = (value << 1);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
 	SetC(oldBit7);
 }
 void CPU::RotateRight (uint8_t& value) {
-	uint8_t oldBit0 = (value & 1);
+	const uint8_t prev_bit0 = (value & 1);
 	value = (value >> 1) | (GetC() << 7);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
-	SetC(oldBit0);
+	SetC(prev_bit0);
+}
+void CPU::RotateRightA () {
+	const uint8_t prev_bit0 = (AF.hi & 1);
+	AF.hi = (AF.hi >> 1) | (GetC() << 7);
+	SetZ(0);
+	SetN(0), SetH(0);
+	SetC(prev_bit0);
 }
 void CPU::RotateRightCarry (uint8_t& value) {
-	uint8_t oldBit0 = (value & 1);
+	uint8_t prev_bit0 = (value & 1);
 	value = (value >> 1);
 	SetZ(value == 0);
 	SetN(0), SetH(0);
-	SetC(oldBit0);
+	SetC(prev_bit0);
 }
 
 void CPU::ShiftLeft (uint8_t& value) {
@@ -280,7 +287,14 @@ void CPU::Increment (reg16_t& value) {
 }
 
 void CPU::AddCarryA (uint8_t value) {
-	AddA(value + GetC());
+	uint8_t  prev_value = AF.hi;
+	uint16_t raw_result = AF.hi + value + GetC();
+
+	AF.hi = raw_result & 0xFF;
+	SetZ(AF.hi == 0);
+	SetN(0);
+	SetH((prev_value & 0x0F) + (value & 0x0F) + GetC() > 0x0F);
+	SetC(prev_value + value + GetC() > 0xFF);
 }
 
 void CPU::AddA (uint8_t value) {
@@ -306,7 +320,14 @@ void CPU::Add (uint16_t& target, uint16_t value) {
 }
 
 void CPU::SubtractCarryA (uint8_t value) {
-	SubtractA(value + GetC());
+	uint8_t  prev_value = AF.hi;
+	uint16_t raw_result = AF.hi - value - GetC();
+
+	AF.hi = raw_result & 0xFF;
+	SetZ(AF.hi == 0);
+	SetN(1);
+	SetH((value & 0x0F) + GetC() > (prev_value & 0x0F) );
+	SetC(value + GetC() > prev_value);
 }
 
 void CPU::SubtractA (uint8_t value) {
@@ -314,12 +335,12 @@ void CPU::SubtractA (uint8_t value) {
 }
 
 void CPU::Subtract (uint8_t& target, uint8_t value) {
-	uint8_t oldTarget = target;
+	uint8_t prev_value = target;
 	target -= value;
 	SetZ(target == 0);
 	SetN(1);
-	SetH((oldTarget & 0xF) < (target & 0xF));
-	SetC(oldTarget < target);
+	SetH((prev_value & 0xF) < (target & 0xF));
+	SetC(prev_value < target);
 }
 
 void CPU::CompareA (uint8_t value) {
@@ -1036,7 +1057,8 @@ void CPU::op0x0F () {
 }
 // RRA
 void CPU::op0x1F () {
-	RotateRight(AF.hi);
+	RotateRightA();
+	clockCycles = 4;
 }
 // CPL
 void CPU::op0x2F () {

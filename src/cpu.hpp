@@ -98,6 +98,7 @@ private:
 	void RotateLeft       (uint8_t& value); // RL
 	void RotateLeftCarry  (uint8_t& value); // RLC
 	void RotateRight      (uint8_t& value); // RR
+	void RotateRightA     ();               // RRA
 	void RotateRightCarry (uint8_t& value); // RRC
 	void ShiftLeft   (uint8_t& value); // SLA
 	void ShiftRight  (uint8_t& value); //
