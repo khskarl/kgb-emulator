@@ -29,6 +29,13 @@ void CPU::Initialize (MMU* _mmu, bool doBootrom) {
 		SP = 0xFFFE;
 		PC = 0x100;
 		SetZ(1); SetN(0); SetH(1); SetC(1);
+		// AF = 0;
+		// BC = 0;
+		// DE = 0;
+		// HL = 0;
+		// SP = 0x0;
+		// PC = 0x100;
+		// SetZ(0); SetN(0); SetH(0); SetC(0);
 	}
 
 	clockCycles = 0;
@@ -64,9 +71,9 @@ void CPU::EmulateCycle () {
 
 	uint8_t opcode = mmu->ReadByte(PC);
 	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
-	if (PC < 0xc6be || PC > 0xc6ce)
+	// if (PC < 0xc35c || PC > 0xc36c)
 	printf("OP: %02x PC: %04x AF: %04x BC: %04x DE: %04x HL: %04x\n", opcode, PC, AF.word, BC.word, DE.word, HL.word);
-	if (PC == 0xCB35) {
+	if (PC == 0xC7D2) {
 		isHalted = true;
 	}
 
@@ -853,32 +860,25 @@ void CPU::op0x17 () {
 }
 // DAA
 void CPU::op0x27 () {
+	const bool was_subtraction = GetN();
+	uint8_t correction = 0;
 
-	uint16_t rawValue = AF.hi;
-	if (GetN()) {
-		if (GetH()) {
-			rawValue = (rawValue - 0x06) & 0xFF;
-		}
-		if (GetC()) {
-			rawValue -= 0x60;
-		}
-	}
-	else {
-		uint8_t lowerNibble = (AF.hi & 0x0F);
-
-		if (lowerNibble > 9 || GetH()) {
-			rawValue += 0x06;
-		}
-		if (rawValue > 0x9f || GetC()) {
-			rawValue += 0x60;
-		}
+	if ((AF.hi > 0x99 && !was_subtraction) || GetC()) {
+		correction += 0x60;
+		SetC(1);
 	}
 
-	AF.hi = static_cast<uint8_t>(rawValue);
+	if (((AF.hi & 0x0F) > 0x09 && !was_subtraction) || GetH()) {
+		correction += 0x06;
+	}
+
+	if (was_subtraction)
+		AF.hi -= correction;
+	else
+		AF.hi += correction;
 
 	SetZ(AF.hi == 0);
 	SetH(0);
-	SetC(rawValue > 0xFF);
 	clockCycles = 4;
 }
 // SCF
@@ -1797,7 +1797,7 @@ void CPU::op0xE1 () {
 }
 // POP AF
 void CPU::op0xF1 () {
-	AF = PopWord();
+	AF = PopWord() & 0xFFF0; // F register's 0-3 bits aren't writeable
 	clockCycles = 12;
 }
 
