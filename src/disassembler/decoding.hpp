@@ -1,5 +1,5 @@
-#ifndef DISASSEMBLER_HPP
-#define DISASSEMBLER_HPP
+#ifndef DECODING_HPP
+#define DECODING_HPP
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -24,5 +24,6 @@
 
 extern std::vector<std::string> DisassembleRom(const Rom& rom);
 extern std::string DisassembleOpcode(const uint8_t* code);
+extern uint8_t GetLastDisassembleStep ();
 
 #endif

@@ -11,7 +11,7 @@
 
 Disassembler::Disassembler (GameBoy* const _gameboy) {
 	p_gameboy = _gameboy;
-	// m_disassembly = DisassembleRom();
+	m_disassembly = Disassemble();
 
 }
 
@@ -26,13 +26,14 @@ std::vector<std::string> Disassembler::Disassemble () {
 	uint16_t pc = 0x0;
 
 	std::vector<std::string> disassembly = {};
-	while (pc < 0x00FF) {
+	do {
 		sprintf(buffer, "%04x ", pc);
 		std::string address(buffer);
 
 		std::string line = address + DisassembleOpcode(memory + pc);
 		disassembly.push_back(line);
-	}
+		pc += GetLastDisassembleStep();
+	} while (pc != 0xFFFF);
 
 	return disassembly;
 }
@@ -62,7 +63,7 @@ void Disassembler::ShowDisassemblerWindow (bool* p_open) {
 	{
 			// if (i > 0) ImGui::SameLine();
 			// ImGui::PushID(current_index);
-			// ListBox("", &current_index, m_disassembly);
+			ListBox("", &current_index, m_disassembly);
 			// ImGui::PopID();
 	}
 	ImGui::PopItemWidth();

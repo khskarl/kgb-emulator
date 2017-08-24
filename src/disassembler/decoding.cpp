@@ -12,6 +12,11 @@
 */
 
 uint16_t pc;
+uint8_t last_pc_step = 1;
+
+uint8_t GetLastDisassembleStep () {
+	return last_pc_step;
+}
 
 template<uint8_t ... Args>
 std::string Format() {
@@ -23,6 +28,7 @@ std::string Format() {
 /* TODO: Rewizard this with variadic template */
 
 std::string Format (const char* mnemonic, const char* args, uint8_t op) {
+	last_pc_step = 1;
 	pc += 1;
 
 	char format[64];
@@ -33,6 +39,7 @@ std::string Format (const char* mnemonic, const char* args, uint8_t op) {
 }
 
 std::string Format (const char* mnemonic, const char* args, uint8_t op, uint8_t x) {
+	last_pc_step = 2;
 	pc += 2;
 
 	char format[64];
@@ -43,6 +50,7 @@ std::string Format (const char* mnemonic, const char* args, uint8_t op, uint8_t 
 }
 
 std::string Format (const char* mnemonic, const char* args, uint8_t op, uint8_t x, uint8_t y) {
+	last_pc_step = 3;
 	pc += 3;
 
 	char format[64];
