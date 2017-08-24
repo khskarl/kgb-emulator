@@ -39,41 +39,23 @@ void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
 	}
 
 	if (*joypadRegister < prevJoypadRegister) {
-		// cpu.RequestInterrupt(4);
+		cpu.RequestInterrupt(4);
 	}
 }
 
-void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
+void GameBoy::StepEmulation () {
 	cpu.isHalted = isHalted;
-	// uint16_t pattern  = mmu.ReadWord(0x8580);
-	// std::cout << "0x8580: " << std::hex << pattern << "\n";
-	//
-	// uint8_t joypadRegister = *mmu.GetMemoryRef(JOYPAD);
-	// std::string p0 = joypadRegister & 0b0001 ? "1" : "0";
-	// std::string p1 = joypadRegister & 0b0010 ? "1" : "0";
-	// std::string p2 = joypadRegister & 0b0100 ? "1" : "0";
-	// std::string p3 = joypadRegister & 0b1000 ? "1" : "0";
-	// std::string directions = joypadRegister & 0b10000 ? "1" : "0";
-	// std::string buttons = joypadRegister & 0b100000 ? "1" : "0";
-	//
-	// std::cout << "Curr FF00: " << std::hex << (int) joypadRegister << "\n";
-	// std::cout << "Buttons:    " + buttons + "\n";
-	// std::cout << "Directions: " + directions + "\n";
-	// std::cout << "| P3: " + p3 + " | P2: " + p2 + " | P1: " + p1 + " | P0: " + p0 + "\n";
 
-	size_t cylesDone = 0;
-	while (cylesDone < cyclesThisUpdate) {
+	const uint32_t cyclesThisUpdate = m_clockSpeed / 60;
+
+	size_t cyclesDone = 0;
+	while (cyclesDone < cyclesThisUpdate) {
 		// By calling this inside this loop, we ensure it's getting the selected pa-
 		//rt of the game pad.
-		UpdateJoypadMemory(joypad);
 
 		this->StepInstruction();
 
-		this->StepTimers(cpu.clockCycles);
-		ppu.StepUpdate(cpu.clockCycles);
-		cpu.ProcessInterrupts();
-
-		cylesDone += cpu.clockCycles;
+		cyclesDone += cpu.clockCycles;
 
 		if (cpu.isHalted) {
 			isHalted = true;
@@ -84,7 +66,12 @@ void GameBoy::StepEmulation (const uint32_t cyclesThisUpdate) {
 }
 
 void GameBoy::StepInstruction () {
+	UpdateJoypadMemory(joypad);
 	cpu.EmulateCycle();
+	this->StepTimers(cpu.clockCycles);
+	ppu.StepUpdate(cpu.clockCycles);
+	cpu.ProcessInterrupts();
+
 }
 
 void GameBoy::StepTimers (const uint32_t cycles) {
@@ -122,7 +109,7 @@ void GameBoy::ResetClockFrequency () {
 	//                                Bin:    00  01  10   11
 	static const uint32_t frequencies[] = { 1024, 16, 64, 256 };
 
-	this->timerCounter = frequencies[mmu.ReadClockFrequency()];
+	this->timerCounter = frequencies[m_clockSpeed / mmu.ReadClockFrequency()];
 }
 
 bool GameBoy::IsClockEnabled () {
@@ -156,4 +143,8 @@ void GameBoy::SetHaltState (const bool state) {
 
 void GameBoy::ToggleHaltState () {
 	this->isHalted ^= 1;
+}
+
+void GameBoy::SetClock(uint32_t new_clock) {
+	m_clockSpeed = new_clock;
 }

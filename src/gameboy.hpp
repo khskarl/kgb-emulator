@@ -16,7 +16,7 @@ private:
 	MMU mmu;
 	PPU ppu;
 
-	// const uint32_t clockSpeed = 4194304; // Hz or Cycles per second
+	uint32_t m_clockSpeed = 4194304; // Hz or Cycles per second
 	// uint32_t clockFrequency = 4096;
 
 	uint32_t timerCounter = 1024; // aka TIMA
@@ -35,7 +35,7 @@ public:
 
 	void UpdateJoypadMemory(uint8_t* const joypadBuffer);
 
-	void StepEmulation (const uint32_t cyclesThisUpdate = 69905);
+	void StepEmulation ();
 	void StepInstruction ();
 	void StepTimers (const uint32_t cycles);
 
@@ -50,6 +50,8 @@ public:
 	bool GetHaltState ();
 	void SetHaltState (const bool state);
 	void ToggleHaltState ();
+
+	void SetClock (uint32_t new_clock = 4194304);
 };
 
 #endif
