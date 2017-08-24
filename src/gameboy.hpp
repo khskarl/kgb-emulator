@@ -47,9 +47,9 @@ public:
 	CPU* GetCPU ();
 	MMU* GetMMU ();
 
-	bool GetHalt ();
-	void SetHalt (const bool state);
-	void ToggleHalt ();
+	bool GetHaltState ();
+	void SetHaltState (const bool state);
+	void ToggleHaltState ();
 };
 
 #endif

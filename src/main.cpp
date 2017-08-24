@@ -47,13 +47,13 @@ void run_emulator(const std::string& filepath) {
 
 		// Toggle halt state if halt button was pressed
 		if (Context::ShouldHalt())
-			gameBoy.ToggleHalt();
+			gameBoy.ToggleHaltState();
 
 		speed = Context::GetSpeedInput();
 		const int cyclesThisFrame = defaultCyclesPerFrame * speed;
-		if (gameBoy.GetHalt() && Context::ShouldStep() == true)
+		if (gameBoy.GetHaltState() && Context::ShouldStep() == true)
 			gameBoy.StepInstruction();
-		else if (gameBoy.GetHalt() == false && Context::ShouldStep() == false)
+		else if (gameBoy.GetHaltState() == false && Context::ShouldStep() == false)
 			gameBoy.StepEmulation(cyclesThisFrame);
 
 		// -------------- //

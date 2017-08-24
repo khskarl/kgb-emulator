@@ -117,7 +117,7 @@ void GameBoy::StepTimers (const uint32_t cycles) {
 }
 
 void GameBoy::ResetClockFrequency () {
-	// Frequencies as define by the pandocs but divided by the clockspeed (4194304)
+	// Frequencies as defined by the pandocs but divided by the clockspeed (4194304)
 	//                                Dec:     0   1   2    3
 	//                                Bin:    00  01  10   11
 	static const uint32_t frequencies[] = { 1024, 16, 64, 256 };
@@ -145,15 +145,15 @@ MMU* GameBoy::GetMMU () {
 	return &mmu;
 }
 
-bool GameBoy::GetHalt () {
+bool GameBoy::GetHaltState () {
 	return isHalted;
 }
 
-void GameBoy::SetHalt (const bool state) {
+void GameBoy::SetHaltState (const bool state) {
 	this->isHalted = state;
 	cpu.isHalted = state;
 }
 
-void GameBoy::ToggleHalt () {
+void GameBoy::ToggleHaltState () {
 	this->isHalted ^= 1;
 }
