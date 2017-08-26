@@ -667,13 +667,13 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0xCC] = &CPU::opNull; opcodesCB[0xCD] = &CPU::opNull;
 	opcodesCB[0xCE] = &CPU::opNull; opcodesCB[0xCF] = &CPU::opNull;
 
-	opcodesCB[0xD0] = &CPU::cb0xD0; opcodesCB[0xD1] = &CPU::opNull;
-	opcodesCB[0xD2] = &CPU::opNull; opcodesCB[0xD3] = &CPU::opNull;
-	opcodesCB[0xD4] = &CPU::opNull; opcodesCB[0xD5] = &CPU::opNull;
-	opcodesCB[0xD6] = &CPU::opNull; opcodesCB[0xD7] = &CPU::opNull;
-	opcodesCB[0xD8] = &CPU::cb0xD8; opcodesCB[0xD9] = &CPU::opNull;
-	opcodesCB[0xDA] = &CPU::opNull; opcodesCB[0xDB] = &CPU::opNull;
-	opcodesCB[0xDC] = &CPU::opNull; opcodesCB[0xDD] = &CPU::opNull;
+	opcodesCB[0xD0] = &CPU::cb0xD0; opcodesCB[0xD1] = &CPU::cb0xD1;
+	opcodesCB[0xD2] = &CPU::cb0xD2; opcodesCB[0xD3] = &CPU::cb0xD3;
+	opcodesCB[0xD4] = &CPU::cb0xD4; opcodesCB[0xD5] = &CPU::cb0xD5;
+	opcodesCB[0xD6] = &CPU::cb0xD6; opcodesCB[0xD7] = &CPU::cb0xD7;
+	opcodesCB[0xD8] = &CPU::cb0xD8; opcodesCB[0xD9] = &CPU::cb0xD9;
+	opcodesCB[0xDA] = &CPU::cb0xDA; opcodesCB[0xDB] = &CPU::cb0xDB;
+	opcodesCB[0xDC] = &CPU::cb0xDC; opcodesCB[0xDD] = &CPU::cb0xDD;
 	opcodesCB[0xDE] = &CPU::cb0xDE; opcodesCB[0xDF] = &CPU::opNull;
 
 	opcodesCB[0xE0] = &CPU::opNull; opcodesCB[0xE1] = &CPU::opNull;
@@ -2744,21 +2744,60 @@ void CPU::cb0xD0 () {
 	SetBit(BC.hi, 2);
 }
 // SET 2,C
+void CPU::cb0xD1 () {
+	SetBit(BC.lo, 2);
+}
 // SET 2,D
+void CPU::cb0xD2 () {
+	SetBit(DE.hi, 2);
+}
 // SET 2,E
+void CPU::cb0xD3 () {
+	SetBit(DE.lo, 2);
+}
 // SET 2,H
+void CPU::cb0xD4 () {
+	SetBit(HL.hi, 2);
+}
 // SET 2,L
+void CPU::cb0xD5 () {
+	SetBit(HL.lo, 2);
+}
 // SET 2,(HL)
+void CPU::cb0xD6 () {
+	uint8_t target = mmu->ReadByte(HL);
+	SetBit(target, 2);
+	mmu->WriteByte(HL, target);
+	clockCycles = 16;
+}
 // SET 2,A
+void CPU::cb0xD7 () {
+	SetBit(AF.hi, 2);
+}
 // SET 3,B
 void CPU::cb0xD8 () {
 	SetBit(BC.hi, 3);
 }
 // SET 3,C
+void CPU::cb0xD9 () {
+	SetBit(BC.lo, 3);
+}
 // SET 3,D
+void CPU::cb0xDA () {
+	SetBit(DE.hi, 3);
+}
 // SET 3,E
+void CPU::cb0xDB () {
+	SetBit(DE.lo, 3);
+}
 // SET 3,H
+void CPU::cb0xDC () {
+	SetBit(HL.hi, 3);
+}
 // SET 3,L
+void CPU::cb0xDD () {
+	SetBit(HL.lo, 3);
+}
 // SET 3,(HL)
 void CPU::cb0xDE () {
 	uint8_t target = mmu->ReadByte(HL);
@@ -2767,6 +2806,9 @@ void CPU::cb0xDE () {
 	clockCycles = 16;
 }
 // SET 3,A
+void CPU::cb0xDF () {
+	SetBit(AF.hi, 3);
+}
 // CBE. instructions
 // SET 4,B
 // SET 4,C
