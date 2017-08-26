@@ -533,7 +533,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0xE2] = &CPU::op0xE2; opcodes[0xE3] = &CPU::opNull;
 	opcodes[0xE4] = &CPU::opNull; opcodes[0xE5] = &CPU::op0xE5;
 	opcodes[0xE6] = &CPU::op0xE6; opcodes[0xE7] = &CPU::op0xE7;
-	opcodes[0xE8] = &CPU::opNull; opcodes[0xE9] = &CPU::op0xE9;
+	opcodes[0xE8] = &CPU::op0xE8; opcodes[0xE9] = &CPU::op0xE9;
 	opcodes[0xEA] = &CPU::op0xEA; opcodes[0xEB] = &CPU::opNull;
 	opcodes[0xEC] = &CPU::opNull; opcodes[0xED] = &CPU::opNull;
 	opcodes[0xEE] = &CPU::op0xEE; opcodes[0xEF] = &CPU::op0xEF;
@@ -1964,9 +1964,20 @@ void CPU::op0xD8 () {
 	clockCycles = 8;
 }
 // ADD SP,r8
+void CPU::op0xE8 () {
+	uint16_t prev_SP = SP;
+	SP += static_cast<int8_t>(ReadByte());
+	SetZ(0), SetN(0);
+	SetH((SP & 0x0F) < (prev_SP & 0x0F));
+	SetC((SP & 0xFF) < (prev_SP & 0xFF));
+	clockCycles = 16;
+}
 // LD HL,SP+r8
 void CPU::op0xF8 () {
-	HL = SP + ReadByte();
+	HL = SP + static_cast<int8_t>(ReadByte());
+	SetZ(0), SetN(0);
+	SetH((HL & 0x0F) < (SP & 0x0F));
+	SetC((HL & 0xFF) < (SP & 0xFF));
 	clockCycles = 12;
 }
 
