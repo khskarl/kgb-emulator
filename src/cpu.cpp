@@ -22,20 +22,20 @@ void CPU::Initialize (MMU* _mmu, bool doBootrom) {
 		SetZ(0); SetN(0); SetH(0); SetC(0);
 	}
 	else {
-		AF = 0x01B0;
-		BC = 0x0013;
-		DE = 0x00D8;
-		HL = 0x014D;
-		SP = 0xFFFE;
-		PC = 0x100;
-		SetZ(1); SetN(0); SetH(1); SetC(1);
-		// AF = 0;
-		// BC = 0;
-		// DE = 0;
-		// HL = 0;
-		// SP = 0x0;
+		// AF = 0x01B0;
+		// BC = 0x0013;
+		// DE = 0x00D8;
+		// HL = 0x014D;
+		// SP = 0xFFFE;
 		// PC = 0x100;
-		// SetZ(0); SetN(0); SetH(0); SetC(0);
+		// SetZ(1); SetN(0); SetH(1); SetC(1);
+		AF = 0;
+		BC = 0;
+		DE = 0;
+		HL = 0;
+		SP = 0x0;
+		PC = 0x100;
+		SetZ(0); SetN(0); SetH(0); SetC(0);
 	}
 
 	clockCycles = 0;
@@ -71,9 +71,9 @@ void CPU::EmulateCycle () {
 
 	uint8_t opcode = mmu->ReadByte(PC);
 	// std::cout << std::hex << PC << ' ' << DisassembleOpcode(mmu->GetMemoryRef(PC)) << '\n';
-	// if (PC < 0xc35c || PC > 0xc36c)
+	if (PC < 0xc6cd || PC > 0xc6dd)
 	printf("OP: %02x PC: %04x AF: %04x BC: %04x DE: %04x HL: %04x\n", opcode, PC, AF.word, BC.word, DE.word, HL.word);
-	if (PC == 0xC7D2) {
+	if (PC == 0xCB44) {
 		isHalted = true;
 	}
 
@@ -904,7 +904,7 @@ void CPU::op0x37 () {
 
 // LD (a16),SP
 void CPU::op0x08 () {
-	mmu->WriteByte(ReadWord(), SP);
+	mmu->WriteWord(ReadWord(), SP);
 	clockCycles = 20;
 }
 // JR r8
@@ -1793,8 +1793,12 @@ void CPU::op0xE0 () {
 }
 // LDH A,(a8)
 void CPU::op0xF0 () {
-	AF.hi = mmu->ReadByte(0xFF00 + ReadByte());;
+	uint8_t byte = ReadByte();
+	// std::cout << std::hex << (int)byte << "\n";
+	// std::cout << std::hex << (int)AF.hi << "\n";
+	AF.hi = mmu->ReadByte(0xFF00 + byte);
 	clockCycles = 12;
+	// isHalted = true;
 }
 
 // POP BC
@@ -2010,8 +2014,8 @@ void CPU::op0xEA () {
 }
 // LD A,(a16)
 void CPU::op0xFA () {
-	AF.hi = mmu->ReadByte(ReadWord());
-
+	uint16_t address = ReadWord();
+	AF.hi = mmu->ReadByte(address);
 	clockCycles = 16;
 }
 
@@ -2020,8 +2024,8 @@ void CPU::op0xCB () {
 	uint8_t secondByte = ReadByte();
 	(this->*opcodesCB[secondByte])();
 	clockCycles = 8;
-	/* In very few instructions, 16 cycles are needed instead,
-	which are added when the instruction is called.
+	/* In very few CB instructions need 16 cycles instead of 8 cycles,
+	so we set 16 cycles in those instructions when they are called.
 	e.g. 0xCB06, 0xCB16, 0xCB26...
 	*/
 }
@@ -2056,9 +2060,18 @@ void CPU::op0xDC () {
 // FC..: I don't exist
 // CALL a16
 void CPU::op0xCD () {
+	if (BC == 0xfb6d) {
+		isHalted = true;
+		std::cout << std::hex << BC.word << "\n";
+	}
 	uint16_t address = ReadWord();
 	Call(address);
+
 	clockCycles = 24;
+	if (BC == 0xfb6d) {
+		isHalted = true;
+		std::cout << std::hex << BC.word << "\n";
+	}
 }
 // DD..: I don't exist
 // ED..: I don't exist
