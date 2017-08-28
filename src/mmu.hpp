@@ -16,6 +16,10 @@ private:
 	uint8_t m_bios[0x100];
 	uint8_t m_memory[0xFFFF + 1]; // 64k
 
+	uint8_t m_numRomBanks = 0;
+	uint8_t m_currRomBank = 0;
+	uint8_t m_romBanks[125][0x4000];
+
 	void HandleRomBankSwitch (uint16_t address);
 
 public:
@@ -32,6 +36,8 @@ public:
 	uint16_t ReadWord  (uint16_t address);
 	void     WriteByte (uint16_t address, uint8_t  value);
 	void     WriteWord (uint16_t address, uint16_t value);
+	void     WriteByteRaw (uint16_t address, uint8_t value);
+	void     WriteWordRaw (uint16_t address, uint16_t value);
 
 	/* Specific memory access functions */
 	uint8_t  ReadClockFrequency ();

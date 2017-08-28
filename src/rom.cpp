@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <utility>
+#include <cassert>
 
 #include "common_memory_addresses.hpp"
 #include "exception.hpp"
@@ -25,9 +26,24 @@ Rom::Rom (const std::string path) {
 		throw Exception("failed to read file \'" + path + '\'');
 
 	m_name = std::string(reinterpret_cast<char const*>(&m_data[0x134]), 16);
-	m_type = get_cartridge_type_string(m_data[CARTRIDGE_TYPE]);
+	uint8_t type = m_data[CARTRIDGE_TYPE];
+	switch (type) {
+		case 0x00:
+		m_mbc = 0; // NONE
+		break;
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		m_mbc = 1; // MBC1
+		break;
+		default:
+		assert("Cartidge type unsupported!" && 0);
+		break;
+	}
+	m_type = get_cartridge_type_string(type);
 }
 
+Rom::~Rom () { }
 
 std::string get_cartridge_type_string(const uint8_t id)
 {

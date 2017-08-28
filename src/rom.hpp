@@ -14,11 +14,13 @@ private:
 	std::string m_name;
 	std::string m_type;
 	uint8_t m_numRomBanks = 0;
+	uint8_t m_mbc = 0;
 
 	bool LoadRomFromFilepath (std::string path);
 
 public:
 	Rom (std::string path);
+	~Rom ();
 
 	const uint8_t*     GetData() const;
 	size_t             GetSize() const;
@@ -49,7 +51,7 @@ inline const std::string& Rom::GetType () const {
 
 
 inline uint8_t Rom::GetNumRomBanks() const {
-	return static_cast<uint8_t>((GetSize() / 16384));
+	return static_cast<uint8_t>((GetSize() / 16384) - 1);
 }
 
 

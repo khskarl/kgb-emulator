@@ -21,6 +21,9 @@ void MMU::Initialize (GameBoy* const argGameboy) {
 
 	memzero(m_memory);
 	memzero(m_bios);
+	for (auto& bank : m_romBanks) {
+		memzero(bank);
+	}
 
 	GetMemoryRef(JOYPAD)[0]  = 0xFF;
 	GetMemoryRef(JOYPAD)[1]  = 0xFF;
@@ -99,7 +102,7 @@ void MMU::WriteBios (const uint8_t* buffer) {
 
 void MMU::WriteRom (const uint8_t* buffer, size_t bufferSize) {
 	assert(buffer != nullptr);
-	assert(bufferSize > 0 && bufferSize <= 0x8001);
+	assert(bufferSize > 0);
 	std::memcpy(m_memory, buffer, bufferSize);
 }
 
