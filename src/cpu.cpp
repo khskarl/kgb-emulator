@@ -395,6 +395,18 @@ void CPU::ResetBit (uint8_t& target, uint8_t bit) {
 	target = (target & ~bitMask) | 0 << bit;
 }
 
+void CPU::SetBitOnAddress (uint16_t address, uint8_t bit) {
+	uint8_t value = mmu->ReadByte(address);
+	SetBit(value, bit);
+	mmu->WriteByte(address, value);
+}
+
+void CPU::ResetBitOnAddress (uint16_t address, uint8_t bit) {
+	uint8_t value = mmu->ReadByte(address);
+	ResetBit(value, bit);
+	mmu->WriteByte(address, value);
+}
+
 void CPU::Bit(uint8_t bit, uint8_t value) {
 	SetZ((value & (1 << bit)) == 0);
 	SetH(1);
@@ -590,9 +602,9 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0x42] = &CPU::cb0x42; opcodesCB[0x43] = &CPU::cb0x43;
 	opcodesCB[0x44] = &CPU::cb0x44; opcodesCB[0x45] = &CPU::cb0x45;
 	opcodesCB[0x46] = &CPU::cb0x46; opcodesCB[0x47] = &CPU::cb0x47;
-	opcodesCB[0x48] = &CPU::cb0x48; opcodesCB[0x49] = &CPU::opNull;
-	opcodesCB[0x4A] = &CPU::opNull; opcodesCB[0x4B] = &CPU::opNull;
-	opcodesCB[0x4C] = &CPU::opNull; opcodesCB[0x4D] = &CPU::opNull;
+	opcodesCB[0x48] = &CPU::cb0x48; opcodesCB[0x49] = &CPU::cb0x49;
+	opcodesCB[0x4A] = &CPU::cb0x4A; opcodesCB[0x4B] = &CPU::cb0x4B;
+	opcodesCB[0x4C] = &CPU::cb0x4C; opcodesCB[0x4D] = &CPU::cb0x4D;
 	opcodesCB[0x4E] = &CPU::opNull; opcodesCB[0x4F] = &CPU::cb0x4F;
 
 	opcodesCB[0x50] = &CPU::cb0x50; opcodesCB[0x51] = &CPU::cb0x51;
@@ -626,46 +638,46 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0x82] = &CPU::cb0x82; opcodesCB[0x83] = &CPU::cb0x83;
 	opcodesCB[0x84] = &CPU::cb0x84; opcodesCB[0x85] = &CPU::cb0x85;
 	opcodesCB[0x86] = &CPU::cb0x86; opcodesCB[0x87] = &CPU::cb0x87;
-	opcodesCB[0x88] = &CPU::cb0x88; opcodesCB[0x89] = &CPU::opNull;
-	opcodesCB[0x8A] = &CPU::opNull; opcodesCB[0x8B] = &CPU::opNull;
-	opcodesCB[0x8C] = &CPU::opNull; opcodesCB[0x8D] = &CPU::opNull;
-	opcodesCB[0x8E] = &CPU::opNull; opcodesCB[0x8F] = &CPU::opNull;
+	opcodesCB[0x88] = &CPU::cb0x88; opcodesCB[0x89] = &CPU::cb0x89;
+	opcodesCB[0x8A] = &CPU::cb0x8A; opcodesCB[0x8B] = &CPU::cb0x8B;
+	opcodesCB[0x8C] = &CPU::cb0x8C; opcodesCB[0x8D] = &CPU::cb0x8D;
+	opcodesCB[0x8E] = &CPU::cb0x8E; opcodesCB[0x8F] = &CPU::cb0x8F;
 
-	opcodesCB[0x90] = &CPU::opNull; opcodesCB[0x91] = &CPU::opNull;
-	opcodesCB[0x92] = &CPU::opNull; opcodesCB[0x93] = &CPU::opNull;
-	opcodesCB[0x94] = &CPU::opNull; opcodesCB[0x95] = &CPU::opNull;
-	opcodesCB[0x96] = &CPU::opNull; opcodesCB[0x97] = &CPU::opNull;
-	opcodesCB[0x98] = &CPU::opNull; opcodesCB[0x99] = &CPU::opNull;
-	opcodesCB[0x9A] = &CPU::opNull; opcodesCB[0x9B] = &CPU::opNull;
-	opcodesCB[0x9C] = &CPU::opNull; opcodesCB[0x9D] = &CPU::opNull;
-	opcodesCB[0x9E] = &CPU::cb0x9E; opcodesCB[0x9F] = &CPU::opNull;
+	opcodesCB[0x90] = &CPU::cb0x90; opcodesCB[0x91] = &CPU::cb0x91;
+	opcodesCB[0x92] = &CPU::cb0x92; opcodesCB[0x93] = &CPU::cb0x93;
+	opcodesCB[0x94] = &CPU::cb0x94; opcodesCB[0x95] = &CPU::cb0x95;
+	opcodesCB[0x96] = &CPU::cb0x96; opcodesCB[0x97] = &CPU::cb0x97;
+	opcodesCB[0x98] = &CPU::cb0x98; opcodesCB[0x99] = &CPU::cb0x99;
+	opcodesCB[0x9A] = &CPU::cb0x9A; opcodesCB[0x9B] = &CPU::cb0x9B;
+	opcodesCB[0x9C] = &CPU::cb0x9C; opcodesCB[0x9D] = &CPU::cb0x9D;
+	opcodesCB[0x9E] = &CPU::cb0x9E; opcodesCB[0x9F] = &CPU::cb0x9F;
 
-	opcodesCB[0xA0] = &CPU::opNull; opcodesCB[0xA1] = &CPU::opNull;
-	opcodesCB[0xA2] = &CPU::opNull; opcodesCB[0xA3] = &CPU::opNull;
-	opcodesCB[0xA4] = &CPU::opNull; opcodesCB[0xA5] = &CPU::opNull;
-	opcodesCB[0xA6] = &CPU::opNull; opcodesCB[0xA7] = &CPU::opNull;
-	opcodesCB[0xA8] = &CPU::opNull; opcodesCB[0xA9] = &CPU::opNull;
-	opcodesCB[0xAA] = &CPU::opNull; opcodesCB[0xAB] = &CPU::opNull;
-	opcodesCB[0xAC] = &CPU::opNull; opcodesCB[0xAD] = &CPU::opNull;
-	opcodesCB[0xAE] = &CPU::opNull; opcodesCB[0xAF] = &CPU::opNull;
+	opcodesCB[0xA0] = &CPU::cb0xA0; opcodesCB[0xA1] = &CPU::cb0xA1;
+	opcodesCB[0xA2] = &CPU::cb0xA2; opcodesCB[0xA3] = &CPU::cb0xA3;
+	opcodesCB[0xA4] = &CPU::cb0xA4; opcodesCB[0xA5] = &CPU::cb0xA5;
+	opcodesCB[0xA6] = &CPU::cb0xA6; opcodesCB[0xA7] = &CPU::cb0xA7;
+	opcodesCB[0xA8] = &CPU::cb0xA8; opcodesCB[0xA9] = &CPU::cb0xA9;
+	opcodesCB[0xAA] = &CPU::cb0xAA; opcodesCB[0xAB] = &CPU::cb0xAB;
+	opcodesCB[0xAC] = &CPU::cb0xAC; opcodesCB[0xAD] = &CPU::cb0xAD;
+	opcodesCB[0xAE] = &CPU::cb0xAE; opcodesCB[0xAF] = &CPU::cb0xAF;
 
-	opcodesCB[0xB0] = &CPU::opNull; opcodesCB[0xB1] = &CPU::opNull;
-	opcodesCB[0xB2] = &CPU::opNull; opcodesCB[0xB3] = &CPU::opNull;
-	opcodesCB[0xB4] = &CPU::opNull; opcodesCB[0xB5] = &CPU::opNull;
-	opcodesCB[0xB6] = &CPU::opNull; opcodesCB[0xB7] = &CPU::opNull;
-	opcodesCB[0xB8] = &CPU::opNull; opcodesCB[0xB9] = &CPU::opNull;
-	opcodesCB[0xBA] = &CPU::opNull; opcodesCB[0xBB] = &CPU::opNull;
-	opcodesCB[0xBC] = &CPU::opNull; opcodesCB[0xBD] = &CPU::opNull;
-	opcodesCB[0xBE] = &CPU::cb0xBE; opcodesCB[0xBF] = &CPU::opNull;
+	opcodesCB[0xB0] = &CPU::cb0xB0; opcodesCB[0xB1] = &CPU::cb0xB1;
+	opcodesCB[0xB2] = &CPU::cb0xB2; opcodesCB[0xB3] = &CPU::cb0xB3;
+	opcodesCB[0xB4] = &CPU::cb0xB4; opcodesCB[0xB5] = &CPU::cb0xB5;
+	opcodesCB[0xB6] = &CPU::cb0xB6; opcodesCB[0xB7] = &CPU::cb0xB7;
+	opcodesCB[0xB8] = &CPU::cb0xB8; opcodesCB[0xB9] = &CPU::cb0xB9;
+	opcodesCB[0xBA] = &CPU::cb0xBA; opcodesCB[0xBB] = &CPU::cb0xBB;
+	opcodesCB[0xBC] = &CPU::cb0xBC; opcodesCB[0xBD] = &CPU::cb0xBD;
+	opcodesCB[0xBE] = &CPU::cb0xBE; opcodesCB[0xBF] = &CPU::cb0xBF;
 
-	opcodesCB[0xC0] = &CPU::opNull; opcodesCB[0xC1] = &CPU::opNull;
-	opcodesCB[0xC2] = &CPU::opNull; opcodesCB[0xC3] = &CPU::opNull;
-	opcodesCB[0xC4] = &CPU::opNull; opcodesCB[0xC5] = &CPU::opNull;
-	opcodesCB[0xC6] = &CPU::opNull; opcodesCB[0xC7] = &CPU::opNull;
-	opcodesCB[0xC8] = &CPU::opNull; opcodesCB[0xC9] = &CPU::opNull;
-	opcodesCB[0xCA] = &CPU::opNull; opcodesCB[0xCB] = &CPU::opNull;
-	opcodesCB[0xCC] = &CPU::opNull; opcodesCB[0xCD] = &CPU::opNull;
-	opcodesCB[0xCE] = &CPU::opNull; opcodesCB[0xCF] = &CPU::opNull;
+	opcodesCB[0xC0] = &CPU::cb0xC0; opcodesCB[0xC1] = &CPU::cb0xC1;
+	opcodesCB[0xC2] = &CPU::cb0xC2; opcodesCB[0xC3] = &CPU::cb0xC3;
+	opcodesCB[0xC4] = &CPU::cb0xC4; opcodesCB[0xC5] = &CPU::cb0xC5;
+	opcodesCB[0xC6] = &CPU::cb0xC6; opcodesCB[0xC7] = &CPU::cb0xC7;
+	opcodesCB[0xC8] = &CPU::cb0xC8; opcodesCB[0xC9] = &CPU::cb0xC9;
+	opcodesCB[0xCA] = &CPU::cb0xCA; opcodesCB[0xCB] = &CPU::cb0xCB;
+	opcodesCB[0xCC] = &CPU::cb0xCC; opcodesCB[0xCD] = &CPU::cb0xCD;
+	opcodesCB[0xCE] = &CPU::cb0xCE; opcodesCB[0xCF] = &CPU::cb0xCF;
 
 	opcodesCB[0xD0] = &CPU::cb0xD0; opcodesCB[0xD1] = &CPU::cb0xD1;
 	opcodesCB[0xD2] = &CPU::cb0xD2; opcodesCB[0xD3] = &CPU::cb0xD3;
@@ -674,7 +686,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodesCB[0xD8] = &CPU::cb0xD8; opcodesCB[0xD9] = &CPU::cb0xD9;
 	opcodesCB[0xDA] = &CPU::cb0xDA; opcodesCB[0xDB] = &CPU::cb0xDB;
 	opcodesCB[0xDC] = &CPU::cb0xDC; opcodesCB[0xDD] = &CPU::cb0xDD;
-	opcodesCB[0xDE] = &CPU::cb0xDE; opcodesCB[0xDF] = &CPU::opNull;
+	opcodesCB[0xDE] = &CPU::cb0xDE; opcodesCB[0xDF] = &CPU::cb0xDF;
 
 	opcodesCB[0xE0] = &CPU::opNull; opcodesCB[0xE1] = &CPU::opNull;
 	opcodesCB[0xE2] = &CPU::opNull; opcodesCB[0xE3] = &CPU::opNull;
@@ -2417,11 +2429,29 @@ void CPU::cb0x48 () {
 	Bit(1, BC.hi);
 }
 // BIT 1,C
+void CPU::cb0x49 () {
+	Bit(1, BC.lo);
+}
 // BIT 1,D
+void CPU::cb0x4A () {
+	Bit(1, DE.hi);
+}
 // BIT 1,E
+void CPU::cb0x4B () {
+	Bit(1, DE.lo);
+}
 // BIT 1,H
+void CPU::cb0x4C () {
+	Bit(1, HL.hi);
+}
 // BIT 1,L
+void CPU::cb0x4D () {
+	Bit(1, HL.lo);
+}
 // BIT 1,(HL)
+void CPU::cb0x4E () {
+	Bit(1, mmu->ReadByte(HL));
+}
 // BIT 1,A
 void CPU::cb0x4F () {
 	Bit(1, AF.hi);
@@ -2649,9 +2679,7 @@ void CPU::cb0x85 () {
 }
 // RES 0,(HL)
 void CPU::cb0x86 () {
-	uint8_t target = mmu->ReadByte(HL);
-	ResetBit(target, 0);
-	mmu->WriteByte(HL, target);
+	ResetBitOnAddress(HL.word, 0);
 	clockCycles = 16;
 }
 // RES 0,A
@@ -2663,92 +2691,302 @@ void CPU::cb0x88 () {
 	ResetBit(BC.hi, 1);
 }
 // RES 1,C
+void CPU::cb0x89 () {
+	ResetBit(BC.lo, 1);
+}
 // RES 1,D
+void CPU::cb0x8A () {
+	ResetBit(DE.hi, 1);
+}
 // RES 1,E
+void CPU::cb0x8B () {
+	ResetBit(DE.lo, 1);
+}
 // RES 1,H
+void CPU::cb0x8C () {
+	ResetBit(HL.hi, 1);
+}
 // RES 1,L
+void CPU::cb0x8D () {
+	ResetBit(HL.lo, 1);
+}
 // RES 1,(HL)
+void CPU::cb0x8E () {
+	ResetBitOnAddress(HL.word, 1);
+	clockCycles = 16;
+}
 // RES 1,A
+void CPU::cb0x8F () {
+	ResetBit(AF.hi, 1);
+}
 // CB9. instructions
 // RES 2,B
+void CPU::cb0x90 () {
+	ResetBit(BC.hi, 2);
+}
 // RES 2,C
+void CPU::cb0x91 () {
+	ResetBit(BC.lo, 2);
+}
 // RES 2,D
+void CPU::cb0x92 () {
+	ResetBit(DE.hi, 2);
+}
 // RES 2,E
+void CPU::cb0x93 () {
+	ResetBit(DE.lo, 2);
+}
 // RES 2,H
+void CPU::cb0x94 () {
+	ResetBit(HL.hi, 2);
+}
 // RES 2,L
+void CPU::cb0x95 () {
+	ResetBit(HL.lo, 2);
+}
 // RES 2,(HL)
+void CPU::cb0x96 () {
+	ResetBitOnAddress(HL.word, 2);
+	clockCycles = 16;
+}
 // RES 2,A
+void CPU::cb0x97 () {
+	ResetBit(AF.hi, 2);
+}
 // RES 3,B
+void CPU::cb0x98 () {
+	ResetBit(BC.hi, 3);
+}
 // RES 3,C
+void CPU::cb0x99 () {
+	ResetBit(BC.lo, 3);
+}
 // RES 3,D
+void CPU::cb0x9A () {
+	ResetBit(DE.hi, 3);
+}
 // RES 3,E
+void CPU::cb0x9B () {
+	ResetBit(DE.lo, 3);
+}
 // RES 3,H
+void CPU::cb0x9C () {
+	ResetBit(HL.hi, 3);
+}
 // RES 3,L
+void CPU::cb0x9D () {
+	ResetBit(HL.lo, 3);
+}
 // RES 3,(HL)
 void CPU::cb0x9E () {
-	uint8_t target = mmu->ReadByte(HL);
-	ResetBit(target, 3);
-	mmu->WriteByte(HL, target);
+	ResetBitOnAddress(HL.word, 3);
 	clockCycles = 16;
 }
 // RES 3,A
+void CPU::cb0x9F () {
+	ResetBit(AF.hi, 3);
+}
 // CBA. instructions
 // RES 4,B
+void CPU::cb0xA0 () {
+	ResetBit(BC.hi, 4);
+}
 // RES 4,C
+void CPU::cb0xA1 () {
+	ResetBit(BC.lo, 4);
+}
 // RES 4,D
+void CPU::cb0xA2 () {
+	ResetBit(DE.hi, 4);
+}
 // RES 4,E
+void CPU::cb0xA3 () {
+	ResetBit(DE.lo, 4);
+}
 // RES 4,H
+void CPU::cb0xA4 () {
+	ResetBit(HL.hi, 4);
+}
 // RES 4,L
+void CPU::cb0xA5 () {
+	ResetBit(HL.lo, 4);
+}
 // RES 4,(HL)
+void CPU::cb0xA6 () {
+	ResetBitOnAddress(HL.word, 4);
+	clockCycles = 16;
+}
 // RES 4,A
+void CPU::cb0xA7 () {
+	ResetBit(AF.hi, 4);
+}
 // RES 5,B
+void CPU::cb0xA8 () {
+	ResetBit(BC.hi, 5);
+}
 // RES 5,C
+void CPU::cb0xA9 () {
+	ResetBit(BC.lo, 5);
+}
 // RES 5,D
+void CPU::cb0xAA () {
+	ResetBit(DE.hi, 5);
+}
 // RES 5,E
+void CPU::cb0xAB () {
+	ResetBit(DE.lo, 5);
+}
 // RES 5,H
+void CPU::cb0xAC () {
+	ResetBit(HL.hi, 5);
+}
 // RES 5,L
+void CPU::cb0xAD () {
+	ResetBit(HL.lo, 5);
+}
 // RES 5,(HL)
+void CPU::cb0xAE () {
+	ResetBitOnAddress(HL.word, 5);
+	clockCycles = 16;
+}
 // RES 5,A
+void CPU::cb0xAF () {
+	ResetBit(AF.hi, 5);
+}
 // CBB. instructions
 // RES 6,B
+void CPU::cb0xB0 () {
+	ResetBit(BC.hi, 6);
+}
 // RES 6,C
+void CPU::cb0xB1 () {
+	ResetBit(BC.lo, 6);
+}
 // RES 6,D
+void CPU::cb0xB2 () {
+	ResetBit(DE.hi, 6);
+}
 // RES 6,E
+void CPU::cb0xB3 () {
+	ResetBit(DE.lo, 6);
+}
 // RES 6,H
+void CPU::cb0xB4 () {
+	ResetBit(HL.hi, 6);
+}
 // RES 6,L
+void CPU::cb0xB5 () {
+	ResetBit(HL.lo, 6);
+}
 // RES 6,(HL)
+void CPU::cb0xB6 () {
+	ResetBitOnAddress(HL.word, 6);
+	clockCycles = 16;
+}
 // RES 6,A
+void CPU::cb0xB7 () {
+	ResetBit(AF.hi, 6);
+}
 // RES 7,B
+void CPU::cb0xB8 () {
+	ResetBit(BC.hi, 7);
+}
 // RES 7,C
+void CPU::cb0xB9 () {
+	ResetBit(BC.lo, 7);
+}
 // RES 7,D
+void CPU::cb0xBA () {
+	ResetBit(DE.hi, 7);
+}
 // RES 7,E
+void CPU::cb0xBB () {
+	ResetBit(DE.lo, 7);
+}
 // RES 7,H
+void CPU::cb0xBC () {
+	ResetBit(HL.hi, 7);
+}
 // RES 7,L
+void CPU::cb0xBD () {
+	ResetBit(HL.lo, 7);
+}
 // RES 7,(HL)
 void CPU::cb0xBE () {
-	uint8_t target = mmu->ReadByte(HL);
-	ResetBit(target, 7);
-	mmu->WriteByte(HL, target);
+	ResetBitOnAddress(HL.word, 7);
 	clockCycles = 16;
 }
 // RES 7,A
+void CPU::cb0xBF () {
+	ResetBit(AF.hi, 7);
+}
 // CBC. instructions
 // SET 0,B
+void CPU::cb0xC0 () {
+	SetBit(BC.hi, 0);
+}
 // SET 0,C
+void CPU::cb0xC1 () {
+	SetBit(BC.lo, 0);
+}
 // SET 0,D
+void CPU::cb0xC2 () {
+	SetBit(DE.hi, 0);
+}
 // SET 0,E
+void CPU::cb0xC3 () {
+	SetBit(DE.lo, 0);
+}
 // SET 0,H
+void CPU::cb0xC4 () {
+	SetBit(HL.hi, 0);
+}
 // SET 0,L
+void CPU::cb0xC5 () {
+	SetBit(HL.lo, 0);
+}
 // SET 0,(HL)
+void CPU::cb0xC6 () {
+	SetBitOnAddress(HL.word, 0);
+	clockCycles = 16;
+}
 // SET 0,A
+void CPU::cb0xC7 () {
+	SetBit(AF.hi, 0);
+}
 // SET 1,B
+void CPU::cb0xC8 () {
+	SetBit(BC.hi, 1);
+}
 // SET 1,C
+void CPU::cb0xC9 () {
+	SetBit(BC.lo, 1);
+}
 // SET 1,D
+void CPU::cb0xCA () {
+	SetBit(DE.hi, 1);
+}
 // SET 1,E
+void CPU::cb0xCB () {
+	SetBit(DE.lo, 1);
+}
 // SET 1,H
+void CPU::cb0xCC () {
+	SetBit(HL.hi, 1);
+}
 // SET 1,L
+void CPU::cb0xCD () {
+	SetBit(HL.lo, 1);
+}
 // SET 1,(HL)
+void CPU::cb0xCE () {
+	SetBitOnAddress(HL.word, 1);
+	clockCycles = 16;
+}
 // SET 1,A
+void CPU::cb0xCF () {
+	SetBit(AF.hi, 1);
+}
 // CBD. instructions
 // SET 2,B
 void CPU::cb0xD0 () {
@@ -2776,9 +3014,7 @@ void CPU::cb0xD5 () {
 }
 // SET 2,(HL)
 void CPU::cb0xD6 () {
-	uint8_t target = mmu->ReadByte(HL);
-	SetBit(target, 2);
-	mmu->WriteByte(HL, target);
+	SetBitOnAddress(HL.word, 2);
 	clockCycles = 16;
 }
 // SET 2,A
@@ -2811,9 +3047,7 @@ void CPU::cb0xDD () {
 }
 // SET 3,(HL)
 void CPU::cb0xDE () {
-	uint8_t target = mmu->ReadByte(HL);
-	SetBit(target, 3);
-	mmu->WriteByte(HL, target);
+	SetBitOnAddress(HL.word, 3);
 	clockCycles = 16;
 }
 // SET 3,A

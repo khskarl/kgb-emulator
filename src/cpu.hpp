@@ -126,6 +126,8 @@ private:
 	/* Common CB Instructions */
 	void SetBit   (uint8_t& target, uint8_t bit);
 	void ResetBit (uint8_t& target, uint8_t bit);
+	void SetBitOnAddress   (uint16_t address, uint8_t bit);
+	void ResetBitOnAddress (uint16_t address, uint8_t bit);
 	void Bit(uint8_t bit, uint8_t value);
 
 	/* Instruction tables */
