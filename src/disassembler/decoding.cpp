@@ -60,23 +60,6 @@ std::string Format (const char* mnemonic, const char* args, uint8_t op, uint8_t 
 	return std::string(buffer);
 }
 
-std::vector<std::string> DisassembleRom(const Rom& rom) {
-	const uint8_t* code = rom.GetData();
-
-	char buffer[64];
-	pc = 0x100;
-	std::vector<std::string> disassembly = {};
-	while (pc < rom.GetSize()) {
-		sprintf(buffer, "%04x ", pc);
-		std::string address(buffer);
-
-		std::string line = address + DisassembleOpcode(code + pc);
-		disassembly.push_back(line);
-	}
-
-	return disassembly;
-}
-
 std::string DisassembleCB(const uint8_t* code);
 
 std::string DisassembleOpcode(const uint8_t* code) {

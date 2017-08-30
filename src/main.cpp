@@ -19,9 +19,11 @@ void RomInfoWindow (bool* p_open, Rom& rom) {
 	ImGui::SetNextWindowPos(ImVec2(50, 400), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Rom Info", p_open);
 		ImGui::Text("Name:      %s", rom.GetName().c_str());
-		ImGui::Text("Size:      %i", rom.GetSize());
+		ImGui::Text("Rom Size:  %u", rom.GetRomSize());
+		ImGui::Text("Ram Size:  %u", rom.GetRamSize());
 		ImGui::Text("Type:      %s", rom.GetType().c_str());
 		ImGui::Text("#RomBanks: %i", rom.GetNumRomBanks());
+		ImGui::Text("#RamBanks: %i", rom.GetNumRamBanks());
 	ImGui::End();
 }
 

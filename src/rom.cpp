@@ -17,14 +17,13 @@ Rom::Rom (const std::string path) {
 
 	const size_t size = file.tellg();
 	file.seekg(0);
-
 	m_data.resize(size + 1);
-
 	file.read((char*) m_data.data(), size);
 
 	if (file.good() == false)
 		throw Exception("failed to read file \'" + path + '\'');
 
+	// Setup members
 	m_name = std::string(reinterpret_cast<char const*>(&m_data[0x134]), 16);
 	uint8_t type = m_data[CARTRIDGE_TYPE];
 	switch (type) {
@@ -41,6 +40,41 @@ Rom::Rom (const std::string path) {
 		break;
 	}
 	m_type = get_cartridge_type_string(type);
+
+	// 0x148 - ROM Size
+	size_t rom_size = 0;
+	switch (m_data[0x148]) {
+		case  0 : rom_size =  32 * 1024; break;
+		case  1 : rom_size =  64 * 1024; break;
+		case  2 : rom_size = 128 * 1024; break;
+		case  3 : rom_size = 256 * 1024; break;
+		case  4 : rom_size = 512 * 1024; break;
+		case  5 : rom_size =   1 * 1024 * 1024; break;
+		case  6 : rom_size =   2 * 1024 * 1024; break;
+		case  7 : rom_size =   3 * 1024 * 1024; break;
+		case 52 : rom_size = 1.1 * 1024 * 1024; break;
+		case 53 : rom_size = 1.2 * 1024 * 1024; break;
+		case 54 : rom_size = 1.5 * 1024 * 1024; break;
+		default : assert("Invalid ROM size in Header!" && 0);
+	}
+
+	// 0x149 - ROM Size
+	size_t ram_size = 0;
+	switch (m_data[0x149]) {
+		case  0 : ram_size =   0; break;
+		case  1 : ram_size =   2 * 1024; break;
+		case  2 : ram_size =   8 * 1024; break;
+		case  3 : ram_size =  32 * 1024; break;
+		case  4 : ram_size = 128 * 1024; break;
+		case  5 : ram_size =  64 * 1024; break;
+		default : assert("Invalid RAM size in Header!" && 0);
+	}
+
+	m_romSize = rom_size;
+	m_ramSize = ram_size;
+	m_numRomBanks = (rom_size - 32 * 1024) / 0x4000;
+	m_numRamBanks = ram_size / 0x2000;
+
 }
 
 Rom::~Rom () { }

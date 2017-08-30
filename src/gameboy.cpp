@@ -14,7 +14,7 @@ void GameBoy::Initialize () {
 }
 
 void GameBoy::LoadRom (Rom rom) {
-	mmu.WriteRom(rom.GetData(), rom.GetSize());
+	mmu.WriteRom(rom.GetData(), rom.GetRomSize());
 }
 
 void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
