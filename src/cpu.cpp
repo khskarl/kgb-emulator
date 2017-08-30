@@ -22,20 +22,20 @@ void CPU::Initialize (MMU* _mmu, bool doBootrom) {
 		SetZ(0); SetN(0); SetH(0); SetC(0);
 	}
 	else {
-		// AF = 0x01B0;
-		// BC = 0x0013;
-		// DE = 0x00D8;
-		// HL = 0x014D;
-		// SP = 0xFFFE;
-		// PC = 0x100;
-		// SetZ(1); SetN(0); SetH(1); SetC(1);
-		AF = 0;
-		BC = 0;
-		DE = 0;
-		HL = 0;
-		SP = 0x0;
+		AF = 0x01B0;
+		BC = 0x0013;
+		DE = 0x00D8;
+		HL = 0x014D;
+		SP = 0xFFFE;
 		PC = 0x100;
-		SetZ(0); SetN(0); SetH(0); SetC(0);
+		SetZ(1); SetN(0); SetH(1); SetC(1);
+		// AF = 0;
+		// BC = 0;
+		// DE = 0;
+		// HL = 0;
+		// SP = 0x0;
+		// PC = 0x100;
+		// SetZ(0); SetN(0); SetH(0); SetC(0);
 	}
 
 	clockCycles = 0;
@@ -92,7 +92,7 @@ void CPU::RequestInterrupt (uint8_t id) {
 	uint8_t requestRegister = mmu->ReadByte(IF);
 	requestRegister |= 0x10 >> (4 - id); // SET bit ID
 	mmu->WriteByte(IF, requestRegister);
-	// std::cout << "Interrupt requested!\n" ;
+	std::cout << "Interrupt requested!\n" ;
 	// isHalted = true;
 }
 
@@ -424,7 +424,7 @@ void CPU::InitializeOpcodeTable () {
 	opcodes[0x0C] = &CPU::op0x0C; opcodes[0x0D] = &CPU::op0x0D;
 	opcodes[0x0E] = &CPU::op0x0E; opcodes[0x0F] = &CPU::op0x0F;
 
-	opcodes[0x10] = &CPU::opNull; opcodes[0x11] = &CPU::op0x11;
+	opcodes[0x10] = &CPU::op0x10; opcodes[0x11] = &CPU::op0x11;
 	opcodes[0x12] = &CPU::op0x12; opcodes[0x13] = &CPU::op0x13;
 	opcodes[0x14] = &CPU::op0x14; opcodes[0x15] = &CPU::op0x15;
 	opcodes[0x16] = &CPU::op0x16; opcodes[0x17] = &CPU::op0x17;

@@ -20,7 +20,7 @@ private:
 	uint8_t m_currRomBank = 0;
 	uint8_t m_romBanks[125][0x4000];
 
-	void HandleRomBankSwitch (uint16_t address);
+	void HandleRomBankSwitch(uint16_t address, uint16_t value);
 
 public:
 	bool m_isInBios = true;
@@ -45,6 +45,7 @@ public:
 	/* Write memory access */
 	void WriteBios (const uint8_t* buffer);
 	void WriteRom  (const uint8_t* buffer, size_t bufferSize);
+	void WriteRomBank (const uint8_t* rom_data, uint8_t num_bank);
 
 	/* Memory References */
 	uint8_t* GetMemoryRef (uint16_t address);

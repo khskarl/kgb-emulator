@@ -21,9 +21,7 @@ void MMU::Initialize (GameBoy* const argGameboy) {
 
 	memzero(m_memory);
 	memzero(m_bios);
-	for (auto& bank : m_romBanks) {
-		memzero(bank);
-	}
+	for (auto& bank : m_romBanks) { memzero(bank); }
 
 	GetMemoryRef(JOYPAD)[0]  = 0xFF;
 	GetMemoryRef(JOYPAD)[1]  = 0xFF;
@@ -45,7 +43,7 @@ uint8_t MMU::ReadClockFrequency () {
 
 void MMU::WriteByte (uint16_t address, uint8_t value) {
 	if (0x4000 <= address && address <= 0x7FFF) {
-		HandleRomBankSwitch(address);
+		HandleRomBankSwitch(address, value);
 		return;
 	}
 	// Reset scanline if we try to write to it
@@ -79,7 +77,7 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
 	if (0x4000 <= address && address <= 0x7FFF) {
-		HandleRomBankSwitch(address);
+		HandleRomBankSwitch(address, value);
 		return;
 	}
 	// Reset current scanline if we try to write to it
@@ -102,9 +100,15 @@ void MMU::WriteBios (const uint8_t* buffer) {
 
 void MMU::WriteRom (const uint8_t* buffer, size_t bufferSize) {
 	assert(buffer != nullptr);
-	assert(bufferSize > 0);
 	std::memcpy(m_memory, buffer, bufferSize);
 }
+
+void MMU::WriteRomBank (const uint8_t* rom_data, uint8_t num_bank) {
+	assert(rom_data != nullptr);
+	uint16_t offset = 0x4000 * num_bank + 32 * 1024;
+	std::memcpy(m_romBanks[num_bank], rom_data + offset, 0x4000);
+}
+
 
 uint8_t* MMU::GetMemoryRef (uint16_t address) {
 	/* Handle BIOS / ROM0 access below 0x100 */
@@ -124,8 +128,8 @@ void MMU::StartDmaTransfer (uint16_t startingAddress) {
 	}
 }
 
-void MMU::HandleRomBankSwitch(uint16_t address) {
-	assert("Unimplemented bank switch!" && __FILE__ && __LINE__ && 0);
+void MMU::HandleRomBankSwitch(uint16_t address, uint16_t value) {
+	assert("Unimplemented bank switch!" && 0);
 }
 
 void MMU::DeactivateBios () {

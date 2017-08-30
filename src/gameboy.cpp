@@ -15,6 +15,9 @@ void GameBoy::Initialize () {
 
 void GameBoy::LoadRom (Rom rom) {
 	mmu.WriteRom(rom.GetData(), rom.GetRomSize());
+	for (uint8_t i = 0; i < rom.GetNumRomBanks(); i++) {
+		mmu.WriteRomBank(rom.GetData(), i);
+	}
 }
 
 void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
@@ -39,7 +42,7 @@ void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
 	}
 
 	if (*joypadRegister < prevJoypadRegister) {
-		cpu.RequestInterrupt(4);
+		// cpu.RequestInterrupt(4);
 	}
 }
 
