@@ -21,7 +21,7 @@ private:
 
 	uint32_t timerCounter = 1024; // aka TIMA
 
-	bool isHalted = true;
+	bool isHalted = false;
 
 	uint8_t joypad[8] = {0, 0, 0, 0,
 	                     0, 0, 0, 0};

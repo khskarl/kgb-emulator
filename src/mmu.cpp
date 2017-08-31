@@ -42,7 +42,11 @@ uint8_t MMU::ReadClockFrequency () {
 
 
 void MMU::WriteByte (uint16_t address, uint8_t value) {
-	if (0x4000 <= address && address <= 0x7FFF) {
+	if (IF == address) {
+		// std::cout << "WRITING TO IF :D \n";
+		// std::cout << std::hex << (int) value <<  " \n";
+	}
+	if (0x0000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address, value);
 		return;
 	}
@@ -76,7 +80,7 @@ void MMU::WriteByte (uint16_t address, uint8_t value) {
 }
 
 void MMU::WriteWord (uint16_t address, uint16_t value) {
-	if (0x4000 <= address && address <= 0x7FFF) {
+	if (0x0000 <= address && address <= 0x7FFF) {
 		HandleRomBankSwitch(address, value);
 		return;
 	}
@@ -98,9 +102,9 @@ void MMU::WriteBios (const uint8_t* buffer) {
 	std::memcpy(m_bios, buffer, 0x100);
 }
 
-void MMU::WriteRom (const uint8_t* buffer, size_t bufferSize) {
+void MMU::WriteRom (const uint8_t* buffer) {
 	assert(buffer != nullptr);
-	std::memcpy(m_memory, buffer, bufferSize);
+	std::memcpy(m_memory, buffer, 0x8000);
 }
 
 void MMU::WriteRomBank (const uint8_t* rom_data, uint8_t num_bank) {
@@ -129,7 +133,17 @@ void MMU::StartDmaTransfer (uint16_t startingAddress) {
 }
 
 void MMU::HandleRomBankSwitch(uint16_t address, uint16_t value) {
-	assert("Unimplemented bank switch!" && 0);
+	if (0x2000 <= address && address <= 0x3FFF) {
+		uint8_t bank = value & 0b00011111;
+		if (bank != 0)
+			bank -= 1;
+
+		SwitchRomBank(bank);
+	}
+}
+
+void MMU::SwitchRomBank (uint8_t bank_id) {
+	std::memcpy(&m_memory[0x4000], m_romBanks[bank_id], 0x4000);
 }
 
 void MMU::DeactivateBios () {

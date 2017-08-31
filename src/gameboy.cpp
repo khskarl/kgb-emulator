@@ -14,7 +14,7 @@ void GameBoy::Initialize () {
 }
 
 void GameBoy::LoadRom (Rom rom) {
-	mmu.WriteRom(rom.GetData(), rom.GetRomSize());
+	mmu.WriteRom(rom.GetData());
 	for (uint8_t i = 0; i < rom.GetNumRomBanks(); i++) {
 		mmu.WriteRomBank(rom.GetData(), i);
 	}
@@ -42,7 +42,7 @@ void GameBoy::UpdateJoypadMemory(uint8_t* const joypadBuffer) {
 	}
 
 	if (*joypadRegister < prevJoypadRegister) {
-		// cpu.RequestInterrupt(4);
+		cpu.RequestInterrupt(4);
 	}
 }
 
@@ -53,6 +53,7 @@ void GameBoy::StepEmulation () {
 
 	size_t cyclesDone = 0;
 	while (cyclesDone < cyclesThisUpdate) {
+
 		// By calling this inside this loop, we ensure it's getting the selected pa-
 		//rt of the game pad.
 
@@ -74,7 +75,6 @@ void GameBoy::StepInstruction () {
 	this->StepTimers(cpu.clockCycles);
 	ppu.StepUpdate(cpu.clockCycles);
 	cpu.ProcessInterrupts();
-
 }
 
 void GameBoy::StepTimers (const uint32_t cycles) {

@@ -89,10 +89,10 @@ void CPU::ExecuteInstruction(uint8_t opcode) {
 }
 
 void CPU::RequestInterrupt (uint8_t id) {
-	uint8_t requestRegister = mmu->ReadByte(IF);
-	requestRegister |= 0x10 >> (4 - id); // SET bit ID
-	mmu->WriteByte(IF, requestRegister);
-	std::cout << "Interrupt requested!\n" ;
+	uint8_t requests = mmu->ReadByte(IF);
+	requests |= 0x10 >> (4 - id); // SET bit ID
+	mmu->WriteByte(IF, requests);
+	// std::cout << "Interrupt requested!\n" ;
 	// isHalted = true;
 }
 
@@ -100,14 +100,17 @@ void CPU::ProcessInterrupts () {
 	if (areInterruptsEnabled == false)
 		return;
 
-	const uint8_t requestRegister = mmu->ReadByte(IF);
-	if (requestRegister == 0)
+	// std::cout << "[Processing Interrupts]\n";
+
+	const uint8_t requests = mmu->ReadByte(IF);
+	if (requests == 0)
 		return;
 
-	const uint8_t enabledRegister = mmu->ReadByte(IE);
+	const uint8_t enableds = mmu->ReadByte(IE);
+
 	for (size_t id = 0; id < 5; id++) {
-		const bool isInterruptRequested = requestRegister & (0x10 >> (4 - id));
-		const bool isInterruptEnabled   = enabledRegister & (0x10 >> (4 - id));
+		const bool isInterruptRequested = requests & (0x10 >> (4 - id));
+		const bool isInterruptEnabled   = enableds & (0x10 >> (4 - id));
 
 		if (isInterruptRequested && isInterruptEnabled) {
 			DoInterrupt(id);

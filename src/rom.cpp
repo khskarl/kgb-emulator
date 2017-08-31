@@ -36,17 +36,17 @@ Rom::Rom (const std::string path) {
 		case 0x03:
 		m_mbc = 1; // MBC1
 		break;
-		default: assert("Cartidge type unsupported!" && 0); break;
+		default: assert("Cartridge type unsupported!" && 0); break;
 	}
 
 	// 0x148 - ROM Size
 	size_t rom_size = 0;
 	switch (m_data[0x148]) {
-		case  0 : rom_size =  32 * 1024; break;
-		case  1 : rom_size =  64 * 1024; break;
-		case  2 : rom_size = 128 * 1024; break;
-		case  3 : rom_size = 256 * 1024; break;
-		case  4 : rom_size = 512 * 1024; break;
+		case  0 : rom_size =  32 * 1024;        break;
+		case  1 : rom_size =  64 * 1024;        break;
+		case  2 : rom_size = 128 * 1024;        break;
+		case  3 : rom_size = 256 * 1024;        break;
+		case  4 : rom_size = 512 * 1024;        break;
 		case  5 : rom_size =   1 * 1024 * 1024; break;
 		case  6 : rom_size =   2 * 1024 * 1024; break;
 		case  7 : rom_size =   3 * 1024 * 1024; break;

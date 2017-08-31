@@ -32,7 +32,11 @@ void run_emulator(const std::string& filepath) {
 
 	GameBoy gameBoy;
 	gameBoy.Initialize();
+	// std::cout << "IF: " <<  (int) gameBoy.GetMMU()->ReadByte(IF);
+	// std::cout << " IE: " << (int) gameBoy.GetMMU()->ReadByte(IE) << "\n";
 	gameBoy.LoadRom(rom);
+	// std::cout << "IF: " <<  (int) gameBoy.GetMMU()->ReadByte(IF);
+	// std::cout << " IE: " << (int) gameBoy.GetMMU()->ReadByte(IE) << "\n";
 
 	Disassembler disassembler(&gameBoy);
 
