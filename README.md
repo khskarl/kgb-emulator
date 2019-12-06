@@ -20,14 +20,14 @@ $ ./build/gameboy-emulator roms/tetris.gb
 -   [x] Tetris Title Screen
 -   [x] Input
 -   [ ] Pass Blargh's cpu_instr tests
--   [ ] Play Tetris
+-   [x] Play Tetris
 -   [ ] Get Opus5 working
 -   [ ] MBC1
 -   [ ] Sound
 -   [ ] Play Metroid II
 
 ## Known bugs
--   It doesn't work
+-   It doesn't work for anything else other than Tetris and Dr. Mario.
 
 ## References & Game Boy documentation
 -   [DuoDreamer's GameBoy Memory map](http://gameboy.mongenel.com/dmg/asmmemmap.html)
